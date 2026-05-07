@@ -1,0 +1,165 @@
+<mvc:View controllerName="sapwebshop.controller.ProductDetail"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:uxap="sap.uxap"
+    xmlns:layout="sap.ui.layout"
+    xmlns:core="sap.ui.core"
+    displayBlock="true">
+
+    <Page id="productDetailPage" showHeader="true" backgroundDesign="Solid">
+        <customHeader>
+            <Bar class="rsShellBar">
+                <contentLeft>
+                    <Button icon="sap-icon://nav-back" type="Transparent" tooltip="Zurück" press="onNavBack" class="rsShellBtn" />
+                    <Button icon="sap-icon://sap-logo-shape" text="RoboShop | Robotics Webshop" type="Transparent" press="onNavHome" class="rsShellLogoBtn" />
+                </contentLeft>
+                <contentMiddle>
+                    <SearchField placeholder="Produkte suchen..." width="400px" search="onSearch" class="rsShellSearch" />
+                </contentMiddle>
+                <contentRight>
+                    <Button icon="sap-icon://bell" type="Transparent" tooltip="Benachrichtigungen" press="onNotificationsPress" class="rsShellBtn" />
+                    <Button icon="sap-icon://cart" type="Transparent" tooltip="Warenkorb" press="onCartPress" class="rsShellBtn">
+                        <customData>
+                            <BadgeCustomData value="{= ${cart>/totalCount} > 0 ? ${cart>/totalCount} : ''}" />
+                        </customData>
+                    </Button>
+                    <Button icon="sap-icon://heart" type="Transparent" tooltip="Wunschliste" press="onWishlistPress" class="rsShellBtn" />
+                    <Avatar initials="MM" displaySize="XS" tooltip="Benutzerprofil" press="onUserPress" class="sapUiTinyMarginBegin rsShellAvatar" backgroundColor="Accent5" />
+                </contentRight>
+            </Bar>
+        </customHeader>
+
+        <content>
+            <!-- Product Header -->
+            <HBox class="sapUiMediumMarginBeginEnd sapUiSmallMarginBottom" justifyContent="SpaceBetween" alignItems="Start">
+                <VBox>
+                    <Title id="productName" text="" level="H2" />
+                    <HBox alignItems="Center" class="sapUiTinyMarginTop">
+                        <Text id="productId" text="" class="rsProductDetailId sapUiSmallMarginEnd" />
+                        <Text id="productManufacturer" text="" class="rsProductDetailId sapUiSmallMarginEnd" />
+                        <ObjectStatus id="productStock" text="" state="Success" />
+                    </HBox>
+                </VBox>
+                <VBox alignItems="End">
+                    <Text text="Listenpreis (netto)" class="rsProductPriceLabel" />
+                    <Title id="productPrice" text="" level="H1" class="rsProductPriceMain" />
+                    <Text text="zzgl. MwSt. &amp; Versand" class="rsProductPriceLabel" />
+                </VBox>
+            </HBox>
+
+            <!-- Main Content: Images + Config -->
+            <HBox class="sapUiMediumMarginBeginEnd sapUiMediumMarginBottom rsDetailLayout" alignItems="Start" wrap="Wrap">
+                <!-- Image Column -->
+                <VBox class="rsDetailImageColumn sapUiSmallMarginEnd">
+                    <VBox class="rsDetailImageThumbs" id="thumbnailContainer" />
+                    <Panel class="rsDetailMainImagePanel">
+                        <Image id="mainProductImage" src="" width="100%" class="rsDetailMainImage" />
+                    </Panel>
+                </VBox>
+
+                <!-- Config Column -->
+                <Panel class="rsDetailConfigPanel" backgroundDesign="Transparent">
+                    <headerToolbar>
+                        <Toolbar>
+                            <Title text="Konfiguration &amp; Bestellung" level="H4" />
+                        </Toolbar>
+                    </headerToolbar>
+                    <content>
+                        <VBox class="sapUiSmallMarginBeginEnd sapUiSmallMarginBottom">
+                            <Label text="Variante" class="sapUiTinyMarginTop" />
+                            <Select id="variantSelect" class="rsFullWidth" />
+
+                            <Label text="Steuerungseinheit" class="sapUiSmallMarginTop" />
+                            <Select id="controllerSelect" class="rsFullWidth" />
+
+                            <Label text="Menge" class="sapUiSmallMarginTop" />
+                            <StepInput id="quantityInput" min="1" max="99" value="1" step="1" change="onQuantityChange" width="120px" />
+
+                            <HBox justifyContent="SpaceBetween" class="sapUiSmallMarginTop">
+                                <Text text="Grundpreis" />
+                                <Text id="basePriceText" text="" />
+                            </HBox>
+                            <HBox justifyContent="SpaceBetween" class="sapUiTinyMarginTop">
+                                <Text text="Controller" />
+                                <Text text="inklusive" />
+                            </HBox>
+                            <HBox justifyContent="SpaceBetween" class="sapUiSmallMarginTop">
+                                <Title text="Gesamtpreis" level="H5" />
+                                <Title id="totalPriceText" text="" level="H5" class="rsPriceHighlight" />
+                            </HBox>
+
+                            <Button id="addToCartBtn" text="In den Warenkorb" type="Emphasized" icon="sap-icon://cart" press="onAddToCart" width="100%" class="sapUiSmallMarginTop rsCartBtn" />
+                            <Button id="pdpWishlistBtn" text="Zur Wunschliste" type="Default" icon="sap-icon://heart" press="onAddToWishlist" width="100%" class="sapUiTinyMarginTop" />
+
+                            <VBox class="sapUiSmallMarginTop rsDeliveryInfo">
+                                <HBox alignItems="Center" class="sapUiTinyMarginBottom">
+                                    <core:Icon src="sap-icon://accept" color="Positive" class="sapUiTinyMarginEnd" />
+                                    <Text id="stockDetailText" text="Auf Lager — Lieferung in 3–5 Werktagen" />
+                                </HBox>
+                                <HBox alignItems="Center" class="sapUiTinyMarginBottom">
+                                    <core:Icon src="sap-icon://shipping-status" class="sapUiTinyMarginEnd" />
+                                    <Text text="Kostenloser Versand (Spedition)" />
+                                </HBox>
+                                <HBox alignItems="Center" class="sapUiTinyMarginBottom">
+                                    <core:Icon src="sap-icon://wrench" class="sapUiTinyMarginEnd" />
+                                    <Text text="Inbetriebnahme durch Techniker buchbar" />
+                                </HBox>
+                                <HBox alignItems="Center">
+                                    <core:Icon src="sap-icon://locked" class="sapUiTinyMarginEnd" />
+                                    <Text text="2 Jahre Herstellergarantie" />
+                                </HBox>
+                            </VBox>
+
+                            <Panel class="sapUiSmallMarginTop" backgroundDesign="Transparent">
+                                <headerToolbar>
+                                    <Toolbar height="auto">
+                                        <Title text="Fragen zu diesem Produkt?" level="H6" />
+                                    </Toolbar>
+                                </headerToolbar>
+                                <content>
+                                    <Button text="Vertrieb kontaktieren" icon="sap-icon://phone" type="Transparent" width="100%" press="onContactSales" />
+                                </content>
+                            </Panel>
+                        </VBox>
+                    </content>
+                </Panel>
+            </HBox>
+
+            <!-- Tabs: Description / Tech Data / Downloads -->
+            <VBox class="sapUiMediumMarginBeginEnd sapUiMediumMarginBottom">
+                <IconTabBar id="productTabs" expanded="true">
+                    <items>
+                        <IconTabFilter text="Beschreibung" key="desc">
+                            <VBox class="sapUiSmallMarginTop">
+                                <Text id="productDescription" text="" wrapping="true" class="sapUiSmallMarginBottom" />
+                                <HBox wrap="Wrap" id="specHighlights" class="rsSpecHighlights" />
+                            </VBox>
+                        </IconTabFilter>
+                        <IconTabFilter text="Technische Daten" key="tech">
+                            <VBox id="techDataContainer" class="sapUiSmallMarginTop" />
+                        </IconTabFilter>
+                        <IconTabFilter text="Downloads" key="downloads">
+                            <VBox class="sapUiSmallMarginTop">
+                                <HBox alignItems="Center" class="sapUiSmallMarginBottom">
+                                    <core:Icon src="sap-icon://pdf-attachment" size="1.5rem" class="sapUiSmallMarginEnd" />
+                                    <Link text="Datenblatt (PDF)" press="onDownload" />
+                                </HBox>
+                                <HBox alignItems="Center" class="sapUiSmallMarginBottom">
+                                    <core:Icon src="sap-icon://pdf-attachment" size="1.5rem" class="sapUiSmallMarginEnd" />
+                                    <Link text="Betriebsanleitung (PDF)" press="onDownload" />
+                                </HBox>
+                                <HBox alignItems="Center">
+                                    <core:Icon src="sap-icon://excel-attachment" size="1.5rem" class="sapUiSmallMarginEnd" />
+                                    <Link text="CAD-Daten (STEP)" press="onDownload" />
+                                </HBox>
+                            </VBox>
+                        </IconTabFilter>
+                        <IconTabFilter text="Zubehör" key="accessories">
+                            <Text text="Passendes Zubehör wird geladen..." class="sapUiSmallMarginTop" />
+                        </IconTabFilter>
+                    </items>
+                </IconTabBar>
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>

@@ -1,0 +1,114 @@
+<mvc:View controllerName="sapwebshop.controller.OrderHistory"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    displayBlock="true">
+
+    <Page id="orderHistoryPage" showHeader="true" backgroundDesign="Solid">
+        <customHeader>
+            <Bar class="rsShellBar">
+                <contentLeft>
+                    <Button icon="sap-icon://nav-back" type="Transparent" press="onNavBack" />
+                    <core:Icon src="sap-icon://sap-logo-shape" size="2rem" color="#ffffff" class="sapUiTinyMarginEnd" />
+                    <Title text="RoboShop | Robotics Webshop" level="H5" />
+                </contentLeft>
+                <contentMiddle>
+                    <SearchField placeholder="Bestellnummer suchen..." width="400px" search="onSearch" />
+                </contentMiddle>
+                <contentRight>
+                    <Button icon="sap-icon://bell" type="Transparent" />
+                    <Button icon="sap-icon://cart" type="Transparent" press="onCartPress" />
+                    <Button icon="sap-icon://heart" type="Transparent" press="onWishlistPress" />
+                    <Avatar initials="MM" displaySize="XS" class="sapUiTinyMarginBegin" />
+                </contentRight>
+            </Bar>
+        </customHeader>
+
+        <content>
+            <Breadcrumbs class="sapUiMediumMarginBegin sapUiSmallMarginTop sapUiSmallMarginBottom">
+                <links>
+                    <Link text="Home" press="onNavHome" />
+                </links>
+            </Breadcrumbs>
+
+            <HBox class="sapUiMediumMarginBeginEnd sapUiSmallMarginBottom" justifyContent="SpaceBetween" alignItems="Center">
+                <Title text="Meine Bestellungen" level="H2" />
+                <HBox>
+                    <Select id="timeFilter" change="onTimeFilterChange" class="sapUiSmallMarginEnd">
+                        <items>
+                            <core:Item key="all" text="Alle Zeiträume" />
+                            <core:Item key="2026" text="2026" />
+                            <core:Item key="2025" text="2025" />
+                        </items>
+                    </Select>
+                    <Select id="statusFilter" change="onStatusFilterChange">
+                        <items>
+                            <core:Item key="all" text="Alle Status" />
+                            <core:Item key="Geliefert" text="Geliefert" />
+                            <core:Item key="In Bearbeitung" text="In Bearbeitung" />
+                            <core:Item key="Versandt" text="Versandt" />
+                            <core:Item key="Storniert" text="Storniert" />
+                        </items>
+                    </Select>
+                </HBox>
+            </HBox>
+
+            <!-- Orders Table -->
+            <VBox class="sapUiMediumMarginBeginEnd">
+                <Panel backgroundDesign="Transparent">
+                    <content>
+                        <Table id="ordersTable" noDataText="Keine Bestellungen gefunden."
+                            items="{filteredOrders>/orders}">
+                            <columns>
+                                <Column><Text text="Bestellnummer" /></Column>
+                                <Column><Text text="Bestelldatum" /></Column>
+                                <Column><Text text="Produkte" /></Column>
+                                <Column hAlign="End"><Text text="Gesamtbetrag" /></Column>
+                                <Column><Text text="Status" /></Column>
+                                <Column><Text text="Lieferdatum" /></Column>
+                                <Column><Text text="" /></Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem>
+                                    <cells>
+                                        <Link text="{filteredOrders>orderId}" press="onOrderPress" class="rsOrderLink" />
+                                        <Text text="{filteredOrders>date}" />
+                                        <VBox id="orderItemsCell">
+                                            <Text text="{parts: [{path: 'filteredOrders>items'}], formatter: '.formatFirstItem'}" />
+                                            <Text text="{parts: [{path: 'filteredOrders>items'}], formatter: '.formatMoreItems'}" class="rsMoreItems" />
+                                        </VBox>
+                                        <ObjectNumber number="{parts: [{path: 'filteredOrders>totalPrice'}], formatter: '.formatPrice'}" unit="€" />
+                                        <ObjectStatus text="{filteredOrders>status}" state="{filteredOrders>statusState}" />
+                                        <Text text="{filteredOrders>deliveryDate}" />
+                                        <HBox>
+                                            <Button text="Details" type="Transparent" press="onOrderPress" class="sapUiSmallMarginEnd" />
+                                            <Button text="{parts: [{path: 'filteredOrders>status'}], formatter: '.formatActionBtn'}"
+                                                    visible="{parts: [{path: 'filteredOrders>status'}], formatter: '.formatActionBtnVisible'}"
+                                                    type="Transparent" press="onOrderAction" />
+                                        </HBox>
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                    </content>
+                </Panel>
+            </VBox>
+
+            <!-- Statistics -->
+            <HBox class="sapUiMediumMarginBeginEnd sapUiMediumMarginTop sapUiMediumMarginBottom rsOrderStatsRow" wrap="Wrap">
+                <VBox class="rsOrderStat" alignItems="Center">
+                    <Title id="totalOrdersCount" text="5" level="H1" class="rsPriceHighlight" />
+                    <Text text="Bestellungen gesamt" />
+                </VBox>
+                <VBox class="rsOrderStat" alignItems="Center">
+                    <Title id="totalRevenue" text="€ 308.428" level="H1" class="rsPriceHighlight" />
+                    <Text text="Gesamtumsatz" />
+                </VBox>
+                <VBox class="rsOrderStat" alignItems="Center">
+                    <Title id="deliveredCount" text="3" level="H1" class="rsPriceHighlight" />
+                    <Text text="Erfolgreich geliefert" />
+                </VBox>
+            </HBox>
+        </content>
+    </Page>
+</mvc:View>

@@ -1,0 +1,173 @@
+{
+  "_version": "1.84.0",
+  "sap.app": {
+    "id": "sapwebshop",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "applicationVersion": {
+      "version": "1.0.0"
+    },
+    "title": "RoboShop – Robotics Webshop",
+    "description": "SAP Fiori Webshop für Industrieroboter"
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "flexEnabled": false,
+    "dependencies": {
+      "minUI5Version": "1.120.0",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {},
+        "sap.uxap": {},
+        "sap.f": {},
+        "sap.ui.layout": {}
+      }
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "sapwebshop.i18n.i18n"
+        }
+      },
+      "products": {
+        "type": "sap.ui.model.json.JSONModel",
+        "uri": "model/products.json"
+      },
+      "orders": {
+        "type": "sap.ui.model.json.JSONModel",
+        "uri": "model/orders.json"
+      }
+    },
+    "resources": {
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "controlAggregation": "pages",
+        "controlId": "app",
+        "transition": "slide",
+        "type": "View",
+        "viewType": "XML",
+        "path": "sapwebshop.view",
+        "async": true
+      },
+      "routes": [
+        {
+          "name": "Home",
+          "pattern": "",
+          "target": ["Home"]
+        },
+        {
+          "name": "ProductList",
+          "pattern": "products/{category}",
+          "target": ["ProductList"]
+        },
+        {
+          "name": "ProductDetail",
+          "pattern": "product/{productId}",
+          "target": ["ProductDetail"]
+        },
+        {
+          "name": "Cart",
+          "pattern": "cart",
+          "target": ["Cart"]
+        },
+        {
+          "name": "OrderHistory",
+          "pattern": "orders",
+          "target": ["OrderHistory"]
+        },
+        {
+          "name": "Wishlist",
+          "pattern": "wishlist",
+          "target": ["Wishlist"]
+        },
+        {
+          "name": "Notifications",
+          "pattern": "notifications",
+          "target": ["Notifications"]
+        },
+        {
+          "name": "Profile",
+          "pattern": "profile",
+          "target": ["Profile"]
+        },
+        {
+          "name": "Support",
+          "pattern": "support",
+          "target": ["Support"]
+        }
+      ],
+      "targets": {
+        "Home": {
+          "id": "Home",
+          "name": "Home",
+          "viewLevel": 1
+        },
+        "ProductList": {
+          "id": "ProductList",
+          "name": "ProductList",
+          "viewLevel": 2
+        },
+        "ProductDetail": {
+          "id": "ProductDetail",
+          "name": "ProductDetail",
+          "viewLevel": 3
+        },
+        "Cart": {
+          "id": "Cart",
+          "name": "Cart",
+          "viewLevel": 2
+        },
+        "OrderHistory": {
+          "id": "OrderHistory",
+          "name": "OrderHistory",
+          "viewLevel": 2
+        },
+        "Wishlist": {
+          "id": "Wishlist",
+          "name": "Wishlist",
+          "viewLevel": 2
+        },
+        "Notifications": {
+          "id": "Notifications",
+          "name": "Notifications",
+          "viewLevel": 2
+        },
+        "Profile": {
+          "id": "Profile",
+          "name": "Profile",
+          "viewLevel": 2
+        },
+        "Support": {
+          "id": "Support",
+          "name": "Support",
+          "viewLevel": 2
+        }
+      }
+    },
+    "rootView": {
+      "viewName": "sapwebshop.view.App",
+      "type": "XML",
+      "id": "App",
+      "async": true
+    }
+  }
+}

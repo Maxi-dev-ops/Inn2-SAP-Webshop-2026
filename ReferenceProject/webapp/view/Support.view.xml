@@ -1,0 +1,101 @@
+<mvc:View controllerName="sapwebshop.controller.Support"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    displayBlock="true">
+
+    <Page id="supportPage" showHeader="true" backgroundDesign="Solid">
+        <customHeader>
+            <Bar class="rsShellBar">
+                <contentLeft>
+                    <Button icon="sap-icon://nav-back" type="Transparent" tooltip="Zurück" press="onNavBack" class="rsShellBtn" />
+                    <Button icon="sap-icon://sap-logo-shape" text="RoboShop | Robotics Webshop" type="Transparent" press="onNavHome" class="rsShellLogoBtn" />
+                </contentLeft>
+                <contentMiddle>
+                    <SearchField placeholder="Produkte suchen..." width="400px" search="onSearch" class="rsShellSearch" />
+                </contentMiddle>
+                <contentRight>
+                    <Button icon="sap-icon://bell" type="Transparent" tooltip="Benachrichtigungen" press="onNotificationsPress" class="rsShellBtn" />
+                    <Button icon="sap-icon://cart" type="Transparent" tooltip="Warenkorb" press="onCartPress" class="rsShellBtn">
+                        <customData>
+                            <BadgeCustomData value="{= ${cart>/totalCount} > 0 ? ${cart>/totalCount} : ''}" />
+                        </customData>
+                    </Button>
+                    <Button icon="sap-icon://heart" type="Transparent" tooltip="Wunschliste" press="onWishlistPress" class="rsShellBtn" />
+                    <Avatar initials="MM" displaySize="XS" tooltip="Benutzerprofil" press="onUserPress" class="sapUiTinyMarginBegin rsShellAvatar" backgroundColor="Accent5" />
+                </contentRight>
+            </Bar>
+        </customHeader>
+
+        <content>
+            <Title text="Support &amp; Hilfe" level="H2" class="sapUiMediumMarginBegin sapUiSmallMarginTop sapUiSmallMarginBottom" />
+
+            <!-- Contact Cards -->
+            <HBox wrap="Wrap" class="sapUiMediumMarginBeginEnd sapUiSmallMarginBottom rsInfoRow">
+                <Panel backgroundDesign="Transparent" class="rsInfoBox">
+                    <content>
+                        <VBox class="sapUiSmallMargin" alignItems="Center">
+                            <core:Icon src="sap-icon://phone" size="2.5rem" color="#0064d9" class="sapUiSmallMarginBottom" />
+                            <Title text="Telefon-Support" level="H5" />
+                            <Text text="+49 800 727-62626" class="sapUiTinyMarginTop" />
+                            <Text text="Mo–Fr 08:00–18:00 Uhr" class="sapUiTinyMarginTop rsProfileRole" />
+                            <Button text="Jetzt anrufen" type="Emphasized" press="onCallSupport" class="sapUiSmallMarginTop" />
+                        </VBox>
+                    </content>
+                </Panel>
+                <Panel backgroundDesign="Transparent" class="rsInfoBox">
+                    <content>
+                        <VBox class="sapUiSmallMargin" alignItems="Center">
+                            <core:Icon src="sap-icon://email" size="2.5rem" color="#0064d9" class="sapUiSmallMarginBottom" />
+                            <Title text="E-Mail-Support" level="H5" />
+                            <Text text="support@roboshop.de" class="sapUiTinyMarginTop" />
+                            <Text text="Antwort innerhalb von 24h" class="sapUiTinyMarginTop rsProfileRole" />
+                            <Button text="E-Mail senden" type="Emphasized" press="onEmailSupport" class="sapUiSmallMarginTop" />
+                        </VBox>
+                    </content>
+                </Panel>
+                <Panel backgroundDesign="Transparent" class="rsInfoBox">
+                    <content>
+                        <VBox class="sapUiSmallMargin" alignItems="Center">
+                            <core:Icon src="sap-icon://discussion-2" size="2.5rem" color="#0064d9" class="sapUiSmallMarginBottom" />
+                            <Title text="Live-Chat" level="H5" />
+                            <Text text="Echtzeit-Beratung" class="sapUiTinyMarginTop" />
+                            <Text text="Mo–Fr 09:00–17:00 Uhr" class="sapUiTinyMarginTop rsProfileRole" />
+                            <Button text="Chat starten" type="Emphasized" press="onStartChat" class="sapUiSmallMarginTop" />
+                        </VBox>
+                    </content>
+                </Panel>
+            </HBox>
+
+            <!-- FAQ -->
+            <Title text="Häufig gestellte Fragen" level="H4" class="sapUiMediumMarginBegin sapUiSmallMarginTop sapUiSmallMarginBottom" />
+            <VBox class="sapUiMediumMarginBeginEnd sapUiMediumMarginBottom">
+                <Panel backgroundDesign="Transparent" class="rsFaqPanel" headerText="Wie lange dauert die Lieferung?" expandable="true" expanded="false">
+                    <content>
+                        <Text text="Artikel auf Lager werden innerhalb von 3–5 Werktagen per Spedition geliefert. Für bestellbare Artikel beträgt die Lieferzeit 4–6 Wochen ab Bestelleingang." wrapping="true" class="sapUiSmallMargin" />
+                    </content>
+                </Panel>
+                <Panel backgroundDesign="Transparent" class="rsFaqPanel" headerText="Gibt es eine Garantie?" expandable="true" expanded="false">
+                    <content>
+                        <Text text="Alle Roboter-Systeme werden mit 2 Jahren Herstellergarantie geliefert. Eine optionale Servicevereinbarung mit 24/7-Support ist erhältlich." wrapping="true" class="sapUiSmallMargin" />
+                    </content>
+                </Panel>
+                <Panel backgroundDesign="Transparent" class="rsFaqPanel" headerText="Kann ich einen Artikel zurückgeben?" expandable="true" expanded="false">
+                    <content>
+                        <Text text="Ja, innerhalb von 14 Tagen nach Lieferung können nicht konfigurierte Standardartikel zurückgegeben werden. Konfigurierte Systeme sind vom Rückgaberecht ausgeschlossen." wrapping="true" class="sapUiSmallMargin" />
+                    </content>
+                </Panel>
+                <Panel backgroundDesign="Transparent" class="rsFaqPanel" headerText="Welche Zahlungsarten werden akzeptiert?" expandable="true" expanded="false">
+                    <content>
+                        <Text text="Wir akzeptieren Kauf auf Rechnung (30 Tage netto), SEPA-Lastschrift sowie Zahlung per Kreditkarte. Für Großaufträge bieten wir individuelle Finanzierungsoptionen." wrapping="true" class="sapUiSmallMargin" />
+                    </content>
+                </Panel>
+                <Panel backgroundDesign="Transparent" class="rsFaqPanel" headerText="Bieten Sie Inbetriebnahme-Service an?" expandable="true" expanded="false">
+                    <content>
+                        <Text text="Ja, unsere zertifizierten SAP-Techniker übernehmen Installation, Konfiguration und Schulung vor Ort. Bitte wenden Sie sich an unseren Vertrieb für ein individuelles Angebot." wrapping="true" class="sapUiSmallMargin" />
+                    </content>
+                </Panel>
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>

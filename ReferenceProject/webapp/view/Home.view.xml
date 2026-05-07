@@ -1,0 +1,112 @@
+<mvc:View controllerName="sapwebshop.controller.Home"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    displayBlock="true">
+
+    <Page id="homePage" showHeader="true" backgroundDesign="Solid">
+        <customHeader>
+            <Bar class="rsShellBar">
+                <contentLeft>
+                    <Button icon="sap-icon://sap-logo-shape" text="RoboShop | Robotics Webshop" type="Transparent" press="onNavHome" class="rsShellLogoBtn" />
+                </contentLeft>
+                <contentMiddle>
+                    <SearchField id="headerSearch" placeholder="Produkte suchen..." width="360px" search="onHeaderSearch" class="rsShellSearch" />
+                </contentMiddle>
+                <contentRight>
+                    <Button icon="sap-icon://bell" type="Transparent" tooltip="Benachrichtigungen" press="onNotificationsPress" class="rsShellBtn" />
+                    <Button id="cartBtn" icon="sap-icon://cart" type="Transparent" tooltip="Warenkorb" press="onCartPress" class="rsShellBtn">
+                        <customData>
+                            <BadgeCustomData value="{= ${cart>/totalCount} > 0 ? ${cart>/totalCount} : ''}" />
+                        </customData>
+                    </Button>
+                    <Button icon="sap-icon://heart" type="Transparent" tooltip="Wunschliste" press="onWishlistPress" class="rsShellBtn" />
+                    <Avatar initials="MM" displaySize="XS" tooltip="Benutzerprofil" press="onUserPress" class="sapUiTinyMarginBegin rsShellAvatar" backgroundColor="Accent5" />
+                </contentRight>
+            </Bar>
+        </customHeader>
+
+        <content>
+            <!-- Hero Banner -->
+            <Panel backgroundDesign="Transparent" class="rsHeroBanner">
+                <content>
+                    <HBox justifyContent="SpaceBetween" alignItems="Center" class="rsHeroBannerInner">
+                        <VBox class="rsHeroContent">
+                            <Text text="NEUHEIT 2026" class="rsHeroLabel" />
+                            <Title text="Intelligente Robotik&#xa;für Ihre Produktion" level="H1" wrapping="true" class="rsHeroTitle" />
+                            <Text text="Entdecken Sie unsere Kollektion präziser Industrie- und Kollaborationsroboter — direkt konfigurierbar und lieferbar." class="rsHeroText" wrapping="true" />
+                            <HBox class="sapUiMediumMarginTop">
+                                <Button text="Produkte entdecken" type="Emphasized" press="onExplorePress" class="sapUiSmallMarginEnd" />
+                                <Button text="Katalog herunterladen" type="Default" press="onDownloadCatalog" class="rsHeroCatalogBtn" />
+                            </HBox>
+                        </VBox>
+                        <Image id="heroImage" src="images/safelog-roboter-pj8.webp" width="320px" height="260px" class="rsHeroImage" />
+                    </HBox>
+                </content>
+            </Panel>
+
+            <!-- Categories -->
+            <VBox class="sapUiSmallMarginTop sapUiMediumMarginBeginEnd">
+                <HBox justifyContent="SpaceBetween" alignItems="Center" class="sapUiTinyMarginBottom">
+                    <Title text="Kategorien" level="H4" />
+                    <Link text="Alle anzeigen →" press="onAllCategoriesPress" />
+                </HBox>
+                <HBox id="categoryRow" wrap="Wrap" class="rsCategoryRow" />
+            </VBox>
+
+            <!-- New Arrivals -->
+            <VBox class="sapUiMediumMarginBeginEnd rsPremiumSection">
+                <HBox justifyContent="SpaceBetween" alignItems="Center" class="sapUiSmallMarginBottom">
+                    <Title text="Neu im Sortiment" level="H3" class="rsPremiumTitle" />
+                    <Link text="Alle Neuheiten →" press="onAllProductsPress" />
+                </HBox>
+                <HBox wrap="Wrap" id="newProductsBox" class="rsFeaturedRow" />
+            </VBox>
+
+            <!-- Deal of the Day -->
+            <VBox id="dealOfTheDay" class="sapUiMediumMarginTop sapUiMediumMarginBeginEnd rsHomeSection" />
+
+            <!-- Featured Products -->
+            <VBox class="sapUiMediumMarginBeginEnd rsPremiumSection">
+                <HBox justifyContent="SpaceBetween" alignItems="Center" class="sapUiSmallMarginBottom">
+                    <Title text="Empfohlene Produkte" level="H3" class="rsPremiumTitle" />
+                    <Link text="Alle Produkte →" press="onAllProductsPress" />
+                </HBox>
+                <Carousel id="featuredProductsCarousel" loop="true" class="rsProductCarousel" arrowsPlacement="Content" pageIndicatorPlacement="Bottom">
+                    <!-- Pages are added from controller -->
+                </Carousel>
+            </VBox>
+
+            <HBox wrap="Wrap" class="sapUiMediumMarginBeginEnd sapUiMediumMarginTop sapUiMediumMarginBottom rsInfoRow">
+                <VBox class="rsInfoBox">
+                    <HBox alignItems="Center">
+                        <core:Icon src="sap-icon://shipping-status" size="2rem" class="sapUiSmallMarginEnd rsInfoIcon" />
+                        <VBox>
+                            <Title text="Kostenloser Versand" level="H6" />
+                            <Text text="Ab € 10.000 Bestellwert" class="sapUiTinyMarginTop" />
+                        </VBox>
+                    </HBox>
+                </VBox>
+                <VBox class="rsInfoBox rsInfoBoxClickable">
+                    <HBox alignItems="Center">
+                        <core:Icon src="sap-icon://wrench" size="2rem" class="sapUiSmallMarginEnd rsInfoIcon" />
+                        <VBox>
+                            <Title text="24/7 Technischer Support" level="H6" />
+                            <Text text="Zertifizierte SAP-Experten" class="sapUiTinyMarginTop" />
+                            <Link text="Support kontaktieren →" press="onSupportPress" class="sapUiTinyMarginTop" />
+                        </VBox>
+                    </HBox>
+                </VBox>
+                <VBox class="rsInfoBox">
+                    <HBox alignItems="Center">
+                        <core:Icon src="sap-icon://locked" size="2rem" class="sapUiSmallMarginEnd rsInfoIcon" />
+                        <VBox>
+                            <Title text="2 Jahre Garantie" level="H6" />
+                            <Text text="Auf alle Roboter-Systeme" class="sapUiTinyMarginTop" />
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </HBox>
+        </content>
+    </Page>
+</mvc:View>
