@@ -9,7 +9,7 @@
 |**Service Type**<br>SAP System (ABAP On-Premise)|
 |**Service URL**<br>https://t4eclnt100.dest/sap/opu/odata/sap/ZINN2_UI_MY_SHOP_CATA_O2|
 |**Module Name**<br>sap-webshop|
-|**Application Title**<br>SAP-WEBSHOP-2026|
+|**Application Title**<br>SAP-Webshop-2026|
 |**Namespace**<br>com.sap_webshop_2026|
 |**UI5 Theme**<br>sap_horizon|
 |**UI5 Version**<br>1.102.8|

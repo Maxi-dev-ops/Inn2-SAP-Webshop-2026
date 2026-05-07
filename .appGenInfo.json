@@ -6,7 +6,7 @@
     "metadataFilename": "",
     "serviceUrl": "https://t4eclnt100.dest/sap/opu/odata/sap/ZINN2_UI_MY_SHOP_CATA_O2",
     "appName": "sap-webshop",
-    "appTitle": "SAP-WEBSHOP-2026",
+    "appTitle": "SAP-Webshop-2026",
     "appDescription": "An B2B SAP Fiori Webshop",
     "appNamespace": "com.sap_webshop_2026",
     "ui5Theme": "sap_horizon",
