@@ -1,0 +1,63 @@
+# yaml-language-server: $schema=https://sap.github.io/ui5-tooling/schema/ui5.yaml.json
+
+specVersion: "4.0"
+metadata:
+  name: com.sapwebshop2026.sapwebshop
+type: application
+framework:
+  name: SAPUI5
+  version: 1.102.8
+  libraries:
+    - name: sap.m
+    - name: sap.ui.core
+    - name: sap.ushell
+    - name: themelib_sap_horizon
+server:
+  customMiddleware:
+    - name: fiori-tools-appreload
+      afterMiddleware: compression
+      configuration:
+        port: 35729
+        path: webapp
+        delay: 300
+    - name: ui5-tooling-transpile-middleware
+      afterMiddleware: compression
+      configuration:
+        debug: true
+        transformModulesToUI5:
+          overridesToOverride: true
+        excludePatterns:
+          - /Component-preload.js
+    - name: fiori-tools-preview
+      afterMiddleware: fiori-tools-appreload
+      configuration:
+        flp:
+          theme: sap_horizon
+    - name: fiori-tools-proxy
+      afterMiddleware: compression
+      configuration:
+        ignoreCertErrors: false # If set to true, certificate errors will be ignored. E.g. self-signed certificates will be accepted
+        backend:
+          - path: /sap
+            url: https://t4eclnt100.dest
+            destination: T4ECLNT100
+    - name: sap-fe-mockserver
+      beforeMiddleware: csp
+      configuration:
+        mountPath: /
+        services:
+          - urlPath: /sap/opu/odata/sap/ZINN2_UI_MY_SHOP_CATA_O2
+            metadataPath: ./webapp/localService/mainService/metadata.xml
+            mockdataPath: ./webapp/localService/mainService/data
+            generateMockData: true
+        annotations:
+          - localPath: ./webapp/localService/mainService/ZINN2_UI_MY_SHOP_CATA_O2_VAN.xml
+            urlPath: /sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZINN2_UI_MY_SHOP_CATA_O2_VAN',Version='0001')/$value/
+builder:
+  customTasks:
+    - name: ui5-tooling-transpile-task
+      afterTask: replaceVersion
+      configuration:
+        debug: true
+        transformModulesToUI5:
+          overridesToOverride: true

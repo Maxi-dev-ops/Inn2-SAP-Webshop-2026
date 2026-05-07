@@ -1,0 +1,853 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:sap="http://www.sap.com/Protocols/SAPData">
+    <edmx:Reference Uri="http://tld-vm-t4e.telekom.site:50000/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_AGGREGATION',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="Org.OData.Aggregation.V1" Alias="Aggregation"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="http://tld-vm-t4e.telekom.site:50000/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_ANALYTICS',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.Analytics.v1" Alias="Analytics"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="http://tld-vm-t4e.telekom.site:50000/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CAPABILITIES',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="Org.OData.Capabilities.V1" Alias="Capabilities"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="http://tld-vm-t4e.telekom.site:50000/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CODELIST',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.CodeList.v1" Alias="SAP__CodeList"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="http://tld-vm-t4e.telekom.site:50000/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMON',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.Common.v1" Alias="Common"/>
+        <edmx:Include Namespace="com.sap.vocabularies.Common.v1" Alias="SAP__common"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="http://tld-vm-t4e.telekom.site:50000/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMUNICATION',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.Communication.v1" Alias="Communication"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="http://tld-vm-t4e.telekom.site:50000/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CORE',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="Org.OData.Core.V1" Alias="SAP__core"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="http://tld-vm-t4e.telekom.site:50000/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_MEASURES',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="Org.OData.Measures.V1" Alias="Measures"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="http://tld-vm-t4e.telekom.site:50000/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_PDF',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.PDF.v1" Alias="SAP__PDF"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="http://tld-vm-t4e.telekom.site:50000/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_PERSONALDATA',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.PersonalData.v1" Alias="PersonalData"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="http://tld-vm-t4e.telekom.site:50000/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_UI',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.UI.v1" Alias="UI"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="http://tld-vm-t4e.telekom.site:50000/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_VALIDATION',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="Org.OData.Validation.V1" Alias="Validation"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="http://tld-vm-t4e.telekom.site:50000/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='SAP__SELF',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.PDF.v1" Alias="SAP__PDF"/>
+    </edmx:Reference>
+    <edmx:DataServices m:DataServiceVersion="2.0">
+        <Schema Namespace="cds_zinn2_ui_my_shopping_catalog" xml:lang="en" sap:schema-version="1" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+            <Annotation Term="Core.SchemaVersion" String="1.0.0" xmlns="http://docs.oasis-open.org/odata/ns/edm"/>
+            <EntityType Name="MaterialTextType" sap:label="Material Text" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Material"/>
+                    <PropertyRef Name="Language"/>
+                </Key>
+                <Property Name="Material" Type="Edm.String" Nullable="false" MaxLength="18" sap:display-format="UpperCase" sap:label="Material" sap:quickinfo="Material Number"/>
+                <Property Name="Language" Type="Edm.String" Nullable="false" MaxLength="2" sap:label="Language Key"/>
+                <Property Name="MaterialName" Type="Edm.String" MaxLength="40" sap:label="Material Description"/>
+            </EntityType>
+            <EntityType Name="ProductDescriptionType" sap:label="Product Descriptions" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Product"/>
+                    <PropertyRef Name="Language"/>
+                </Key>
+                <Property Name="Product" Type="Edm.String" Nullable="false" MaxLength="18" sap:display-format="UpperCase" sap:label="Product" sap:quickinfo="Product Number"/>
+                <Property Name="Language" Type="Edm.String" Nullable="false" MaxLength="2" sap:label="Language Key"/>
+                <Property Name="ProductDescription" Type="Edm.String" MaxLength="40" sap:label="Product Description"/>
+                <Property Name="LanguageISOCode" Type="Edm.String" MaxLength="2" sap:display-format="UpperCase" sap:label="Language" sap:quickinfo="2-Character SAP Language Code"/>
+            </EntityType>
+            <EntityType Name="ProductTextType" sap:label="Product - Text" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Product"/>
+                    <PropertyRef Name="Language"/>
+                </Key>
+                <Property Name="Product" Type="Edm.String" Nullable="false" MaxLength="18" sap:display-format="UpperCase" sap:label="Material" sap:quickinfo="Material Number"/>
+                <Property Name="Language" Type="Edm.String" Nullable="false" MaxLength="2" sap:label="Language Key"/>
+                <Property Name="ProductName" Type="Edm.String" MaxLength="40" sap:label="Product Description"/>
+            </EntityType>
+            <EntityType Name="ProductVHType" sap:label="Product Value Help" sap:value-list="true" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Product"/>
+                </Key>
+                <Property Name="Product" Type="Edm.String" Nullable="false" MaxLength="18" sap:display-format="UpperCase" sap:text="Product_Text" sap:label="Product" sap:quickinfo="Product Number"/>
+                <Property Name="Product_Text" Type="Edm.String" MaxLength="40" sap:label="Product Description" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ProductExternalID" Type="Edm.String" MaxLength="40" sap:display-format="UpperCase" sap:label="External Product ID" sap:quickinfo="External Representation of Material Number"/>
+                <Property Name="IndustrySector" Type="Edm.String" MaxLength="1" sap:display-format="UpperCase" sap:label="Industry Sector"/>
+                <Property Name="ProductType" Type="Edm.String" MaxLength="4" sap:display-format="UpperCase" sap:label="Product Type"/>
+                <Property Name="ProductGroup" Type="Edm.String" MaxLength="9" sap:display-format="UpperCase" sap:label="Product Group"/>
+                <Property Name="BaseUnit" Type="Edm.String" MaxLength="3" sap:label="Base Unit of Measure" sap:semantics="unit-of-measure"/>
+                <Property Name="GrossWeight" Type="Edm.Decimal" Precision="13" Scale="3" sap:unit="WeightUnit" sap:label="Gross Weight"/>
+                <Property Name="NetWeight" Type="Edm.Decimal" Precision="13" Scale="3" sap:unit="WeightUnit" sap:label="Net Weight"/>
+                <Property Name="WeightUnit" Type="Edm.String" MaxLength="3" sap:label="Unit of Weight" sap:semantics="unit-of-measure"/>
+                <Property Name="ManufacturerNumber" Type="Edm.String" MaxLength="10" sap:display-format="UpperCase" sap:label="Manufacturer" sap:quickinfo="Manufacturer number"/>
+                <Property Name="IsBatchManagementRequired" Type="Edm.Boolean" sap:display-format="UpperCase" sap:label="Batch Management" sap:quickinfo="Batch Management Requirement Indicator"/>
+                <Property Name="ProductManufacturerNumber" Type="Edm.String" MaxLength="40" sap:display-format="UpperCase" sap:label="Mfr Part Number" sap:quickinfo="Manufacturer Part Number"/>
+                <Property Name="ArticleCategory" Type="Edm.String" MaxLength="2" sap:display-format="UpperCase" sap:label="Product Category"/>
+                <NavigationProperty Name="to_Text" Relationship="cds_zinn2_ui_my_shopping_catalog.assoc_EB0CC7C740CCDAFFF8CA1788143D4C2D" FromRole="FromRole_assoc_EB0CC7C740CCDAFFF8CA1788143D4C2D" ToRole="ToRole_assoc_EB0CC7C740CCDAFFF8CA1788143D4C2D"/>
+            </EntityType>
+            <EntityType Name="UserType" sap:label="User" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="UserID"/>
+                </Key>
+                <Property Name="UserID" Type="Edm.String" Nullable="false" MaxLength="12" sap:display-format="UpperCase" sap:text="UserDescription" sap:label="User ID"/>
+                <Property Name="UserDescription" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="User Description"/>
+                <Property Name="IsTechnicalUser" Type="Edm.String" MaxLength="1"/>
+            </EntityType>
+            <EntityType Name="CatalogType" sap:label="Inn2: Shop Katalog (Projektion Root)" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="CatalogUuid"/>
+                </Key>
+                <Property Name="CatalogUuid" Type="Edm.Guid" Nullable="false" sap:label="Shop Katalog UUID" sap:quickinfo="Inn2: Shop Katalog UUID" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="CatalogId" Type="Edm.String" MaxLength="10" sap:display-format="NonNegative" sap:text="Title" sap:label="Shop Katalog ID" sap:quickinfo="Inn2: Shop Katalog ID" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Title" Type="Edm.String" MaxLength="255" sap:label="Shop Katalog Titel" sap:quickinfo="Inn2: Shop Katalog Titel"/>
+                <Property Name="CatalogPictureUrl" Type="Edm.String" MaxLength="255" sap:label="ProductPictureUrl" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="CreationDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:filter-restriction="interval" sap:label="Created On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="CreatedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="CreatedByUserDescription" sap:label="Created By" sap:creatable="false" sap:updatable="false" sap:value-list="standard"/>
+                <Property Name="CreatedByUserDescription" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="User Description" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="LastChangeDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:filter-restriction="interval" sap:label="Last Changed On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="LastChangedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="LastChangedByUserDescription" sap:label="Last Changed By" sap:creatable="false" sap:updatable="false" sap:value-list="standard"/>
+                <Property Name="LastChangedByUserDescription" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="User Description" sap:creatable="false" sap:updatable="false"/>
+                <NavigationProperty Name="to_CatalogItem" Relationship="cds_zinn2_ui_my_shopping_catalog.assoc_0B3FDE590C391920FC450AE9D9AF5762" FromRole="FromRole_assoc_0B3FDE590C391920FC450AE9D9AF5762" ToRole="ToRole_assoc_0B3FDE590C391920FC450AE9D9AF5762"/>
+                <NavigationProperty Name="to_CreatedByUser" Relationship="cds_zinn2_ui_my_shopping_catalog.assoc_0DCA0636ACF24F08B43A13286F6083AF" FromRole="FromRole_assoc_0DCA0636ACF24F08B43A13286F6083AF" ToRole="ToRole_assoc_0DCA0636ACF24F08B43A13286F6083AF"/>
+                <NavigationProperty Name="to_LastChangedByUser" Relationship="cds_zinn2_ui_my_shopping_catalog.assoc_8A4E791BCE3CDFDC9DEEED2B0BCA2CF3" FromRole="FromRole_assoc_8A4E791BCE3CDFDC9DEEED2B0BCA2CF3" ToRole="ToRole_assoc_8A4E791BCE3CDFDC9DEEED2B0BCA2CF3"/>
+            </EntityType>
+            <EntityType Name="CatalogItemType" sap:label="Inn2: Shop Katalog (Projektion Root)" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="CatalogItemUuid"/>
+                </Key>
+                <Property Name="addToShoppingCart_ac" Type="Edm.Boolean" sap:label="Dyn. Action Control" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="CatalogItemUuid" Type="Edm.Guid" Nullable="false" sap:label="SK Position UUID" sap:quickinfo="Inn2: Shop Katalog Position UUID" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="CatalogItemId" Type="Edm.String" MaxLength="6" sap:display-format="NonNegative" sap:label="SK Position ID" sap:quickinfo="Inn2: Shop Katalog Position ID" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="CatalogUuid" Type="Edm.Guid" sap:label="Shop Katalog UUID" sap:quickinfo="Inn2: Shop Katalog UUID" sap:creatable="false" sap:updatable="false" sap:value-list="standard"/>
+                <Property Name="Material" Type="Edm.String" MaxLength="18" sap:display-format="UpperCase" sap:text="ProductName" sap:label="Material" sap:quickinfo="Material Number" sap:value-list="standard"/>
+                <Property Name="ProductName" Type="Edm.String" MaxLength="40" sap:label="Product Description"/>
+                <Property Name="ProductPictureUrl" Type="Edm.String" MaxLength="255" sap:label="ProductPictureUrl" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ProductSalesDescription" Type="Edm.String" MaxLength="255" sap:label="Verkaufstext" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="NetPriceAmount" Type="Edm.Decimal" Precision="11" Scale="3" sap:unit="TransactionCurrency" sap:variable-scale="true" sap:label="Net Price" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="TransactionCurrency" Type="Edm.String" MaxLength="5" sap:display-format="UpperCase" sap:label="Document Currency" sap:quickinfo="SD Document Currency" sap:creatable="false" sap:updatable="false" sap:semantics="currency-code"/>
+                <Property Name="CreationDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:filter-restriction="interval" sap:label="Created On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="CreatedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="CreatedByUserDescription" sap:label="Created By" sap:creatable="false" sap:updatable="false" sap:value-list="standard"/>
+                <Property Name="CreatedByUserDescription" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="User Description" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="LastChangeDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:filter-restriction="interval" sap:label="Last Changed On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="LastChangedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="LastChangedByUserDescription" sap:label="Last Changed By" sap:creatable="false" sap:updatable="false" sap:value-list="standard"/>
+                <Property Name="LastChangedByUserDescription" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="User Description" sap:creatable="false" sap:updatable="false"/>
+                <NavigationProperty Name="to_Catalog" Relationship="cds_zinn2_ui_my_shopping_catalog.assoc_0B3FDE590C391920FC450AE9D9AF5762" FromRole="ToRole_assoc_0B3FDE590C391920FC450AE9D9AF5762" ToRole="FromRole_assoc_0B3FDE590C391920FC450AE9D9AF5762"/>
+                <NavigationProperty Name="to_BundleItem" Relationship="cds_zinn2_ui_my_shopping_catalog.assoc_E11480D02A97ECD5DFC3CA938CDEB675" FromRole="FromRole_assoc_E11480D02A97ECD5DFC3CA938CDEB675" ToRole="ToRole_assoc_E11480D02A97ECD5DFC3CA938CDEB675"/>
+                <NavigationProperty Name="to_CreatedByUser" Relationship="cds_zinn2_ui_my_shopping_catalog.assoc_2A7737C1223EDD0637E5B00946E3975C" FromRole="FromRole_assoc_2A7737C1223EDD0637E5B00946E3975C" ToRole="ToRole_assoc_2A7737C1223EDD0637E5B00946E3975C"/>
+                <NavigationProperty Name="to_LastChangedByUser" Relationship="cds_zinn2_ui_my_shopping_catalog.assoc_95863AFE44BC6EE8AD4E50CD90F3B274" FromRole="FromRole_assoc_95863AFE44BC6EE8AD4E50CD90F3B274" ToRole="ToRole_assoc_95863AFE44BC6EE8AD4E50CD90F3B274"/>
+            </EntityType>
+            <EntityType Name="BundleItemType" sap:label="Inn2: Warenkorb Item BOM (Projektion)" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="BillOfMaterialItemUUID"/>
+                </Key>
+                <Property Name="BillOfMaterialItemUUID" Type="Edm.Guid" Nullable="false" sap:label="ID item chge status" sap:quickinfo="Global identification of an item's change status"/>
+                <Property Name="BillOfMaterialCategory" Type="Edm.String" MaxLength="1" sap:display-format="UpperCase" sap:label="BOM category"/>
+                <Property Name="Plant" Type="Edm.String" MaxLength="4" sap:display-format="UpperCase" sap:label="Plant"/>
+                <Property Name="Material" Type="Edm.String" MaxLength="18" sap:display-format="UpperCase" sap:label="Material" sap:quickinfo="Material Number"/>
+                <Property Name="BillOfMaterialComponent" Type="Edm.String" MaxLength="18" sap:display-format="UpperCase" sap:label="Component" sap:quickinfo="BOM component"/>
+                <Property Name="ProductPictureUrl" Type="Edm.String" MaxLength="255" sap:label="ProductPictureUrl" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ProductSalesDescription" Type="Edm.String" MaxLength="255" sap:label="Verkaufstext" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ComponentDescription" Type="Edm.String" MaxLength="40" sap:label="Item Text" sap:quickinfo="BOM Item Text (Line 1)"/>
+                <Property Name="BOMItemDescription" Type="Edm.String" MaxLength="40" sap:label="Item Text" sap:quickinfo="BOM Item Text (Line 1)"/>
+                <Property Name="BOMItemText2" Type="Edm.String" MaxLength="40" sap:label="Item Text 2" sap:quickinfo="BOM Item Text (Line 2)"/>
+            </EntityType>
+            <EntityType Name="SAP__Currency" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="CurrencyCode"/>
+                </Key>
+                <Property Name="CurrencyCode" Type="Edm.String" Nullable="false" MaxLength="5" sap:label="Currency" sap:semantics="currency-code"/>
+                <Property Name="ISOCode" Type="Edm.String" Nullable="false" MaxLength="3" sap:label="ISO code"/>
+                <Property Name="Text" Type="Edm.String" Nullable="false" MaxLength="15" sap:label="Short text"/>
+                <Property Name="DecimalPlaces" Type="Edm.Byte" Nullable="false" sap:label="Decimals"/>
+            </EntityType>
+            <EntityType Name="SAP__UnitOfMeasure" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="UnitCode"/>
+                </Key>
+                <Property Name="UnitCode" Type="Edm.String" Nullable="false" MaxLength="3" sap:label="Internal UoM" sap:semantics="unit-of-measure"/>
+                <Property Name="ISOCode" Type="Edm.String" Nullable="false" MaxLength="3" sap:label="ISO Code"/>
+                <Property Name="ExternalCode" Type="Edm.String" Nullable="false" MaxLength="3" sap:label="Commercial"/>
+                <Property Name="Text" Type="Edm.String" Nullable="false" MaxLength="30" sap:label="Measurement Unit Txt"/>
+                <Property Name="DecimalPlaces" Type="Edm.Int16" sap:label="Decimal Places"/>
+            </EntityType>
+            <EntityType Name="SAP__DocumentDescription" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Id"/>
+                </Key>
+                <Property Name="Id" Type="Edm.Guid" Nullable="false" sap:label="UUID"/>
+                <Property Name="CreatedBy" Type="Edm.String" Nullable="false" MaxLength="12"/>
+                <Property Name="CreatedAt" Type="Edm.DateTime" Nullable="false" Precision="0" sap:label="Time Stamp"/>
+                <Property Name="FileName" Type="Edm.String" Nullable="false" MaxLength="256"/>
+                <Property Name="Title" Type="Edm.String" Nullable="false" MaxLength="256"/>
+                <NavigationProperty Name="Format" Relationship="cds_zinn2_ui_my_shopping_catalog.to_format" FromRole="FromRole_to_format" ToRole="ToRole_to_format"/>
+                <NavigationProperty Name="TableColumns" Relationship="cds_zinn2_ui_my_shopping_catalog.to_tablecolumns" FromRole="FromRole_to_tablecolumns" ToRole="ToRole_to_tablecolumns"/>
+                <NavigationProperty Name="CoverPage" Relationship="cds_zinn2_ui_my_shopping_catalog.to_coverpage" FromRole="FromRole_to_coverpage" ToRole="ToRole_to_coverpage"/>
+                <NavigationProperty Name="Signature" Relationship="cds_zinn2_ui_my_shopping_catalog.to_signature" FromRole="FromRole_to_signature" ToRole="ToRole_to_signature"/>
+                <NavigationProperty Name="PDFStandard" Relationship="cds_zinn2_ui_my_shopping_catalog.to_pdfstandard" FromRole="FromRole_to_pdfstandard" ToRole="ToRole_to_pdfstandard"/>
+            </EntityType>
+            <EntityType Name="SAP__Format" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Id"/>
+                </Key>
+                <Property Name="FitToPage" Type="cds_zinn2_ui_my_shopping_catalog.SAP__FitToPage" Nullable="false"/>
+                <Property Name="Id" Type="Edm.Guid" Nullable="false" sap:label="UUID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="FontSize" Type="Edm.Int32" Nullable="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Orientation" Type="Edm.String" Nullable="false" MaxLength="10" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="PaperSize" Type="Edm.String" Nullable="false" MaxLength="10" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="BorderSize" Type="Edm.Int32" Nullable="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="MarginSize" Type="Edm.Int32" Nullable="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="FontName" Type="Edm.String" Nullable="false" MaxLength="255" sap:label="Font Name" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <EntityType Name="SAP__PDFStandard" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Id"/>
+                </Key>
+                <Property Name="Id" Type="Edm.Guid" Nullable="false" sap:label="UUID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="UsePDFAConformance" Type="Edm.Boolean" Nullable="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="DoEnableAccessibility" Type="Edm.Boolean" Nullable="false" sap:label="Indicator" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <EntityType Name="SAP__TableColumns" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Id"/>
+                    <PropertyRef Name="Name"/>
+                    <PropertyRef Name="Header"/>
+                </Key>
+                <Property Name="Id" Type="Edm.Guid" Nullable="false" sap:label="UUID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Name" Type="Edm.String" Nullable="false" MaxLength="256" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Header" Type="Edm.String" Nullable="false" MaxLength="256" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="HorizontalAlignment" Type="Edm.String" Nullable="false" MaxLength="10" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <EntityType Name="SAP__CoverPage" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Title"/>
+                    <PropertyRef Name="Id"/>
+                    <PropertyRef Name="Name"/>
+                </Key>
+                <Property Name="Title" Type="Edm.String" Nullable="false" MaxLength="256" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Id" Type="Edm.Guid" Nullable="false" sap:label="UUID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Name" Type="Edm.String" Nullable="false" MaxLength="256" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Value" Type="Edm.String" Nullable="false" MaxLength="256" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <EntityType Name="SAP__Signature" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Id"/>
+                </Key>
+                <Property Name="Id" Type="Edm.Guid" Nullable="false" sap:label="UUID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="DoSign" Type="Edm.Boolean" Nullable="false" sap:label="Indicator" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Reason" Type="Edm.String" Nullable="false" MaxLength="256" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <EntityType Name="SAP__ValueHelp" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="VALUEHELP"/>
+                </Key>
+                <Property Name="VALUEHELP" Type="Edm.String" Nullable="false"/>
+                <Property Name="FIELD_VALUE" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="DESCRIPTION" Type="Edm.String"/>
+            </EntityType>
+            <ComplexType Name="SAP__FitToPage">
+                <Property Name="ErrorRecoveryBehavior" Type="Edm.String" Nullable="false" MaxLength="8" sap:label="Error behavior" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="IsEnabled" Type="Edm.Boolean" Nullable="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="MinimumFontSize" Type="Edm.Int32" Nullable="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </ComplexType>
+            <Association Name="assoc_EB0CC7C740CCDAFFF8CA1788143D4C2D" sap:content-version="1">
+                <End Type="cds_zinn2_ui_my_shopping_catalog.ProductVHType" Multiplicity="1" Role="FromRole_assoc_EB0CC7C740CCDAFFF8CA1788143D4C2D"/>
+                <End Type="cds_zinn2_ui_my_shopping_catalog.ProductDescriptionType" Multiplicity="*" Role="ToRole_assoc_EB0CC7C740CCDAFFF8CA1788143D4C2D"/>
+            </Association>
+            <Association Name="to_format" sap:content-version="1">
+                <End Type="cds_zinn2_ui_my_shopping_catalog.SAP__DocumentDescription" Multiplicity="1" Role="FromRole_to_format"/>
+                <End Type="cds_zinn2_ui_my_shopping_catalog.SAP__Format" Multiplicity="1" Role="ToRole_to_format"/>
+                <ReferentialConstraint>
+                    <Principal Role="FromRole_to_format">
+                        <PropertyRef Name="Id"/>
+                    </Principal>
+                    <Dependent Role="ToRole_to_format">
+                        <PropertyRef Name="Id"/>
+                    </Dependent>
+                </ReferentialConstraint>
+            </Association>
+            <Association Name="to_tablecolumns" sap:content-version="1">
+                <End Type="cds_zinn2_ui_my_shopping_catalog.SAP__DocumentDescription" Multiplicity="1" Role="FromRole_to_tablecolumns"/>
+                <End Type="cds_zinn2_ui_my_shopping_catalog.SAP__TableColumns" Multiplicity="*" Role="ToRole_to_tablecolumns"/>
+                <ReferentialConstraint>
+                    <Principal Role="FromRole_to_tablecolumns">
+                        <PropertyRef Name="Id"/>
+                    </Principal>
+                    <Dependent Role="ToRole_to_tablecolumns">
+                        <PropertyRef Name="Id"/>
+                    </Dependent>
+                </ReferentialConstraint>
+            </Association>
+            <Association Name="to_coverpage" sap:content-version="1">
+                <End Type="cds_zinn2_ui_my_shopping_catalog.SAP__DocumentDescription" Multiplicity="1" Role="FromRole_to_coverpage"/>
+                <End Type="cds_zinn2_ui_my_shopping_catalog.SAP__CoverPage" Multiplicity="*" Role="ToRole_to_coverpage"/>
+                <ReferentialConstraint>
+                    <Principal Role="FromRole_to_coverpage">
+                        <PropertyRef Name="Id"/>
+                    </Principal>
+                    <Dependent Role="ToRole_to_coverpage">
+                        <PropertyRef Name="Id"/>
+                    </Dependent>
+                </ReferentialConstraint>
+            </Association>
+            <Association Name="to_signature" sap:content-version="1">
+                <End Type="cds_zinn2_ui_my_shopping_catalog.SAP__DocumentDescription" Multiplicity="1" Role="FromRole_to_signature"/>
+                <End Type="cds_zinn2_ui_my_shopping_catalog.SAP__Signature" Multiplicity="1" Role="ToRole_to_signature"/>
+                <ReferentialConstraint>
+                    <Principal Role="FromRole_to_signature">
+                        <PropertyRef Name="Id"/>
+                    </Principal>
+                    <Dependent Role="ToRole_to_signature">
+                        <PropertyRef Name="Id"/>
+                    </Dependent>
+                </ReferentialConstraint>
+            </Association>
+            <Association Name="to_pdfstandard" sap:content-version="1">
+                <End Type="cds_zinn2_ui_my_shopping_catalog.SAP__DocumentDescription" Multiplicity="1" Role="FromRole_to_pdfstandard"/>
+                <End Type="cds_zinn2_ui_my_shopping_catalog.SAP__PDFStandard" Multiplicity="1" Role="ToRole_to_pdfstandard"/>
+                <ReferentialConstraint>
+                    <Principal Role="FromRole_to_pdfstandard">
+                        <PropertyRef Name="Id"/>
+                    </Principal>
+                    <Dependent Role="ToRole_to_pdfstandard">
+                        <PropertyRef Name="Id"/>
+                    </Dependent>
+                </ReferentialConstraint>
+            </Association>
+            <Association Name="assoc_0B3FDE590C391920FC450AE9D9AF5762" sap:content-version="1">
+                <End Type="cds_zinn2_ui_my_shopping_catalog.CatalogType" Multiplicity="1" Role="FromRole_assoc_0B3FDE590C391920FC450AE9D9AF5762">
+                    <OnDelete Action="Cascade"/>
+                </End>
+                <End Type="cds_zinn2_ui_my_shopping_catalog.CatalogItemType" Multiplicity="*" Role="ToRole_assoc_0B3FDE590C391920FC450AE9D9AF5762"/>
+                <ReferentialConstraint>
+                    <Principal Role="FromRole_assoc_0B3FDE590C391920FC450AE9D9AF5762">
+                        <PropertyRef Name="CatalogUuid"/>
+                    </Principal>
+                    <Dependent Role="ToRole_assoc_0B3FDE590C391920FC450AE9D9AF5762">
+                        <PropertyRef Name="CatalogUuid"/>
+                    </Dependent>
+                </ReferentialConstraint>
+            </Association>
+            <Association Name="assoc_0DCA0636ACF24F08B43A13286F6083AF" sap:content-version="1">
+                <End Type="cds_zinn2_ui_my_shopping_catalog.CatalogType" Multiplicity="1" Role="FromRole_assoc_0DCA0636ACF24F08B43A13286F6083AF"/>
+                <End Type="cds_zinn2_ui_my_shopping_catalog.UserType" Multiplicity="0..1" Role="ToRole_assoc_0DCA0636ACF24F08B43A13286F6083AF"/>
+                <ReferentialConstraint>
+                    <Principal Role="ToRole_assoc_0DCA0636ACF24F08B43A13286F6083AF">
+                        <PropertyRef Name="UserID"/>
+                    </Principal>
+                    <Dependent Role="FromRole_assoc_0DCA0636ACF24F08B43A13286F6083AF">
+                        <PropertyRef Name="CreatedByUser"/>
+                    </Dependent>
+                </ReferentialConstraint>
+            </Association>
+            <Association Name="assoc_8A4E791BCE3CDFDC9DEEED2B0BCA2CF3" sap:content-version="1">
+                <End Type="cds_zinn2_ui_my_shopping_catalog.CatalogType" Multiplicity="1" Role="FromRole_assoc_8A4E791BCE3CDFDC9DEEED2B0BCA2CF3"/>
+                <End Type="cds_zinn2_ui_my_shopping_catalog.UserType" Multiplicity="0..1" Role="ToRole_assoc_8A4E791BCE3CDFDC9DEEED2B0BCA2CF3"/>
+                <ReferentialConstraint>
+                    <Principal Role="ToRole_assoc_8A4E791BCE3CDFDC9DEEED2B0BCA2CF3">
+                        <PropertyRef Name="UserID"/>
+                    </Principal>
+                    <Dependent Role="FromRole_assoc_8A4E791BCE3CDFDC9DEEED2B0BCA2CF3">
+                        <PropertyRef Name="LastChangedByUser"/>
+                    </Dependent>
+                </ReferentialConstraint>
+            </Association>
+            <Association Name="assoc_E11480D02A97ECD5DFC3CA938CDEB675" sap:content-version="1">
+                <End Type="cds_zinn2_ui_my_shopping_catalog.CatalogItemType" Multiplicity="1" Role="FromRole_assoc_E11480D02A97ECD5DFC3CA938CDEB675"/>
+                <End Type="cds_zinn2_ui_my_shopping_catalog.BundleItemType" Multiplicity="*" Role="ToRole_assoc_E11480D02A97ECD5DFC3CA938CDEB675"/>
+            </Association>
+            <Association Name="assoc_2A7737C1223EDD0637E5B00946E3975C" sap:content-version="1">
+                <End Type="cds_zinn2_ui_my_shopping_catalog.CatalogItemType" Multiplicity="1" Role="FromRole_assoc_2A7737C1223EDD0637E5B00946E3975C"/>
+                <End Type="cds_zinn2_ui_my_shopping_catalog.UserType" Multiplicity="0..1" Role="ToRole_assoc_2A7737C1223EDD0637E5B00946E3975C"/>
+                <ReferentialConstraint>
+                    <Principal Role="ToRole_assoc_2A7737C1223EDD0637E5B00946E3975C">
+                        <PropertyRef Name="UserID"/>
+                    </Principal>
+                    <Dependent Role="FromRole_assoc_2A7737C1223EDD0637E5B00946E3975C">
+                        <PropertyRef Name="CreatedByUser"/>
+                    </Dependent>
+                </ReferentialConstraint>
+            </Association>
+            <Association Name="assoc_95863AFE44BC6EE8AD4E50CD90F3B274" sap:content-version="1">
+                <End Type="cds_zinn2_ui_my_shopping_catalog.CatalogItemType" Multiplicity="1" Role="FromRole_assoc_95863AFE44BC6EE8AD4E50CD90F3B274"/>
+                <End Type="cds_zinn2_ui_my_shopping_catalog.UserType" Multiplicity="0..1" Role="ToRole_assoc_95863AFE44BC6EE8AD4E50CD90F3B274"/>
+                <ReferentialConstraint>
+                    <Principal Role="ToRole_assoc_95863AFE44BC6EE8AD4E50CD90F3B274">
+                        <PropertyRef Name="UserID"/>
+                    </Principal>
+                    <Dependent Role="FromRole_assoc_95863AFE44BC6EE8AD4E50CD90F3B274">
+                        <PropertyRef Name="LastChangedByUser"/>
+                    </Dependent>
+                </ReferentialConstraint>
+            </Association>
+            <EntityContainer Name="cds_zinn2_ui_my_shopping_catalog_Entities" m:IsDefaultEntityContainer="true" sap:message-scope-supported="true" sap:supported-formats="atom json xlsx pdf">
+                <EntitySet Name="SAP__Currencies" EntityType="cds_zinn2_ui_my_shopping_catalog.SAP__Currency" sap:content-version="1"/>
+                <EntitySet Name="SAP__UnitsOfMeasure" EntityType="cds_zinn2_ui_my_shopping_catalog.SAP__UnitOfMeasure" sap:content-version="1"/>
+                <EntitySet Name="SAP__MyDocumentDescriptions" EntityType="cds_zinn2_ui_my_shopping_catalog.SAP__DocumentDescription" sap:content-version="1"/>
+                <EntitySet Name="SAP__FormatSet" EntityType="cds_zinn2_ui_my_shopping_catalog.SAP__Format" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
+                <EntitySet Name="SAP__PDFStandardSet" EntityType="cds_zinn2_ui_my_shopping_catalog.SAP__PDFStandard" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
+                <EntitySet Name="SAP__TableColumnsSet" EntityType="cds_zinn2_ui_my_shopping_catalog.SAP__TableColumns" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
+                <EntitySet Name="SAP__CoverPageSet" EntityType="cds_zinn2_ui_my_shopping_catalog.SAP__CoverPage" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
+                <EntitySet Name="SAP__SignatureSet" EntityType="cds_zinn2_ui_my_shopping_catalog.SAP__Signature" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
+                <EntitySet Name="SAP__ValueHelpSet" EntityType="cds_zinn2_ui_my_shopping_catalog.SAP__ValueHelp" sap:content-version="1"/>
+                <EntitySet Name="MaterialText" EntityType="cds_zinn2_ui_my_shopping_catalog.MaterialTextType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:searchable="true" sap:content-version="1"/>
+                <EntitySet Name="ProductDescription" EntityType="cds_zinn2_ui_my_shopping_catalog.ProductDescriptionType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:searchable="true" sap:content-version="1"/>
+                <EntitySet Name="ProductText" EntityType="cds_zinn2_ui_my_shopping_catalog.ProductTextType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:searchable="true" sap:content-version="1"/>
+                <EntitySet Name="ProductVH" EntityType="cds_zinn2_ui_my_shopping_catalog.ProductVHType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:searchable="true" sap:content-version="1"/>
+                <EntitySet Name="User" EntityType="cds_zinn2_ui_my_shopping_catalog.UserType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:addressable="false" sap:content-version="1"/>
+                <EntitySet Name="Catalog" EntityType="cds_zinn2_ui_my_shopping_catalog.CatalogType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
+                <EntitySet Name="CatalogItem" EntityType="cds_zinn2_ui_my_shopping_catalog.CatalogItemType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
+                <EntitySet Name="BundleItem" EntityType="cds_zinn2_ui_my_shopping_catalog.BundleItemType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
+                <AssociationSet Name="assoc_E11480D02A97ECD5DFC3CA938CDEB675" Association="cds_zinn2_ui_my_shopping_catalog.assoc_E11480D02A97ECD5DFC3CA938CDEB675" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="CatalogItem" Role="FromRole_assoc_E11480D02A97ECD5DFC3CA938CDEB675"/>
+                    <End EntitySet="BundleItem" Role="ToRole_assoc_E11480D02A97ECD5DFC3CA938CDEB675"/>
+                </AssociationSet>
+                <AssociationSet Name="to_formatSet" Association="cds_zinn2_ui_my_shopping_catalog.to_format" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="SAP__MyDocumentDescriptions" Role="FromRole_to_format"/>
+                    <End EntitySet="SAP__FormatSet" Role="ToRole_to_format"/>
+                </AssociationSet>
+                <AssociationSet Name="to_pdfstandardSet" Association="cds_zinn2_ui_my_shopping_catalog.to_pdfstandard" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="SAP__MyDocumentDescriptions" Role="FromRole_to_pdfstandard"/>
+                    <End EntitySet="SAP__PDFStandardSet" Role="ToRole_to_pdfstandard"/>
+                </AssociationSet>
+                <AssociationSet Name="assoc_0B3FDE590C391920FC450AE9D9AF5762" Association="cds_zinn2_ui_my_shopping_catalog.assoc_0B3FDE590C391920FC450AE9D9AF5762" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="Catalog" Role="FromRole_assoc_0B3FDE590C391920FC450AE9D9AF5762"/>
+                    <End EntitySet="CatalogItem" Role="ToRole_assoc_0B3FDE590C391920FC450AE9D9AF5762"/>
+                </AssociationSet>
+                <AssociationSet Name="assoc_0DCA0636ACF24F08B43A13286F6083AF" Association="cds_zinn2_ui_my_shopping_catalog.assoc_0DCA0636ACF24F08B43A13286F6083AF" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="Catalog" Role="FromRole_assoc_0DCA0636ACF24F08B43A13286F6083AF"/>
+                    <End EntitySet="User" Role="ToRole_assoc_0DCA0636ACF24F08B43A13286F6083AF"/>
+                </AssociationSet>
+                <AssociationSet Name="assoc_EB0CC7C740CCDAFFF8CA1788143D4C2D" Association="cds_zinn2_ui_my_shopping_catalog.assoc_EB0CC7C740CCDAFFF8CA1788143D4C2D" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="ProductVH" Role="FromRole_assoc_EB0CC7C740CCDAFFF8CA1788143D4C2D"/>
+                    <End EntitySet="ProductDescription" Role="ToRole_assoc_EB0CC7C740CCDAFFF8CA1788143D4C2D"/>
+                </AssociationSet>
+                <AssociationSet Name="to_tablecolumnsSet" Association="cds_zinn2_ui_my_shopping_catalog.to_tablecolumns" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="SAP__MyDocumentDescriptions" Role="FromRole_to_tablecolumns"/>
+                    <End EntitySet="SAP__TableColumnsSet" Role="ToRole_to_tablecolumns"/>
+                </AssociationSet>
+                <AssociationSet Name="to_signatureSet" Association="cds_zinn2_ui_my_shopping_catalog.to_signature" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="SAP__MyDocumentDescriptions" Role="FromRole_to_signature"/>
+                    <End EntitySet="SAP__SignatureSet" Role="ToRole_to_signature"/>
+                </AssociationSet>
+                <AssociationSet Name="assoc_95863AFE44BC6EE8AD4E50CD90F3B274" Association="cds_zinn2_ui_my_shopping_catalog.assoc_95863AFE44BC6EE8AD4E50CD90F3B274" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="CatalogItem" Role="FromRole_assoc_95863AFE44BC6EE8AD4E50CD90F3B274"/>
+                    <End EntitySet="User" Role="ToRole_assoc_95863AFE44BC6EE8AD4E50CD90F3B274"/>
+                </AssociationSet>
+                <AssociationSet Name="assoc_8A4E791BCE3CDFDC9DEEED2B0BCA2CF3" Association="cds_zinn2_ui_my_shopping_catalog.assoc_8A4E791BCE3CDFDC9DEEED2B0BCA2CF3" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="Catalog" Role="FromRole_assoc_8A4E791BCE3CDFDC9DEEED2B0BCA2CF3"/>
+                    <End EntitySet="User" Role="ToRole_assoc_8A4E791BCE3CDFDC9DEEED2B0BCA2CF3"/>
+                </AssociationSet>
+                <AssociationSet Name="assoc_2A7737C1223EDD0637E5B00946E3975C" Association="cds_zinn2_ui_my_shopping_catalog.assoc_2A7737C1223EDD0637E5B00946E3975C" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="CatalogItem" Role="FromRole_assoc_2A7737C1223EDD0637E5B00946E3975C"/>
+                    <End EntitySet="User" Role="ToRole_assoc_2A7737C1223EDD0637E5B00946E3975C"/>
+                </AssociationSet>
+                <AssociationSet Name="to_coverpageSet" Association="cds_zinn2_ui_my_shopping_catalog.to_coverpage" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="SAP__MyDocumentDescriptions" Role="FromRole_to_coverpage"/>
+                    <End EntitySet="SAP__CoverPageSet" Role="ToRole_to_coverpage"/>
+                </AssociationSet>
+                <FunctionImport Name="addToShoppingCart" ReturnType="cds_zinn2_ui_my_shopping_catalog.CatalogItemType" EntitySet="CatalogItem" m:HttpMethod="POST" sap:action-for="cds_zinn2_ui_my_shopping_catalog.CatalogItemType" sap:applicable-path="addToShoppingCart_ac">
+                    <Parameter Name="CatalogItemUuid" Type="Edm.Guid" Mode="In" sap:label="SK Position UUID"/>
+                </FunctionImport>
+            </EntityContainer>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.CatalogItemType/Material" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String=""/>
+                        <PropertyValue Property="CollectionPath" String="ProductVH"/>
+                        <PropertyValue Property="SearchSupported" Bool="true"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="Material"/>
+                                    <PropertyValue Property="ValueListProperty" String="Product"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="Product_Text"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="ProductExternalID"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="ProductType"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="ProductGroup"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="BaseUnit"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="IsBatchManagementRequired"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="ArticleCategory"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.cds_zinn2_ui_my_shopping_catalog_Entities" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ApplyMultiUnitBehaviorForSortingAndFiltering" Bool="true"/>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.CatalogType/to_CatalogItem" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.Composition"/>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.CatalogType/Title" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.cds_zinn2_ui_my_shopping_catalog_Entities/BundleItem" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Capabilities.FilterRestrictions">
+                    <Record>
+                        <PropertyValue Property="NonFilterableProperties">
+                            <Collection>
+                                <PropertyPath>ProductPictureUrl</PropertyPath>
+                                <PropertyPath>ProductSalesDescription</PropertyPath>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="Capabilities.SortRestrictions">
+                    <Record>
+                        <PropertyValue Property="NonSortableProperties">
+                            <Collection>
+                                <PropertyPath>ProductPictureUrl</PropertyPath>
+                                <PropertyPath>ProductSalesDescription</PropertyPath>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.cds_zinn2_ui_my_shopping_catalog_Entities/Catalog" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Capabilities.FilterRestrictions">
+                    <Record>
+                        <PropertyValue Property="NonFilterableProperties">
+                            <Collection>
+                                <PropertyPath>CatalogPictureUrl</PropertyPath>
+                            </Collection>
+                        </PropertyValue>
+                        <PropertyValue Property="FilterExpressionRestrictions">
+                            <Collection>
+                                <Record>
+                                    <PropertyValue Property="Property" PropertyPath="CreationDateTime"/>
+                                    <PropertyValue Property="AllowedExpressions" String="SingleRange"/>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="Property" PropertyPath="LastChangeDateTime"/>
+                                    <PropertyValue Property="AllowedExpressions" String="SingleRange"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="Capabilities.NavigationRestrictions">
+                    <Record>
+                        <PropertyValue Property="RestrictedProperties">
+                            <Collection>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to_CatalogItem"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to_CreatedByUser"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to_LastChangedByUser"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+                <Annotation Term="Capabilities.SortRestrictions">
+                    <Record>
+                        <PropertyValue Property="NonSortableProperties">
+                            <Collection>
+                                <PropertyPath>CatalogPictureUrl</PropertyPath>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.cds_zinn2_ui_my_shopping_catalog_Entities/CatalogItem" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Capabilities.FilterRestrictions">
+                    <Record>
+                        <PropertyValue Property="NonFilterableProperties">
+                            <Collection>
+                                <PropertyPath>addToShoppingCart_ac</PropertyPath>
+                                <PropertyPath>ProductPictureUrl</PropertyPath>
+                                <PropertyPath>ProductSalesDescription</PropertyPath>
+                            </Collection>
+                        </PropertyValue>
+                        <PropertyValue Property="FilterExpressionRestrictions">
+                            <Collection>
+                                <Record>
+                                    <PropertyValue Property="Property" PropertyPath="CreationDateTime"/>
+                                    <PropertyValue Property="AllowedExpressions" String="SingleRange"/>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="Property" PropertyPath="LastChangeDateTime"/>
+                                    <PropertyValue Property="AllowedExpressions" String="SingleRange"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="Capabilities.NavigationRestrictions">
+                    <Record>
+                        <PropertyValue Property="RestrictedProperties">
+                            <Collection>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to_BundleItem"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to_Catalog"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to_CreatedByUser"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to_LastChangedByUser"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+                <Annotation Term="Capabilities.SortRestrictions">
+                    <Record>
+                        <PropertyValue Property="NonSortableProperties">
+                            <Collection>
+                                <PropertyPath>addToShoppingCart_ac</PropertyPath>
+                                <PropertyPath>ProductPictureUrl</PropertyPath>
+                                <PropertyPath>ProductSalesDescription</PropertyPath>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.cds_zinn2_ui_my_shopping_catalog_Entities/ProductVH" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Capabilities.NavigationRestrictions">
+                    <Record>
+                        <PropertyValue Property="RestrictedProperties">
+                            <Collection>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to_Text"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.cds_zinn2_ui_my_shopping_catalog_Entities" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Org.OData.Capabilities.V1.BatchSupport">
+                    <Record Type="Org.OData.Capabilities.V1.BatchSupportType">
+                        <PropertyValue Property="ReferencesAcrossChangeSetsSupported" Bool="true"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__CodeList.CurrencyCodes">
+                    <Record>
+                        <PropertyValue Property="Url" String="./$metadata"/>
+                        <PropertyValue Property="CollectionPath" String="SAP__Currencies"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__CodeList.UnitsOfMeasure">
+                    <Record>
+                        <PropertyValue Property="Url" String="./$metadata"/>
+                        <PropertyValue Property="CollectionPath" String="SAP__UnitsOfMeasure"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__PDF.Features">
+                    <Record>
+                        <PropertyValue Property="DocumentDescriptionReference" String="./$metadata"/>
+                        <PropertyValue Property="DocumentDescriptionCollection" String="SAP__MyDocumentDescriptions"/>
+                        <PropertyValue Property="ArchiveFormat" Bool="true"/>
+                        <PropertyValue Property="CoverPage" Bool="true"/>
+                        <PropertyValue Property="Signature" Bool="true"/>
+                        <PropertyValue Property="FitToPage" Bool="true"/>
+                        <PropertyValue Property="FontName" Bool="true"/>
+                        <PropertyValue Property="FontSize" Bool="true"/>
+                        <PropertyValue Property="Margin" Bool="true"/>
+                        <PropertyValue Property="Border" Bool="true"/>
+                        <PropertyValue Property="ResultSizeDefault" Int="20000"/>
+                        <PropertyValue Property="ResultSizeMaximum" Int="20000"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__CodeList.SAP__DocumentDescription">
+                    <Record>
+                        <PropertyValue Property="Url" String="./$metadata"/>
+                        <PropertyValue Property="CollectionPath" String="SAP__MyDocumentDescriptions"/>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.SAP__Currency/CurrencyCode" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="SAP__common.Text" Path="Text"/>
+                <Annotation Term="SAP__common.UnitSpecificScale" Path="DecimalPlaces"/>
+                <Annotation Term="SAP__CodeList.StandardCode" Path="ISOCode"/>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.SAP__UnitOfMeasure/UnitCode" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="SAP__common.Text" Path="Text"/>
+                <Annotation Term="SAP__common.UnitSpecificScale" Path="DecimalPlaces"/>
+                <Annotation Term="SAP__CodeList.StandardCode" Path="ISOCode"/>
+                <Annotation Term="SAP__CodeList.ExternalCode" Path="ExternalCode"/>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.SAP__UnitOfMeasure" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="SAP__core.AlternateKeys">
+                    <Collection>
+                        <Record>
+                            <PropertyValue Property="Key">
+                                <Collection>
+                                    <Record>
+                                        <PropertyValue Property="Name" Path="ExternalCode"/>
+                                        <PropertyValue Property="Alias" String="ExternalCode"/>
+                                    </Record>
+                                </Collection>
+                            </PropertyValue>
+                        </Record>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.SAP__DocumentDescription/CreatedBy" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="SAP__core.Computed"/>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.SAP__DocumentDescription/CreatedAt" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="SAP__core.Computed"/>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.SAP__DocumentDescription" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="SAP__capabilties.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilties.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="Updatable" Bool="false"/>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilties.DeleteRestrictions">
+                    <Record>
+                        <PropertyValue Property="Deletable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilties.FilterRestrictions">
+                    <Record>
+                        <PropertyValue Property="FilterExpressionRestrictions">
+                            <Collection>
+                                <Record>
+                                    <PropertyValue Property="Property" PropertyPath="Format/Orientation"/>
+                                    <PropertyValue Property="AllowedExpressions" String="Multivalue"/>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="Property" PropertyPath="Format/PaperSize"/>
+                                    <PropertyValue Property="AllowedExpressions" String="Multivalue"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.SAP__Format/FitToPage/ErrorRecoveryBehavior" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="SAP__common.ValueListReferences">
+                    <Record>
+                        <PropertyValue Property="Url" String="./$metadata"/>
+                        <PropertyValue Property="CollectionPath" String="../../../../SAP__ValueHelpSet?$filter=VALUEHELP%20eq%20%27ErrorRecoveryBehaviour%27"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__common.ValueListWithFixedValues"/>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.SAP__Format/FontName" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="SAP__common.ValueListReferences">
+                    <Record>
+                        <PropertyValue Property="Url" String="./$metadata"/>
+                        <PropertyValue Property="CollectionPath" String="SAP__ValueHelpSet?$filter=VALUEHELP%20eq%20%27FontName%27"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__common.ValueListWithFixedValues"/>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.SAP__Format/PaperSize" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="SAP__common.ValueListReferences">
+                    <Record>
+                        <PropertyValue Property="Url" String="./$metadata"/>
+                        <PropertyValue Property="CollectionPath" String="SAP__ValueHelpSet?$filter=VALUEHELP%20eq%20%27PaperSize%27"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__common.ValueListWithFixedValues"/>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.SAP__Format/Orientation" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="SAP__common.ValueListReferences">
+                    <Record>
+                        <PropertyValue Property="Url" String="./$metadata"/>
+                        <PropertyValue Property="CollectionPath" String="SAP__ValueHelpSet?$filter=VALUEHELP%20eq%20%27FontName%27"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__common.ValueListWithFixedValues"/>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.SAP__TableColumns/HorizontalAlignment" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="SAP__common.ValueListReferences">
+                    <Record>
+                        <PropertyValue Property="Url" String="./$metadata"/>
+                        <PropertyValue Property="CollectionPath" String="SAP__ValueHelpSet?$filter=VALUEHELP%20eq%20%27HorizontalAlignment%27"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__common.ValueListWithFixedValues"/>
+            </Annotations>
+            <atom:link rel="self" href="http://tld-vm-t4e.telekom.site:50000/sap/opu/odata/sap/ZINN2_UI_MY_SHOP_CATA_O2/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+            <atom:link rel="latest-version" href="http://tld-vm-t4e.telekom.site:50000/sap/opu/odata/sap/ZINN2_UI_MY_SHOP_CATA_O2/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>

@@ -1,0 +1,124 @@
+{
+  "_version": "1.42.0",
+  "sap.app": {
+    "id": "com.sapwebshop2026.sapwebshop",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "applicationVersion": {
+      "version": "0.0.1"
+    },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "resources": "resources.json",
+    "sourceTemplate": {
+      "id": "@sap/generator-fiori:basic",
+      "version": "1.23.0",
+      "toolsId": "716f26d6-e3f2-42e1-8878-a53bb3fc08e2"
+    },
+    "dataSources": {
+      "ZINN2_UI_MY_SHOP_CATA_O2_VAN": {
+        "uri": "/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZINN2_UI_MY_SHOP_CATA_O2_VAN',Version='0001')/$value/",
+        "type": "ODataAnnotation",
+        "settings": {
+          "localUri": "localService/mainService/ZINN2_UI_MY_SHOP_CATA_O2_VAN.xml"
+        }
+      },
+      "mainService": {
+        "uri": "/sap/opu/odata/sap/ZINN2_UI_MY_SHOP_CATA_O2/",
+        "type": "OData",
+        "settings": {
+          "annotations": [
+            "ZINN2_UI_MY_SHOP_CATA_O2_VAN"
+          ],
+          "localUri": "localService/mainService/metadata.xml",
+          "odataVersion": "2.0"
+        }
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": {
+      "icon": "",
+      "favIcon": "",
+      "phone": "",
+      "phone@2": "",
+      "tablet": "",
+      "tablet@2": ""
+    },
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "flexEnabled": true,
+    "dependencies": {
+      "minUI5Version": "1.102.8",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {}
+      }
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "com.sapwebshop2026.sapwebshop.i18n.i18n"
+        }
+      },
+      "": {
+        "dataSource": "mainService",
+        "preload": true,
+        "settings": {}
+      }
+    },
+    "resources": {
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "viewType": "XML",
+        "async": true,
+        "viewPath": "com.sapwebshop2026.sapwebshop.view",
+        "controlAggregation": "pages",
+        "controlId": "app",
+        "clearControlAggregation": false
+      },
+      "routes": [
+        {
+          "name": "RouteView1",
+          "pattern": ":?query:",
+          "target": [
+            "TargetView1"
+          ]
+        }
+      ],
+      "targets": {
+        "TargetView1": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "View1",
+          "viewName": "View1"
+        }
+      }
+    },
+    "rootView": {
+      "viewName": "com.sapwebshop2026.sapwebshop.view.App",
+      "type": "XML",
+      "async": true,
+      "id": "App"
+    }
+  }
+}

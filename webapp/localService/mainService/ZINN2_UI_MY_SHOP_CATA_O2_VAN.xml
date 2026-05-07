@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Reference Uri="../../catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMON',Version='0001',SAP__Origin='')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.Common.v1" Alias="Common"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="../../catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_UI',Version='0001',SAP__Origin='')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.UI.v1" Alias="UI"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="../../catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMUNICATION',Version='0001',SAP__Origin='')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.Communication.v1" Alias="Communication"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="../../catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_PERSONALDATA',Version='0001',SAP__Origin='')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.PersonalData.v1" Alias="PersonalData"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="../../catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_VALIDATION',Version='0001',SAP__Origin='')/$value">
+        <edmx:Include Namespace="Org.OData.Validation.V1" Alias="Validation"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="../../catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_ANALYTICS',Version='0001',SAP__Origin='')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.Analytics.v1" Alias="Analytics"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="../../catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_HTML5',Version='0001',SAP__Origin='')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.HTML5.v1" Alias="HTML5"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="../../../sap/zinn2_ui_my_shop_cata_o2/$metadata">
+        <edmx:Include Namespace="ZINN2_UI_MY_SHOP_CATA_O2" Alias="SAP"/>
+    </edmx:Reference>
+    <edmx:DataServices>
+        <Schema Namespace="zinn2_ui_my_shop_cata_o2_van.v1" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.ProductVHType/IndustrySector">
+                <Annotation Term="UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.ProductVHType/GrossWeight">
+                <Annotation Term="UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.ProductVHType/NetWeight">
+                <Annotation Term="UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.ProductVHType/WeightUnit">
+                <Annotation Term="UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.ProductVHType/ManufacturerNumber">
+                <Annotation Term="UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.ProductVHType/ProductManufacturerNumber">
+                <Annotation Term="UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.CatalogType/CatalogUuid">
+                <Annotation Term="UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.CatalogType">
+                <Annotation Term="UI.Facets">
+                    <Collection>
+                        <Record Type="UI.ReferenceFacet">
+                            <PropertyValue Property="Label" String="Details"/>
+                            <PropertyValue Property="ID" String="KatalogDetails"/>
+                            <PropertyValue Property="Target" AnnotationPath="@UI.Identification"/>
+                        </Record>
+                        <Record Type="UI.ReferenceFacet">
+                            <PropertyValue Property="Label" String="Positionen"/>
+                            <PropertyValue Property="ID" String="Katalogpositionen"/>
+                            <PropertyValue Property="Target" AnnotationPath="to_CatalogItem/@UI.LineItem"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.HeaderInfo">
+                    <Record>
+                        <PropertyValue Property="TypeName" String="Katalog"/>
+                        <PropertyValue Property="TypeNamePlural" String="Kataloge"/>
+                        <PropertyValue Property="ImageUrl" Path="CatalogPictureUrl"/>
+                        <PropertyValue Property="Title">
+                            <Record Type="UI.DataField">
+                                <PropertyValue Property="Label" String="Katalog"/>
+                                <PropertyValue Property="Value" Path="CatalogId"/>
+                            </Record>
+                        </PropertyValue>
+                        <PropertyValue Property="Description">
+                            <Record Type="UI.DataField">
+                                <PropertyValue Property="Label" String="Titel"/>
+                                <PropertyValue Property="Value" Path="Title"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="UI.Identification">
+                    <Collection>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="CatalogId"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="Title"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="LastChangeDateTime"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="CreationDateTime"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="CreatedByUser"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="LastChangedByUser"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.LineItem">
+                    <Collection>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="CatalogId"/>
+                            <Annotation Term="UI.Importance" EnumMember="UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="CatalogPictureUrl"/>
+                            <Annotation Term="UI.Importance" EnumMember="UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="Title"/>
+                            <Annotation Term="UI.Importance" EnumMember="UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="CreationDateTime"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="CreatedByUser"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="LastChangeDateTime"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="LastChangedByUser"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.SelectionFields">
+                    <Collection>
+                        <PropertyPath>CatalogId</PropertyPath>
+                        <PropertyPath>CreationDateTime</PropertyPath>
+                        <PropertyPath>CreatedByUser</PropertyPath>
+                        <PropertyPath>LastChangeDateTime</PropertyPath>
+                        <PropertyPath>LastChangedByUser</PropertyPath>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.CatalogItemType/CatalogItemUuid">
+                <Annotation Term="UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.CatalogItemType/CatalogUuid">
+                <Annotation Term="UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.CatalogItemType/addToShoppingCart_ac">
+                <Annotation Term="UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.CatalogItemType/ProductSalesDescription">
+                <Annotation Term="UI.MultiLineText"/>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.CatalogItemType/Material">
+                <Annotation Term="Common.Text" Path="ProductName">
+                    <Annotation Term="UI.TextArrangement" EnumMember="UI.TextArrangementType/TextOnly"/>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.CatalogItemType">
+                <Annotation Term="UI.Facets">
+                    <Collection>
+                        <Record Type="UI.ReferenceFacet">
+                            <PropertyValue Property="Label" String="Details"/>
+                            <PropertyValue Property="ID" String="KatalogPositionDetails"/>
+                            <PropertyValue Property="Target" AnnotationPath="@UI.Identification"/>
+                        </Record>
+                        <Record Type="UI.ReferenceFacet">
+                            <PropertyValue Property="Label" String="Bundlepositionen"/>
+                            <PropertyValue Property="ID" String="Bundlepositionen"/>
+                            <PropertyValue Property="Target" AnnotationPath="to_BundleItem/@UI.LineItem"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.HeaderInfo">
+                    <Record>
+                        <PropertyValue Property="TypeName" String="Katalog Position"/>
+                        <PropertyValue Property="TypeNamePlural" String="Katalog Positionen"/>
+                        <PropertyValue Property="ImageUrl" Path="ProductPictureUrl"/>
+                        <PropertyValue Property="Title">
+                            <Record Type="UI.DataField">
+                                <PropertyValue Property="Label" String="Position"/>
+                                <PropertyValue Property="Value" Path="CatalogItemId"/>
+                            </Record>
+                        </PropertyValue>
+                        <PropertyValue Property="Description">
+                            <Record Type="UI.DataField">
+                                <PropertyValue Property="Label" String="Titel"/>
+                                <PropertyValue Property="Value" Path="Material"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="UI.Identification">
+                    <Collection>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="CatalogItemId"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="Material"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="NetPriceAmount"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="LastChangeDateTime"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="CreationDateTime"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="CreatedByUser"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="LastChangedByUser"/>
+                        </Record>
+                        <Record Type="UI.DataFieldForAction">
+                            <PropertyValue Property="Label" String="Zum Warenkorb hinzufügen"/>
+                            <PropertyValue Property="IconUrl" String="sap-icon://cart-4"/>
+                            <PropertyValue Property="Action" String="cds_zinn2_ui_my_shopping_catalog.cds_zinn2_ui_my_shopping_catalog_Entities/addToShoppingCart"/>
+                            <PropertyValue Property="InvocationGrouping" EnumMember="UI.OperationGroupingType/Isolated"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.LineItem">
+                    <Collection>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="CatalogItemId"/>
+                            <Annotation Term="UI.Importance" EnumMember="UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="ProductPictureUrl"/>
+                            <Annotation Term="UI.Importance" EnumMember="UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="ProductSalesDescription"/>
+                            <Annotation Term="UI.Importance" EnumMember="UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="Material"/>
+                            <Annotation Term="UI.Importance" EnumMember="UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="NetPriceAmount"/>
+                            <Annotation Term="UI.Importance" EnumMember="UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="CreationDateTime"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="CreatedByUser"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="LastChangeDateTime"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="LastChangedByUser"/>
+                        </Record>
+                        <Record Type="UI.DataFieldForAction">
+                            <PropertyValue Property="Label" String="Zum Warenkorb hinzufügen"/>
+                            <PropertyValue Property="IconUrl" String="sap-icon://cart-4"/>
+                            <PropertyValue Property="Action" String="cds_zinn2_ui_my_shopping_catalog.cds_zinn2_ui_my_shopping_catalog_Entities/addToShoppingCart"/>
+                            <PropertyValue Property="InvocationGrouping" EnumMember="UI.OperationGroupingType/Isolated"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.SelectionFields">
+                    <Collection>
+                        <PropertyPath>CatalogItemId</PropertyPath>
+                        <PropertyPath>Material</PropertyPath>
+                        <PropertyPath>CreationDateTime</PropertyPath>
+                        <PropertyPath>CreatedByUser</PropertyPath>
+                        <PropertyPath>LastChangeDateTime</PropertyPath>
+                        <PropertyPath>LastChangedByUser</PropertyPath>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.BundleItemType/ProductSalesDescription">
+                <Annotation Term="UI.MultiLineText"/>
+            </Annotations>
+            <Annotations Target="cds_zinn2_ui_my_shopping_catalog.BundleItemType">
+                <Annotation Term="UI.Facets">
+                    <Collection>
+                        <Record Type="UI.ReferenceFacet">
+                            <PropertyValue Property="Label" String="Details"/>
+                            <PropertyValue Property="ID" String="BundlepositionenDetails"/>
+                            <PropertyValue Property="Target" AnnotationPath="@UI.Identification"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.HeaderInfo">
+                    <Record>
+                        <PropertyValue Property="TypeName" String="Bundleposition"/>
+                        <PropertyValue Property="TypeNamePlural" String="Bundlepositionen"/>
+                        <PropertyValue Property="ImageUrl" Path="ProductPictureUrl"/>
+                        <PropertyValue Property="Title">
+                            <Record Type="UI.DataField">
+                                <PropertyValue Property="Label" String="Bundleposition"/>
+                                <PropertyValue Property="Value" Path="Material"/>
+                            </Record>
+                        </PropertyValue>
+                        <PropertyValue Property="Description">
+                            <Record Type="UI.DataField">
+                                <PropertyValue Property="Label" String="Beschreibung"/>
+                                <PropertyValue Property="Value" Path="ComponentDescription"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="UI.Identification">
+                    <Collection>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="BillOfMaterialComponent"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="ProductSalesDescription"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="ComponentDescription"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="BOMItemDescription"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="BOMItemText2"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.LineItem">
+                    <Collection>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="BillOfMaterialComponent"/>
+                            <Annotation Term="UI.Importance" EnumMember="UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="ProductPictureUrl"/>
+                            <Annotation Term="UI.Importance" EnumMember="UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="ProductSalesDescription"/>
+                            <Annotation Term="UI.Importance" EnumMember="UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="ComponentDescription"/>
+                            <Annotation Term="UI.Importance" EnumMember="UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="BOMItemDescription"/>
+                            <Annotation Term="UI.Importance" EnumMember="UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="BOMItemText2"/>
+                            <Annotation Term="UI.Importance" EnumMember="UI.ImportanceType/High"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>
