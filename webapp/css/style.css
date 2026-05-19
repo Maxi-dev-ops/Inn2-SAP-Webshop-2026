@@ -1,1 +1,1339 @@
-/* Enter your custom styles here */
+/* ===================================================
+   HEART BUTTON — ACTIVE STATE (rot wenn auf Wunschliste)
+   =================================================== */
+.rsHeartActive.sapMBtn .sapMBtnInner,
+.rsHeartActive .sapMBtnInner {
+    background-color: #e74c3c !important;
+    border-color: #e74c3c !important;
+}
+
+.rsHeartActive.sapMBtn .sapMBtnIcon,
+.rsHeartActive .sapMBtnIcon,
+.rsHeartActive.sapMBtn .sapMBtnInner .sapUiIcon,
+.rsHeartActive .sapMBtnInner .sapUiIcon {
+    color: #ffffff !important;
+}
+
+.rsHeartActive.sapMBtn:hover .sapMBtnInner {
+    background-color: #c0392b !important;
+    border-color: #c0392b !important;
+}
+
+/* ===================================================
+   CART BUTTON — FLASH ANIMATION (kurz dunkler bei Klick)
+   =================================================== */
+@keyframes rsCartFlash {
+    0%   { filter: brightness(1); }
+    25%  { filter: brightness(0.65); }
+    100% { filter: brightness(1); }
+}
+
+.rsCartBtnFlash .sapMBtnInner {
+    animation: rsCartFlash 0.45s ease;
+}
+
+/* ===================================================
+   SHELL LOGO BUTTON (icon + title, navigates home)
+   =================================================== */
+.rsShellLogoBtn.sapMBtn .sapMBtnInner {
+    background: transparent !important;
+    border: none !important;
+    color: #ffffff !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.01em !important;
+    padding: 0 8px 0 4px !important;
+}
+
+.rsShellLogoBtn.sapMBtn .sapMBtnIcon,
+.rsShellLogoBtn .sapMBtnInner .sapUiIcon {
+    color: #ffffff !important;
+}
+
+.rsShellLogoBtn.sapMBtn:hover .sapMBtnInner {
+    background: rgba(255,255,255,0.1) !important;
+    border-radius: 6px !important;
+}
+
+/* ===================================================
+   SHELL BAR (dark header on all pages)
+   =================================================== */
+.rsShellBar,
+.rsShellBar.sapMBar {
+    background-color: #1a2b4a !important;
+    border-bottom: none !important;
+    height: 3rem !important;
+    min-height: 3rem !important;
+}
+
+.rsShellTitle .sapMTitle,
+.rsShellBar .sapMTitle {
+    color: #ffffff !important;
+    font-size: 1rem !important;
+}
+
+/* All buttons inside the bar */
+.rsShellBar .sapMBtn .sapMBtnIcon,
+.rsShellBar .sapMBtn .sapMBtnInner,
+.rsShellBar .sapMBtnGhost .sapMBtnInner,
+.rsShellBar .sapMBtnTransparent .sapMBtnInner {
+    color: #ffffff !important;
+}
+
+.rsShellBar .sapMBtn:hover .sapMBtnInner,
+.rsShellBar .sapMBtnTransparent:hover .sapMBtnInner {
+    background-color: rgba(255,255,255,0.12) !important;
+}
+
+/* Search field — outer .sapMSF: completely invisible at all times (incl. focus) */
+.rsShellSearch.sapMSF,
+.rsShellBar .sapMSF {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    padding: 0 !important;
+}
+
+/* Kill SAP's own focus ring on the outer container */
+.rsShellSearch.sapMSF:focus,
+.rsShellSearch.sapMSF:focus-within,
+.rsShellSearch.sapMSFFocused,
+.rsShellSearch.sapMSFWithText,
+.rsShellBar .sapMSF:focus,
+.rsShellBar .sapMSF:focus-within,
+.rsShellBar .sapMSFFocused {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Inner visible box — the ONLY styled element (.sapMSFI in sap_horizon) */
+.rsShellSearch .sapMSFI,
+.rsShellBar .sapMSF .sapMSFI {
+    background: rgba(255,255,255,0.14) !important;
+    border: 1.5px solid rgba(255,255,255,0.32) !important;
+    border-radius: 10px !important;
+    box-shadow: none !important;
+    transition: border-color 0.2s !important;
+}
+
+/* Focus state only on the inner box */
+.rsShellSearch .sapMSFI:focus-within,
+.rsShellBar .sapMSF .sapMSFI:focus-within {
+    border-color: rgba(255,255,255,0.7) !important;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.15) !important;
+    background: rgba(255,255,255,0.22) !important;
+    outline: none !important;
+}
+
+.rsShellSearch input,
+.rsShellSearch .sapMSFVal,
+.rsShellBar .sapMSF input,
+.rsShellBar .sapMSF .sapMSFVal {
+    color: #ffffff !important;
+    background: transparent !important;
+    font-size: 0.9rem !important;
+    letter-spacing: 0.01em !important;
+}
+
+.rsShellSearch input::placeholder,
+.rsShellSearch .sapMSFVal::placeholder,
+.rsShellBar .sapMSF input::placeholder {
+    color: rgba(255,255,255,0.52) !important;
+    font-style: italic;
+}
+
+.rsShellSearch .sapMSFB,
+.rsShellSearch .sapMSFB .sapUiIcon,
+.rsShellSearch .sapMSFB button,
+.rsShellBar .sapMSF .sapMSFB,
+.rsShellBar .sapMSF .sapMSFB .sapUiIcon {
+    color: rgba(255,255,255,0.75) !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+/* Avatar */
+.rsShellBar .sapFAvatar {
+    background-color: #0064d9 !important;
+}
+
+.rsShellBar .sapFAvatarInitialsHolder {
+    color: #ffffff !important;
+}
+
+/* Badge on cart button */
+.rsShellBar .sapMBadgeCustomData .sapMBadge {
+    background-color: #e74c3c !important;
+}
+
+/* Page header wrapper — override sap_horizon white background */
+.sapMPageHeader,
+.sapMPage > .sapMPageHeader {
+    background-color: #1a2b4a !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25) !important;
+}
+
+/* ===================================================
+   HERO BANNER
+   =================================================== */
+.rsHeroBanner,
+.rsHeroBanner.sapMPanel {
+    background: linear-gradient(135deg, #101c33 0%, #0040a8 100%) !important;
+    border-radius: 12px !important;
+    margin: 16px !important;
+    border: none !important;
+    overflow: hidden !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
+    width: calc(100% - 32px) !important;
+    box-sizing: border-box !important;
+}
+
+.rsHeroBannerInner {
+    padding: 32px 40px;
+    min-height: 180px;
+}
+
+.rsHeroContent {
+    max-width: 55%;
+}
+
+.rsHeroLabel .sapMText {
+    color: #ffffff !important;
+    font-size: 0.72rem !important;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.rsHeroTitle,
+.rsHeroTitle.sapMTitle,
+.rsHeroTitle span,
+.rsHeroTitle .sapMTitleInner {
+    color: #ffffff !important;
+    font-size: 2.5rem !important;
+    font-weight: 800 !important;
+    line-height: 1.2 !important;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+}
+
+.rsHeroText,
+.rsHeroText.sapMText,
+.rsHeroText span,
+.rsHeroText .sapMTextInner {
+    color: #e2e8f0 !important;
+    line-height: 1.6 !important;
+    font-size: 1.05rem !important;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+
+.rsHeroCatalogBtn .sapMBtnInner {
+    border-color: rgba(255,255,255,0.45) !important;
+    color: #ffffff !important;
+    background: rgba(255,255,255,0.08) !important;
+}
+
+.rsHeroImage {
+    border-radius: 8px;
+    object-fit: cover;
+    opacity: 0.92;
+}
+
+/* ===================================================
+   CATEGORY CARDS
+   =================================================== */
+.rsCategoryRow {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 1px !important;
+}
+
+.rsCategoryRow > * {
+    flex: 0 0 auto !important;
+    width: max-content !important;
+    margin: 0 !important;
+}
+
+.rsCategoryPill {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 30px !important;
+    padding: 2px 12px 2px 4px !important;
+    height: 32px !important;
+    width: max-content !important;
+    min-width: 0 !important;
+    flex: 0 0 auto !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex !important;
+    align-items: center !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03) !important;
+}
+
+.rsCategoryPill:hover {
+    border-color: #0064d9 !important;
+    background: #f8fafc !important;
+    box-shadow: 0 4px 10px rgba(0,100,217,0.1) !important;
+    transform: translateY(-1px);
+}
+
+.rsCategoryPillIcon {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    background: #eef3ff !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.rsCategoryPillText,
+.rsCategoryPillText.sapMText {
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    margin: 0 !important;
+    color: #1e293b !important;
+    white-space: nowrap !important;
+}
+
+/* ===================================================
+   HOME PAGE SECTIONS
+   =================================================== */
+.rsHomeSection {
+    padding-top: 24px;
+    border-top: 1px solid #e2e8f0;
+}
+
+/* ===================================================
+   PRODUCT CARDS (Home + ProductList)
+   =================================================== */
+.rsFeaturedRow,
+.rsProductGrid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, 260px) !important;
+    gap: 20px !important;
+    justify-content: center !important;
+    margin-bottom: 16px !important;
+}
+
+/* renderType:"Bare" means cards are direct grid children — no SAP wrapper divs */
+.rsFeaturedRow > *,
+.rsProductGrid > * {
+    margin: 0 !important;
+    min-width: 0 !important;
+}
+
+.rsProductCard {
+    width: 100% !important;
+    height: 100% !important;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e5e5e5;
+    overflow: hidden;
+    position: relative;
+    display: flex !important;
+    flex-direction: column;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    cursor: pointer;
+}
+
+.rsProductCard:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+}
+
+.rsProductCardImageWrap {
+    background: #f8fafc !important;
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    position: relative;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.rsProductBadgeRow {
+    min-height: 22px;
+    margin-bottom: 6px;
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+}
+
+.rsCardHeartBtn.sapMBtn,
+.rsCardHeartBtn.sapMBtnTransparent {
+    position: absolute !important;
+    top: 8px !important;
+    right: 8px !important;
+    z-index: 2;
+    border-radius: 6px !important;
+    min-width: 2rem !important;
+    width: 2rem !important;
+    height: 2rem !important;
+    padding: 0 !important;
+    background: transparent !important;
+}
+
+/* Override SAP Transparent button's own border/bg — must be more specific */
+.rsCardHeartBtn.sapMBtn .sapMBtnInner,
+.rsCardHeartBtn.sapMBtnTransparent .sapMBtnInner,
+.rsProductCardImageWrap .rsCardHeartBtn .sapMBtnInner {
+    background: #ffffff !important;
+    border: 1.5px solid #9ca3af !important;
+    border-radius: 6px !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12) !important;
+}
+
+.rsCardHeartBtn .sapMBtnIcon,
+.rsCardHeartBtn .sapMBtnInner .sapUiIcon,
+.rsCardHeartBtn .sapMBtnInner .sapUiIconMirrorInRTL {
+    color: #4b5563 !important;
+    font-size: 0.9rem !important;
+}
+
+.rsCardHeartBtn.sapMBtn:hover .sapMBtnInner,
+.rsCardHeartBtn.sapMBtnTransparent:hover .sapMBtnInner {
+    background: #f0f4ff !important;
+    border-color: #374151 !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.16) !important;
+}
+
+.rsProductCardImageWrap .sapMImg,
+.rsProductCardImageWrap img {
+    width: 100% !important;
+    height: 180px !important;
+    object-fit: contain !important;
+    display: block !important;
+}
+
+/* Fix for standard UI5 rendering (without renderType:"Bare") */
+.rsProductCard > .sapMFlexItem:first-child {
+    flex: 0 0 auto !important;
+    width: 100% !important;
+}
+
+.rsProductCard > .sapMFlexItem:last-child {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    display: flex !important;
+    width: 100% !important;
+}
+
+.rsProductCardBody {
+    padding: 16px;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    flex: 1 1 auto !important;
+    box-sizing: border-box !important;
+    height: 100% !important;
+}
+
+/* Push button to the bottom */
+.rsProductCardBody > :last-child {
+    margin-top: auto !important;
+}
+
+.rsFeaturedBadge .sapMText {
+    background: #0064d9;
+    color: white !important;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 0.7rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+}
+
+.rsProductPrice .sapMObjectNumberText {
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+}
+
+.rsAddToCartBtn {
+    margin-top: 12px;
+}
+
+.rsProductCardTitle .sapMTitle {
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    line-height: 1.35 !important;
+    margin-bottom: 2px;
+}
+
+.rsProductCardId .sapMText {
+    color: #9ca3af !important;
+    font-size: 0.73rem !important;
+}
+
+.rsPayloadText {
+    color: #9ca3af !important;
+    font-size: 0.73rem !important;
+    white-space: nowrap;
+}
+
+/* ===================================================
+   PRODUCT LIST PAGE
+   =================================================== */
+.rsProductListLayout {
+    min-height: calc(100vh - 60px);
+}
+
+.rsFilterPanel {
+    width: 240px;
+    min-width: 240px;
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    padding: 16px;
+    align-self: flex-start;
+    flex-shrink: 0;
+}
+
+.rsProductListContent {
+    flex: 1;
+}
+
+/* ===================================================
+   PRODUCT DETAIL
+   =================================================== */
+.rsProductDetailId .sapMText {
+    color: #6b7280 !important;
+    font-size: 0.85rem !important;
+}
+
+.rsProductPriceLabel .sapMText {
+    color: #9ca3af !important;
+    font-size: 0.78rem !important;
+}
+
+.rsProductPriceMain .sapMTitle {
+    color: #1a2b4a !important;
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+}
+
+.rsDetailLayout.sapMHBox {
+    display: grid !important;
+    grid-template-columns: 500px 1fr !important;
+    gap: 32px !important;
+    align-items: start !important;
+}
+
+/* SAP wrapper divs become grid children — give them full width */
+.rsDetailLayout > .sapMFlexItem,
+.rsDetailLayout > .sapMHBoxItem {
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+.rsDetailImageColumn {
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+.rsDetailConfigPanel.sapMPanel {
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+.rsDetailMainImagePanel.sapMPanel {
+    border-radius: 8px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #dce8ff 0%, #eef3ff 100%) !important;
+    border: none !important;
+}
+
+.rsDetailMainImage {
+    height: 460px !important;
+    width: 100% !important;
+    object-fit: contain;
+    display: block;
+}
+
+.rsDetailImageThumbs.sapMVBox {
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.rsThumbnail {
+    width: 60px !important;
+    height: 60px !important;
+    border-radius: 6px;
+    border: 2px solid #e5e5e5;
+    cursor: pointer;
+    object-fit: cover;
+    background: #f0f4ff;
+}
+
+.rsThumbActive {
+    border-color: #0064d9 !important;
+}
+
+.rsDetailConfigPanel.sapMPanel {
+    min-width: 300px;
+    border: 1px solid #e5e5e5 !important;
+    border-radius: 10px !important;
+    background: #ffffff !important;
+}
+
+.rsFullWidth {
+    width: 100% !important;
+}
+
+.rsPriceHighlight .sapMTitle,
+.rsPriceHighlight {
+    color: #0064d9 !important;
+}
+
+.rsDeliveryInfo {
+    padding-top: 10px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.rsSpecHighlights {
+    gap: 16px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+
+.rsSpecCard {
+    flex: 1;
+    min-width: 110px;
+    background: #f5f8ff;
+    border: 1px solid #dce8ff;
+    border-radius: 8px;
+    padding: 14px 10px;
+    text-align: center;
+}
+
+.rsSpecLabel .sapMText {
+    color: #6b7280 !important;
+    font-size: 0.72rem !important;
+    text-align: center;
+}
+
+.rsTechRow {
+    padding: 8px 0;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.rsTechLabel .sapMText { color: #6b7280 !important; }
+.rsTechValue .sapMText { font-weight: 500 !important; }
+
+/* ===================================================
+   DEAL OF THE DAY
+   =================================================== */
+.rsDealCard.sapMPanel {
+    background: linear-gradient(105deg, #eef3ff 0%, #f8fafc 100%) !important;
+    border: 1px solid #dce8ff !important;
+    border-radius: 16px !important;
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.rsDealCard .sapMPanelContent {
+    padding: 0 !important;
+}
+
+.rsDealInfoBox {
+    flex: 1;
+    padding: 16px 24px 16px 0;
+    min-width: 0;
+}
+
+.rsDealImage {
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    min-width: 240px !important;
+    flex-shrink: 0 !important;
+    padding: 16px !important;
+    box-sizing: border-box !important;
+}
+
+.rsDealImage img,
+.rsDealImage.sapMImg {
+    object-fit: contain !important;
+    height: 100% !important;
+}
+
+.rsDealLabel {
+    color: #e9730c !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    font-size: 0.8rem !important;
+}
+
+.rsDealTitle.sapMTitle {
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+}
+
+.rsDealText.sapMText {
+    color: #4b5563 !important;
+    font-size: 0.95rem !important;
+}
+
+.rsDealPrice,
+.rsDealPrice .sapMObjectNumberText,
+.rsDealPrice .sapMObjectNumberUnit {
+    font-size: 2.2rem !important;
+    font-weight: 700 !important;
+    line-height: 1.1 !important;
+    height: auto !important;
+}
+
+.rsDealOldPrice.sapMText {
+    color: #9ca3af !important;
+    text-decoration: line-through;
+}
+
+/* ===================================================
+   PREMIUM SECTION & PRODUCT SLIDER
+   =================================================== */
+.rsPremiumSection {
+    background: linear-gradient(135deg, #f8fafc 0%, #eef3ff 100%);
+    border-radius: 16px;
+    padding: 24px 32px 8px 32px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    margin-top: 32px !important;
+}
+
+.rsPremiumTitle.sapMTitle {
+    color: #0f172a !important;
+    font-size: 1.5rem !important;
+    font-weight: 800 !important;
+}
+
+.rsProductCarousel {
+    padding: 0;
+}
+
+.rsProductCarousel .sapMCrslBul {
+    background-color: #d1d5db !important;
+    border: none !important;
+    width: 8px !important;
+    height: 8px !important;
+    margin: 0 4px !important;
+    transition: all 0.2s ease;
+}
+
+.rsProductCarousel .sapMCrslBulActive {
+    background-color: #0064d9 !important;
+    transform: scale(1.2);
+}
+
+.rsProductCarousel .sapMCrslArr {
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid #e5e5e5;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    backdrop-filter: blur(4px);
+}
+
+.rsCarouselPageBox {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 20px !important;
+    width: 100% !important;
+    padding: 16px 0 32px 0 !important;
+}
+
+.rsCarouselPageBox > .sapMFlexItem {
+    flex: 0 0 260px !important;
+    width: 260px !important;
+    margin: 0 !important;
+}
+
+/* ===================================================
+   CART
+   =================================================== */
+.rsCartItemsColumn {
+    flex: 1;
+    min-width: 300px;
+}
+
+/* Voucher panel compact */
+.rsVoucherPanel.sapMPanel {
+    border: 1px solid #e5e5e5 !important;
+    border-radius: 8px !important;
+    background: #fafbfc !important;
+}
+
+/* Each cart item row — card-style with border */
+.rsCartListItem {
+    border: 1px solid #e5e5e5 !important;
+    border-radius: 10px !important;
+    margin-bottom: 12px !important;
+    background: #ffffff !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05) !important;
+}
+
+.rsCartListItem:last-child {
+    margin-bottom: 0 !important;
+}
+
+.rsCartItem {
+    padding: 16px;
+    width: 100%;
+    gap: 16px;
+}
+
+.rsCartItemImage {
+    border-radius: 8px;
+    object-fit: contain;
+    background: linear-gradient(135deg, #dce8ff, #eef3ff);
+    flex-shrink: 0;
+    border: 1px solid #e5e5e5;
+}
+
+/* Quantity box with visible border */
+.rsQtyBox {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.rsQtyBox .sapMBtn .sapMBtnInner {
+    border-radius: 0 !important;
+}
+
+.rsQtyText .sapMText {
+    min-width: 36px;
+    text-align: center;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    border-left: 1px solid #e2e8f0;
+    border-right: 1px solid #e2e8f0;
+    padding: 0 8px;
+}
+
+.rsCartSummaryPanel.sapMPanel {
+    width: 320px;
+    min-width: 260px;
+    border: 1px solid #e5e5e5 !important;
+    border-radius: 10px !important;
+    background: #ffffff !important;
+    align-self: flex-start;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+}
+
+.rsCartTrustBadges {
+    padding-top: 12px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.rsGreen .sapMText { color: #107e3e !important; font-weight: 600 !important; }
+.rsGreen { color: #107e3e !important; }
+
+/* ===================================================
+   ORDER HISTORY
+   =================================================== */
+.rsOrderLink { color: #0064d9 !important; font-weight: 600 !important; }
+.rsMoreItems .sapMText { color: #9ca3af !important; font-size: 0.78rem !important; }
+
+.rsOrderStatsRow {
+    gap: 16px;
+}
+
+.rsOrderStat {
+    flex: 1;
+    min-width: 140px;
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    padding: 24px;
+    align-items: center;
+}
+
+.rsOrderStat .sapMTitle { font-size: 2rem !important; }
+
+/* ===================================================
+   WISHLIST
+   =================================================== */
+.rsWishlistGrid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, 240px) !important;
+    gap: 24px !important;
+    justify-content: start !important;
+}
+.rsWishlistGrid > * {
+    display: flex !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+}
+
+.rsWishlistCard {
+    width: 100% !important;
+    height: 100% !important;
+    background: #ffffff;
+    border-radius: 10px;
+    border: 1.5px solid #e2e8f0;
+    overflow: hidden;
+    position: relative;
+    display: flex !important;
+    flex-direction: column;
+    transition: box-shadow 0.18s, transform 0.18s, border-color 0.18s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+
+.rsWishlistCard:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.13);
+    border-color: #0064d9;
+    transform: translateY(-3px);
+}
+
+.rsWishlistHeartBtn.sapMBtn,
+.rsWishlistHeartBtn.sapMBtnTransparent {
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    z-index: 10;
+    border-radius: 6px !important;
+    min-width: 2rem !important;
+    width: 2rem !important;
+    height: 2rem !important;
+    padding: 0 !important;
+    background: transparent !important;
+}
+
+.rsWishlistHeartBtn.sapMBtn .sapMBtnInner,
+.rsWishlistHeartBtn.sapMBtnTransparent .sapMBtnInner {
+    border-radius: 6px !important;
+    background: #ffffff !important;
+    border: 1.5px solid #9ca3af !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12) !important;
+}
+
+.rsWishlistHeartBtn .sapMBtnIcon,
+.rsWishlistHeartBtn .sapMBtnInner .sapUiIcon {
+    color: #4b5563 !important;
+    font-size: 0.9rem !important;
+}
+
+.rsWishlistHeartBtn.rsHeartActive.sapMBtn .sapMBtnInner,
+.rsWishlistHeartBtn.rsHeartActive.sapMBtnTransparent .sapMBtnInner,
+.rsWishlistHeartBtn.rsHeartActive .sapMBtnInner {
+    background-color: #e74c3c !important;
+    border-color: #e74c3c !important;
+}
+
+.rsWishlistHeartBtn.rsHeartActive.sapMBtn .sapMBtnIcon,
+.rsWishlistHeartBtn.rsHeartActive .sapMBtnInner .sapUiIcon {
+    color: #ffffff !important;
+}
+
+.rsWishlistHeartBtn.rsHeartActive.sapMBtn:hover .sapMBtnInner,
+.rsWishlistHeartBtn.rsHeartActive.sapMBtnTransparent:hover .sapMBtnInner {
+    background-color: #c0392b !important;
+    border-color: #c0392b !important;
+}
+
+.rsNewBadge .sapMText {
+    background: #e9730c;
+    color: white !important;
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+}
+
+/* Recommendations section — more top padding */
+#recommendationsSection {
+    padding-top: 8px;
+    border-top: 1px solid #e2e8f0;
+    margin-top: 32px !important;
+}
+
+.rsEmptyState { padding: 60px 20px; }
+
+/* ===================================================
+   INFO BOXES (Home page footer)
+   =================================================== */
+.rsInfoRow {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+    gap: 20px !important;
+}
+.rsInfoRow > * {
+    display: flex !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+}
+
+.rsInfoBox {
+    width: 100%;
+    background: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #e5e5e5;
+    padding: 18px;
+}
+
+.rsInfoIcon { color: #0064d9 !important; }
+
+/* ===================================================
+   PROFILE PAGE
+   =================================================== */
+.rsProfileHeader.sapMPanel {
+    background: linear-gradient(135deg, #f8fafc 0%, #eef3ff 100%) !important;
+    border: 1px solid #dce8ff !important;
+    border-radius: 16px !important;
+}
+
+.rsProfileRole .sapMText {
+    color: #6b7280 !important;
+    font-size: 0.85rem !important;
+}
+
+.rsProfileStatsRow {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
+    gap: 16px !important;
+}
+
+.rsProfileStat.sapMPanel {
+    border: 1px solid #e5e5e5 !important;
+    border-radius: 10px !important;
+    background: #ffffff !important;
+    text-align: center;
+}
+
+/* ===================================================
+   NOTIFICATIONS PAGE
+   =================================================== */
+.rsNotifCard.sapMPanel {
+    border: 1px solid #e5e5e5 !important;
+    border-radius: 10px !important;
+    background: #ffffff !important;
+    margin-bottom: 10px !important;
+}
+
+.rsNotifUnread.sapMPanel {
+    border-left: 3px solid #0064d9 !important;
+    background: #f8faff !important;
+}
+
+.rsNotifRow {
+    padding: 12px 16px;
+    gap: 12px;
+}
+
+.rsNotifTime .sapMText {
+    color: #9ca3af !important;
+    font-size: 0.75rem !important;
+    margin-top: 4px;
+}
+
+/* ===================================================
+   SUPPORT PAGE
+   =================================================== */
+.rsFaqPanel.sapMPanel {
+    border: 1px solid #e5e5e5 !important;
+    border-radius: 8px !important;
+    margin-bottom: 8px !important;
+}
+
+/* ===================================================
+   FLP / LAUNCHPAD SHELL — hide shell header, make app fullscreen
+   =================================================== */
+#shell-hdr,
+.sapUshellShellHead,
+.sapUshellShellHeader {
+    display: none !important;
+}
+
+/* Remove top offset the FLP adds for its header */
+.sapUshellContainerCanvas,
+.sapUshellContainer {
+    top: 0 !important;
+    height: 100vh !important;
+}
+
+/* Make the application panel fill all available width */
+.sapUshellApplicationContainer,
+.sapUshellInnerPage,
+.sapUshellPage,
+.sapMShellContent,
+.sapUshellContentContainer {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+}
+
+/* ===================================================
+   GENERAL UTILITIES
+   =================================================== */
+.sapMPage > .sapMPageSubHeader { display: none; }
+
+/* Breadcrumbs spacing */
+.sapMBreadcrumbs { padding: 8px 0 4px; }
+
+/* ===================================================
+   SCROLL FIX — use natural browser scroll
+   =================================================== */
+html,
+body.sapUiBody {
+    height: auto !important;
+    min-height: 100vh;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+/* App and component wrappers fill viewport but don't clip */
+.sapMApp,
+.sapUiComponentContent,
+body > div {
+    height: auto !important;
+    min-height: 100vh;
+    overflow: visible !important;
+}
+
+/* Page: auto height, no inner scroll */
+.sapMPage {
+    position: relative !important;
+    height: auto !important;
+    min-height: 100vh;
+    overflow: visible !important;
+}
+
+/* The scroll container should just flow naturally */
+.sapMPageScrollContainer {
+    height: auto !important;
+    overflow: visible !important;
+    padding-top: 0 !important;
+    padding-bottom: 64px !important;
+}
+
+/* Sticky header */
+.sapMPageHeader,
+.sapMPage > .sapMPageHeader {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 200 !important;
+}
+
+/* ===================================================
+   INN2 SHOP ADDITIONS
+   sap.m.List-based product grid + active pill + compat
+   =================================================== */
+
+/* When rsProductGrid is a sap.m.List (OData declarative binding) */
+.rsProductGrid.sapMList {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    /* Reset grid — applied by parent class above, not needed here */
+    display: block !important;
+}
+
+.rsProductGrid.sapMList .sapMListItems {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, 260px) !important;
+    gap: 20px !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    list-style: none !important;
+}
+
+.rsProductGrid.sapMList .sapMListNoData {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem;
+}
+
+/* List items: no separator, no padding, full height */
+.rsProductGrid.sapMList .sapMLIB {
+    border-bottom: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+    height: 100% !important;
+}
+
+/* The content wrapper inside CustomListItem must also be full height */
+.rsProductGrid.sapMList .sapMLIBContent {
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* rsProductCard when it's an inner VBox (not the CustomListItem itself) */
+.rsProductCard.sapMVBox {
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Price as Text (formatter produces string, not ObjectNumber) */
+.rsProductPrice .sapMText {
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+}
+
+/* Active / selected category pill */
+.rsCategoryPillActive.sapMBtn .sapMBtnInner,
+.rsCategoryPillActive .sapMBtnInner {
+    background: #0064d9 !important;
+    border-color: #0064d9 !important;
+}
+
+.rsCategoryPillActive .sapMBtnContent,
+.rsCategoryPillActive .sapMBtnText,
+.rsCategoryPillActive .sapMBtnInner {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+.rsCategoryPillActive:hover .sapMBtnInner {
+    background: #0052b3 !important;
+    border-color: #0052b3 !important;
+}
+
+/* rsCategoryPill as sap.m.Button */
+.rsCategoryPill.sapMBtn {
+    height: 32px !important;
+    min-width: 0 !important;
+    margin: 2px !important;
+    border-radius: 30px !important;
+}
+
+.rsCategoryPill.sapMBtn .sapMBtnInner {
+    border-radius: 30px !important;
+    border: 1px solid #e2e8f0 !important;
+    background: #ffffff !important;
+    padding: 0 14px !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    color: #1e293b !important;
+}
+
+.rsCategoryPill.sapMBtn:hover .sapMBtnInner {
+    border-color: #0064d9 !important;
+    background: #f0f7ff !important;
+}
+
+/* Product detail: price text (formatter output) */
+.rsProductPriceMain .sapMText {
+    color: #1a2b4a !important;
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+}
+
+/* Filter sidebar divider line */
+.rsFilterDivider {
+    height: 1px !important;
+    min-height: 1px !important;
+    background: #e2e8f0 !important;
+    width: 100% !important;
+}
+
+/* Filter panel sidebar title */
+.rsFilterPanelTitle.sapMTitle {
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    color: #6b7280 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+}
+
+/* Broken images — controller adds this class on error */
+.webshopImageBroken img { opacity: 0 !important; }
+
+/* Detail image: contained in the gradient panel */
+.rsDetailMainImagePanel .sapMImg img,
+.rsDetailMainImagePanel img {
+    width: 100% !important;
+    height: 460px !important;
+    object-fit: contain !important;
+    display: block !important;
+    padding: 24px !important;
+    box-sizing: border-box !important;
+}
+
+/* Bundle grid as sap.m.List */
+.rsBundleGrid.sapMList {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    display: block !important;
+}
+
+.rsBundleGrid.sapMList .sapMListItems {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+    gap: 12px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    list-style: none !important;
+}
+
+.rsBundleGrid.sapMList .sapMLIB {
+    border-bottom: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+}
+
+.rsBundleCard {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: box-shadow 0.18s, transform 0.18s;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.rsBundleCard:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.rsBundleCardImageWrap {
+    background: #ffffff;
+    height: 120px;
+    overflow: hidden;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.rsBundleCardImageWrap .sapMImg img,
+.rsBundleCardImageWrap img {
+    width: 100% !important;
+    height: 120px !important;
+    object-fit: contain !important;
+    padding: 8px !important;
+    box-sizing: border-box !important;
+}
+
+.rsBundleCardBody {
+    padding: 10px 12px !important;
+}
+
+.rsBundleCardBody .rsProductCardTitle .sapMTitle {
+    font-size: 0.8rem !important;
+}
+
+.rsBundleCardBody .rsProductCardId .sapMText {
+    font-size: 0.68rem !important;
+}

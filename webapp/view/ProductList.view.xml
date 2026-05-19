@@ -1,0 +1,180 @@
+<mvc:View
+    controllerName="com.sapwebshop2026.sapwebshop.controller.ProductList"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    displayBlock="true">
+
+    <Page id="productListPage" showHeader="true" backgroundDesign="Solid">
+
+        <!-- ═══════════════════════════════════════════════════════════
+             SHELL BAR  (orientiert am ReferenceProject rsShellBar)
+             ═══════════════════════════════════════════════════════════ -->
+        <customHeader>
+            <Bar class="rsShellBar">
+                <contentLeft>
+                    <Button
+                        icon="sap-icon://home"
+                        text="Inn2 Shop"
+                        type="Transparent"
+                        press="onNavHome"
+                        class="rsShellLogoBtn"/>
+                </contentLeft>
+                <contentMiddle>
+                    <SearchField
+                        id="searchField"
+                        placeholder="Produkte suchen..."
+                        width="400px"
+                        liveChange="onSearchLive"
+                        search="onSearch"
+                        class="rsShellSearch"/>
+                </contentMiddle>
+                <contentRight>
+                    <Button
+                        icon="sap-icon://cart"
+                        type="Transparent"
+                        tooltip="Warenkorb"
+                        class="rsShellBtn">
+                        <customData>
+                            <BadgeCustomData value="{= ${cartModel>/count} > 0 ? ${cartModel>/count} : ''}"/>
+                        </customData>
+                    </Button>
+                </contentRight>
+            </Bar>
+        </customHeader>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             HAUPTINHALT:  Filter-Sidebar  |  Produktgrid
+             ═══════════════════════════════════════════════════════════ -->
+        <content>
+            <HBox class="rsProductListLayout" alignItems="Start">
+
+                <!-- ─── LINKE SIDEBAR ──────────────────────────────── -->
+                <VBox
+                    id="filterPanel"
+                    class="rsFilterPanel sapUiMediumMarginTop sapUiMediumMarginBegin">
+
+                    <!-- Katalog-Chips (werden per Controller aus /Catalog geladen) -->
+                    <Title text="Kategorie" level="H5" class="rsFilterPanelTitle sapUiSmallMarginBottom"/>
+                    <HBox id="categoryBar" wrap="Wrap" class="rsCategoryRow sapUiSmallMarginBottom">
+                        <Button
+                            id="btnAllCategories"
+                            text="Alle"
+                            type="Transparent"
+                            press="onAllCatalogsPress"
+                            class="rsCategoryPill rsCategoryPillActive"/>
+                    </HBox>
+
+                    <!-- Trennlinie -->
+                    <HBox class="sapUiMediumMarginTopBottom rsFilterDivider"/>
+
+                    <!-- Sortierung -->
+                    <Title text="Sortierung" level="H5" class="rsFilterPanelTitle sapUiSmallMarginBottom"/>
+                    <Select id="sortSelect" change="onSort" width="200px">
+                        <core:Item key="ProductName-asc"     text="Name A–Z"/>
+                        <core:Item key="ProductName-desc"    text="Name Z–A"/>
+                        <core:Item key="NetPriceAmount-asc"  text="Preis aufsteigend"/>
+                        <core:Item key="NetPriceAmount-desc" text="Preis absteigend"/>
+                    </Select>
+
+                    <!-- Filter zurücksetzen -->
+                    <Button
+                        text="Filter zurücksetzen"
+                        type="Transparent"
+                        press="onResetFilters"
+                        class="sapUiMediumMarginTop"/>
+                </VBox>
+
+                <!-- ─── RECHTS: Ergebnis + Produktgrid ──────────────── -->
+                <VBox
+                    class="rsProductListContent sapUiMediumMarginTop sapUiMediumMarginBeginEnd"
+                    width="100%">
+
+                    <!-- Ergebnis-Zähler -->
+                    <HBox
+                        justifyContent="SpaceBetween"
+                        alignItems="Center"
+                        class="sapUiSmallMarginBottom">
+                        <Text id="resultCountText" text=""/>
+                    </HBox>
+
+                    <!-- Produktkacheln  (sap.m.List mit CSS-Grid via .rsProductGrid) -->
+                    <List
+                        id="productGrid"
+                        items="{
+                            path: '/CatalogItem',
+                            parameters: { operationMode: 'Server' }
+                        }"
+                        mode="None"
+                        noDataText="Keine Produkte gefunden"
+                        busyIndicatorDelay="0"
+                        growing="true"
+                        growingThreshold="24"
+                        growingScrollToLoad="true"
+                        updateFinished="onListUpdateFinished"
+                        class="rsProductGrid">
+
+                        <CustomListItem type="Active" press="onProductPress">
+
+                            <!-- rsProductCard liegt auf dem inneren VBox, nicht auf dem LI,
+                                 damit die CSS-Flex-Column korrekt funktioniert -->
+                            <VBox class="rsProductCard">
+
+                                <!-- Bild-Bereich -->
+                                <VBox class="rsProductCardImageWrap">
+                                    <Image
+                                        src="{ProductPictureUrl}"
+                                        width="100%"
+                                        error="onImageError"/>
+                                </VBox>
+
+                                <!-- Karten-Body -->
+                                <VBox class="rsProductCardBody">
+
+                                    <!-- Badge-Zeile (Platzhalter für zukünftige Badges) -->
+                                    <HBox class="rsProductBadgeRow"/>
+
+                                    <!-- Titel-Wrapper → CSS .rsProductCardTitle .sapMTitle -->
+                                    <VBox class="rsProductCardTitle">
+                                        <Title
+                                            text="{ProductName}"
+                                            level="H5"
+                                            wrapping="true"/>
+                                    </VBox>
+
+                                    <!-- Artikelnummer-Wrapper → CSS .rsProductCardId .sapMText -->
+                                    <VBox class="rsProductCardId">
+                                        <Text text="{= 'Art.-Nr. ' + ${Material}}"/>
+                                    </VBox>
+
+                                    <!-- Preis-Wrapper → CSS .rsProductPrice .sapMText -->
+                                    <VBox class="rsProductPrice sapUiTinyMarginTop">
+                                        <Text text="{
+                                            parts: [
+                                                { path: 'NetPriceAmount' },
+                                                { path: 'TransactionCurrency' }
+                                            ],
+                                            formatter: '.formatter.formatPrice'
+                                        }"/>
+                                    </VBox>
+
+                                    <!-- In den Warenkorb -->
+                                    <Button
+                                        text="In den Warenkorb"
+                                        icon="sap-icon://cart"
+                                        type="Emphasized"
+                                        enabled="{addToShoppingCart_ac}"
+                                        press="onAddToCart"
+                                        width="100%"
+                                        class="rsAddToCartBtn"/>
+
+                                </VBox>
+                            </VBox>
+                        </CustomListItem>
+                    </List>
+                </VBox>
+
+            </HBox>
+        </content>
+    </Page>
+</mvc:View>

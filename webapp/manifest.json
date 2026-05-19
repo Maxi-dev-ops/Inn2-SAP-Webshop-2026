@@ -53,12 +53,14 @@
     }
   },
   "sap.ui5": {
-    "flexEnabled": true,
+    "flexEnabled": false,
     "dependencies": {
       "minUI5Version": "1.102.8",
       "libs": {
         "sap.m": {},
-        "sap.ui.core": {}
+        "sap.ui.core": {},
+        "sap.ui.layout": {},
+        "sap.f": {}
       }
     },
     "contentDensities": {
@@ -97,20 +99,30 @@
       },
       "routes": [
         {
-          "name": "RouteView1",
-          "pattern": ":?query:",
-          "target": [
-            "TargetView1"
-          ]
+          "name": "RouteProductList",
+          "pattern": "",
+          "target": ["TargetProductList"]
+        },
+        {
+          "name": "RouteProductDetail",
+          "pattern": "product/{catalogItemUuid}",
+          "target": ["TargetProductDetail"]
         }
       ],
       "targets": {
-        "TargetView1": {
+        "TargetProductList": {
           "viewType": "XML",
           "transition": "slide",
           "clearControlAggregation": false,
-          "viewId": "View1",
-          "viewName": "View1"
+          "viewId": "ProductList",
+          "viewName": "ProductList"
+        },
+        "TargetProductDetail": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "ProductDetail",
+          "viewName": "ProductDetail"
         }
       }
     },
