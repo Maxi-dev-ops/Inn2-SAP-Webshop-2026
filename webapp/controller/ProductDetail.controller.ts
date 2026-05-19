@@ -3,7 +3,6 @@ import ODataModel from "sap/ui/model/odata/v2/ODataModel";
 import JSONModel from "sap/ui/model/json/JSONModel";
 import UIComponent from "sap/ui/core/UIComponent";
 import MessageToast from "sap/m/MessageToast";
-import History from "sap/ui/core/routing/History";
 import Event from "sap/ui/base/Event";
 import formatter from "../model/formatter";
 
@@ -70,14 +69,7 @@ export default class ProductDetailController extends Controller {
     // ─── Navigation ───────────────────────────────────────────────────────────
 
     public onNavBack(): void {
-        const oHistory = History.getInstance();
-        const sPreviousHash = oHistory.getPreviousHash();
-
-        if (sPreviousHash !== undefined) {
-            window.history.go(-1);
-        } else {
-            UIComponent.getRouterFor(this).navTo("RouteProductList");
-        }
+        UIComponent.getRouterFor(this).navTo("RouteProductList");
     }
 
     public onNavHome(): void {
@@ -132,9 +124,67 @@ export default class ProductDetailController extends Controller {
         (oEvent.getSource() as any).addStyleClass("webshopImageBroken");
     }
 
-    // ─── Stub-Handler ─────────────────────────────────────────────────────────
+    // ─── Downloads ────────────────────────────────────────────────────────────
 
     public onDownload(): void {
-        MessageToast.show("Download nicht verfügbar");
+        const oCtx = this.getView()!.getBindingContext();
+        if (!oCtx) {
+            MessageToast.show("Produktdaten noch nicht geladen");
+            return;
+        }
+
+        const oData = oCtx.getObject() as {
+            ProductName?: string;
+            Material?: string;
+            NetPriceAmount?: number;
+            TransactionCurrency?: string;
+            ProductSalesDescription?: string;
+            ProductPictureUrl?: string;
+        };
+
+        const sName   = oData.ProductName ?? "–";
+        const sMat    = oData.Material ?? "–";
+        const sPrice  = oData.NetPriceAmount != null
+            ? `${Number(oData.NetPriceAmount).toFixed(2)} ${oData.TransactionCurrency ?? ""}`
+            : "–";
+        const sDesc   = oData.ProductSalesDescription ?? "";
+        const sImgSrc = oData.ProductPictureUrl ?? "";
+
+        const sHtml = `<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8"/>
+<title>Datenblatt – ${sName}</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 40px; color: #1a2b4a; }
+  h1   { font-size: 1.6rem; margin-bottom: 4px; }
+  .sub { color: #6b7280; font-size: 0.85rem; margin-bottom: 24px; }
+  table { border-collapse: collapse; width: 100%; margin-bottom: 24px; }
+  td   { padding: 8px 12px; border: 1px solid #e2e8f0; }
+  td:first-child { font-weight: 600; width: 180px; background: #f8fafc; }
+  img  { max-width: 280px; max-height: 280px; object-fit: contain; display: block; margin: 0 auto 24px; }
+  .desc { font-size: 0.9rem; line-height: 1.6; color: #374151; }
+  @media print { button { display: none; } }
+</style>
+</head>
+<body>
+${sImgSrc ? `<img src="${sImgSrc}" alt="${sName}"/>` : ""}
+<h1>${sName}</h1>
+<div class="sub">Inn2 Shop – Produktdatenblatt</div>
+<table>
+  <tr><td>Artikelnummer</td><td>${sMat}</td></tr>
+  <tr><td>Listenpreis (netto)</td><td>${sPrice}</td></tr>
+</table>
+${sDesc ? `<div class="desc"><strong>Beschreibung</strong><p>${sDesc}</p></div>` : ""}
+<script>window.onload = function(){ window.print(); }<\/script>
+</body></html>`;
+
+        const oWin = window.open("", "_blank", "width=700,height=900");
+        if (oWin) {
+            oWin.document.write(sHtml);
+            oWin.document.close();
+        } else {
+            MessageToast.show("Popup wurde blockiert – bitte Popup-Blocker deaktivieren");
+        }
     }
 }

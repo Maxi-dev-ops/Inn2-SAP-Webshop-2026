@@ -158,7 +158,7 @@
                                 text="In den Warenkorb"
                                 type="Emphasized"
                                 icon="sap-icon://cart"
-                                enabled="{addToShoppingCart_ac}"
+                                enabled="{= ${addToShoppingCart_ac} !== false}"
                                 press="onAddToCart"
                                 width="100%"
                                 class="sapUiSmallMarginTop rsCartBtn"/>

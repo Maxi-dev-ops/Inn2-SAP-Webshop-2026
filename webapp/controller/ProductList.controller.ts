@@ -32,6 +32,18 @@ export default class ProductListController extends Controller {
         this._activeChip = this.byId("btnAllCategories") as Button;
 
         this._loadCatalogFilter();
+
+        // Bei jedem Zurücknavigieren Binding aktualisieren, damit die Liste nicht leer bleibt
+        UIComponent.getRouterFor(this)
+            .getRoute("RouteProductList")!
+            .attachPatternMatched(this._onRouteMatched, this);
+    }
+
+    private _onRouteMatched(): void {
+        const oBinding = (this.byId("productGrid") as any)?.getBinding("items");
+        if (oBinding && !oBinding.isSuspended()) {
+            oBinding.refresh();
+        }
     }
 
     // ─── Katalog-Filterleiste ──────────────────────────────────────────────────
@@ -133,11 +145,24 @@ export default class ProductListController extends Controller {
     public onResetFilters(): void {
         this._searchQuery = "";
         this._catalogFilter = "";
-        this._setActiveChip(this.byId("btnAllCategories") as Button);
-        this._applyFilters();
+
+        const oBtnAll = this.byId("btnAllCategories") as Button;
+        if (oBtnAll) this._setActiveChip(oBtnAll);
+
         // Suchfeld leeren
         const oSearch = this.byId("searchField") as any;
         if (oSearch) oSearch.setValue("");
+
+        // Sort-Select zurücksetzen
+        const oSortSelect = this.byId("sortSelect") as any;
+        if (oSortSelect) oSortSelect.setSelectedKey("ProductName-asc");
+
+        // Filter UND Sortierung aus der Binding entfernen
+        const oBinding = (this.byId("productGrid") as any)?.getBinding("items");
+        if (oBinding) {
+            oBinding.filter(null);
+            oBinding.sort(new Sorter("ProductName", false));
+        }
     }
 
     // ─── Ergebnis-Anzeige ─────────────────────────────────────────────────────
