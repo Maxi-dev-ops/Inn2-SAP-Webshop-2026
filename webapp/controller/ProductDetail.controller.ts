@@ -76,6 +76,10 @@ export default class ProductDetailController extends Controller {
         UIComponent.getRouterFor(this).navTo("RouteProductList");
     }
 
+    public onNavToCart(): void {
+        UIComponent.getRouterFor(this).navTo("RouteCart");
+    }
+
     public onSearch(oEvent: Event): void {
         const sQuery = (oEvent.getParameter("query") as string) ?? "";
         if (sQuery) {
@@ -89,11 +93,17 @@ export default class ProductDetailController extends Controller {
         const oCtx = this.getView()!.getBindingContext();
         if (!oCtx) return;
 
-        const oData = oCtx.getObject() as { CatalogItemUuid: string; ProductName: string };
+        const oData = oCtx.getObject() as {
+            CatalogItemUuid: string;
+            ProductName: string;
+            Material: string;
+            NetPriceAmount: number;
+            TransactionCurrency: string;
+            ProductPictureUrl: string;
+        };
         const oBtn = this.byId("addToCartBtn") as any;
         oBtn.setBusy(true);
 
-        // getOwnerComponent().getModel() — nicht getView().getModel()
         const oModel = this.getOwnerComponent()!.getModel() as ODataModel;
         oModel.callFunction("/addToShoppingCart", {
             method: "POST",
@@ -102,14 +112,81 @@ export default class ProductDetailController extends Controller {
                 oBtn.setBusy(false);
                 const oCartModel = this.getOwnerComponent()?.getModel("cartModel") as JSONModel | undefined;
                 if (oCartModel) {
-                    const nCount = (oCartModel.getProperty("/count") as number) + 1;
-                    oCartModel.setProperty("/count", nCount);
+                    const aItems = oCartModel.getProperty("/items") as Array<{ uuid: string; name: string; material: string; price: number; currency: string; pictureUrl: string; quantity: number }>;
+                    const oExisting = aItems.find((i) => i.uuid === oData.CatalogItemUuid);
+                    if (oExisting) {
+                        oExisting.quantity += 1;
+                        oCartModel.setProperty("/items", aItems);
+                    } else {
+                        aItems.push({
+                            uuid: oData.CatalogItemUuid,
+                            name: oData.ProductName,
+                            material: oData.Material,
+                            price: oData.NetPriceAmount,
+                            currency: oData.TransactionCurrency,
+                            pictureUrl: oData.ProductPictureUrl,
+                            quantity: 1
+                        });
+                        oCartModel.setProperty("/items", aItems);
+                    }
+                    oCartModel.setProperty("/count", aItems.reduce((s: number, i: { quantity: number }) => s + i.quantity, 0));
                 }
                 MessageToast.show(`„${oData.ProductName}" wurde in den Warenkorb gelegt`);
             },
-            error: () => {
+            error: (oErr: any) => {
                 oBtn.setBusy(false);
-                MessageToast.show("Fehler beim Hinzufügen zum Warenkorb");
+                console.error("addToShoppingCart error:", oErr);
+                let sMsg = "Fehler beim Hinzufügen zum Warenkorb";
+                const sResp = oErr?.responseText ?? "";
+                try {
+                    // Versuche JSON-Response
+                    const oResp = JSON.parse(sResp);
+                    sMsg = oResp?.error?.message?.value ?? sMsg;
+                } catch {
+                    // Versuche XML-Response (SAP OData V2 Standard)
+                    const oMatch = sResp.match(/<message[^>]*>([^<]+)<\/message>/i);
+                    if (oMatch?.[1]) sMsg = oMatch[1];
+                }
+                MessageToast.show(sMsg);
+            }
+        });
+    }
+
+    // ─── Bundle-Navigation ────────────────────────────────────────────────────
+
+    public onBundleItemPress(oEvent: Event): void {
+        const oCtx = (oEvent.getSource() as any).getBindingContext();
+        if (!oCtx) return;
+        const sMaterial = (oCtx.getObject() as { BillOfMaterialComponent: string }).BillOfMaterialComponent;
+        if (!sMaterial) {
+            MessageToast.show("Kein Artikel hinterlegt");
+            return;
+        }
+
+        // SAP MATNR is CHAR18 — CatalogItem.Material may be zero-padded while
+        // BillOfMaterialComponent may be the short numeric value. Try both forms.
+        const sMaterialPadded = sMaterial.padStart(18, '0');
+        const sFilter = sMaterial === sMaterialPadded
+            ? `Material eq '${sMaterial}'`
+            : `Material eq '${sMaterial}' or Material eq '${sMaterialPadded}'`;
+
+        const oModel = this.getOwnerComponent()!.getModel() as ODataModel;
+        oModel.read("/CatalogItem", {
+            urlParameters: {
+                $filter: sFilter,
+                $top: "1",
+                $select: "CatalogItemUuid"
+            },
+            success: (oData: { results: Array<{ CatalogItemUuid: string }> }) => {
+                const sUuid = oData.results?.[0]?.CatalogItemUuid;
+                if (sUuid) {
+                    UIComponent.getRouterFor(this).navTo("RouteProductDetail", { catalogItemUuid: sUuid });
+                } else {
+                    MessageToast.show(`Kein Katalog-Eintrag für Artikel ${sMaterial} gefunden`);
+                }
+            },
+            error: () => {
+                MessageToast.show("Fehler beim Laden der Komponentendaten");
             }
         });
     }

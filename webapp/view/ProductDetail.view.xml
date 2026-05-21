@@ -38,6 +38,7 @@
                         icon="sap-icon://cart"
                         type="Transparent"
                         tooltip="Warenkorb"
+                        press="onNavToCart"
                         class="rsShellBtn">
                         <customData>
                             <BadgeCustomData value="{= ${cartModel>/count} > 0 ? ${cartModel>/count} : ''}"/>
@@ -120,30 +121,10 @@
                     <content>
                         <VBox class="sapUiSmallMarginBeginEnd sapUiSmallMarginBottom">
 
-                            <!-- Menge -->
-                            <Label text="Menge" class="sapUiTinyMarginTop"/>
-                            <StepInput
-                                id="quantityInput"
-                                min="1"
-                                max="99"
-                                value="1"
-                                step="1"
-                                width="120px"/>
-
                             <!-- Preisübersicht -->
                             <HBox justifyContent="SpaceBetween" class="sapUiSmallMarginTop">
-                                <Text text="Grundpreis"/>
-                                <Text id="basePriceText" text="{
-                                    parts: [
-                                        { path: 'NetPriceAmount' },
-                                        { path: 'TransactionCurrency' }
-                                    ],
-                                    formatter: '.formatter.formatPrice'
-                                }"/>
-                            </HBox>
-                            <HBox justifyContent="SpaceBetween" class="sapUiSmallMarginTop">
-                                <Title text="Gesamtpreis" level="H5"/>
-                                <Title id="totalPriceText" text="{
+                                <Text text="Grundpreis (netto)"/>
+                                <Title id="basePriceText" text="{
                                     parts: [
                                         { path: 'NetPriceAmount' },
                                         { path: 'TransactionCurrency' }
@@ -192,13 +173,13 @@
                  TABS: Beschreibung | Downloads
                  ═══════════════════════════════════════════════════════ -->
             <VBox class="sapUiMediumMarginBeginEnd sapUiMediumMarginBottom">
-                <IconTabBar id="productTabs" expanded="true">
+                <IconTabBar id="productTabs" expanded="true" selectedKey="desc">
                     <items>
                         <IconTabFilter text="Beschreibung" key="desc">
                             <VBox class="sapUiSmallMarginTop">
                                 <Text
                                     id="productDescription"
-                                    text="{ProductSalesDescription}"
+                                    text="{= ${ProductSalesDescription} ? ${ProductSalesDescription} : 'Keine Beschreibung verfügbar.'}"
                                     wrapping="true"
                                     class="sapUiSmallMarginBottom"/>
                             </VBox>
@@ -246,7 +227,7 @@
                     showNoData="false"
                     class="rsBundleGrid">
 
-                    <CustomListItem type="Inactive">
+                    <CustomListItem type="Active" press="onBundleItemPress">
                         <VBox class="rsBundleCard">
                             <VBox class="rsBundleCardImageWrap">
                                 <Image

@@ -34,6 +34,7 @@
                         icon="sap-icon://cart"
                         type="Transparent"
                         tooltip="Warenkorb"
+                        press="onNavToCart"
                         class="rsShellBtn">
                         <customData>
                             <BadgeCustomData value="{= ${cartModel>/count} > 0 ? ${cartModel>/count} : ''}"/>

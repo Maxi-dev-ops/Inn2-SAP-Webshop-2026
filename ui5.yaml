@@ -17,7 +17,8 @@ server:
           url: https://ui5.sap.com
         backend:
           - path: /sap
-            url: https://t4eclnt100.dest
+            url: http://tld-vm-t4e.telekom.site:50000
+            client: '100'
             destination: T4ECLNT100
     - name: fiori-tools-appreload
       afterMiddleware: compression

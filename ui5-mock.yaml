@@ -17,7 +17,8 @@ server:
           url: https://ui5.sap.com
         backend:
           - path: /sap
-            url: https://t4eclnt100.dest
+            url: http://tld-vm-t4e.telekom.site:50000
+            client: '100'
             destination: T4ECLNT100
     - name: fiori-tools-appreload
       afterMiddleware: compression
@@ -47,9 +48,16 @@ server:
             metadataPath: ./webapp/localService/mainService/metadata.xml
             mockdataPath: ./webapp/localService/mainService/data
             generateMockData: true
+          - urlPath: /sap/opu/odata/sap/ZINN2_UI_MY_SHOP_CART_O2
+            metadataPath: ./webapp/localService/cartService/metadata.xml
+            mockdataPath: ./webapp/localService/cartService/data
+            generateMockData: true
+            resolveExternalServiceReferences: true
         annotations:
           - localPath: ./webapp/localService/mainService/ZINN2_UI_MY_SHOP_CATA_O2_VAN.xml
             urlPath: /sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZINN2_UI_MY_SHOP_CATA_O2_VAN',Version='0001')/$value/
+          - localPath: ./webapp/localService/cartService/ZINN2_UI_MY_SHOP_CART_O2_VAN.xml
+            urlPath: /sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZINN2_UI_MY_SHOP_CART_O2_VAN',Version='0001')/$value/
 builder:
   customTasks:
     - name: ui5-tooling-transpile-task

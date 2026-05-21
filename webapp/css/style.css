@@ -85,83 +85,90 @@
     background-color: rgba(255,255,255,0.12) !important;
 }
 
-/* Search field — outer .sapMSF: completely invisible at all times (incl. focus) */
-.rsShellSearch.sapMSF,
+/* ── SEARCH FIELD ON DARK SHELL BAR ──
+   DOM: div.sapMSF.rsShellSearch > form.sapMSFF > input.sapMSFI
+   Target every real element — outer div, form, AND input. */
+
+/* 1. Outer container div.sapMSF — strip everything */
 .rsShellBar .sapMSF {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
-    padding: 0 !important;
+    all: unset !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    width: 400px !important;
 }
 
-/* Kill SAP's own focus ring on the outer container */
-.rsShellSearch.sapMSF:focus,
-.rsShellSearch.sapMSF:focus-within,
-.rsShellSearch.sapMSFFocused,
-.rsShellSearch.sapMSFWithText,
-.rsShellBar .sapMSF:focus,
-.rsShellBar .sapMSF:focus-within,
-.rsShellBar .sapMSFFocused {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
-}
-
-/* Inner visible box — the ONLY styled element (.sapMSFI in sap_horizon) */
-.rsShellSearch .sapMSFI,
-.rsShellBar .sapMSF .sapMSFI {
+/* 2. Form wrapper — THIS was the missing target (carries the white bg in Horizon) */
+.rsShellBar .sapMSFF,
+.rsShellBar .sapMSF > form {
+    all: unset !important;
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
     background: rgba(255,255,255,0.14) !important;
     border: 1.5px solid rgba(255,255,255,0.32) !important;
     border-radius: 10px !important;
-    box-shadow: none !important;
-    transition: border-color 0.2s !important;
+    padding: 0 8px !important;
+    box-sizing: border-box !important;
+    transition: border-color 0.2s, background 0.2s !important;
 }
 
-/* Focus state only on the inner box */
-.rsShellSearch .sapMSFI:focus-within,
-.rsShellBar .sapMSF .sapMSFI:focus-within {
+/* Form focus state */
+.rsShellBar .sapMSFF:focus-within,
+.rsShellBar .sapMSF > form:focus-within {
+    background: rgba(255,255,255,0.22) !important;
     border-color: rgba(255,255,255,0.7) !important;
     box-shadow: 0 0 0 2px rgba(255,255,255,0.15) !important;
-    background: rgba(255,255,255,0.22) !important;
-    outline: none !important;
 }
 
-/* When field has a value SAP Horizon overrides .sapMSFI to white — keep it dark */
-.rsShellSearch.sapMSFWithText .sapMSFI,
-.rsShellBar .sapMSF.sapMSFWithText .sapMSFI,
-.rsShellBar .sapMSFWithText .sapMSFI {
-    background: rgba(255,255,255,0.22) !important;
-    border-color: rgba(255,255,255,0.55) !important;
-}
-
-.rsShellSearch input,
-.rsShellSearch .sapMSFVal,
-.rsShellBar .sapMSF input,
-.rsShellBar .sapMSF .sapMSFVal {
+/* 3. The actual <input> — fully transparent, white text */
+.rsShellBar input.sapMSFI,
+.rsShellBar .sapMSFF input,
+.rsShellBar .sapMSF input[type="search"] {
+    all: unset !important;
+    flex: 1 !important;
     color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
     background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
     font-size: 0.9rem !important;
     letter-spacing: 0.01em !important;
     caret-color: #ffffff !important;
+    padding: 6px 4px !important;
+    height: auto !important;
+    min-height: 0 !important;
 }
 
-.rsShellSearch input::placeholder,
-.rsShellSearch .sapMSFVal::placeholder,
+.rsShellBar input.sapMSFI::placeholder,
 .rsShellBar .sapMSF input::placeholder {
     color: rgba(255,255,255,0.52) !important;
-    font-style: italic;
+    -webkit-text-fill-color: rgba(255,255,255,0.52) !important;
+    font-style: italic !important;
 }
 
-.rsShellSearch .sapMSFB,
-.rsShellSearch .sapMSFB .sapUiIcon,
-.rsShellSearch .sapMSFB button,
-.rsShellBar .sapMSF .sapMSFB,
-.rsShellBar .sapMSF .sapMSFB .sapUiIcon {
+/* 4. Search / Reset buttons inside the form */
+.rsShellBar .sapMSFB,
+.rsShellBar .sapMSFR,
+.rsShellBar .sapMSFS {
+    all: unset !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    padding: 4px !important;
     color: rgba(255,255,255,0.75) !important;
-    background: transparent !important;
-    border: none !important;
+}
+
+.rsShellBar .sapMSFB .sapUiIcon,
+.rsShellBar .sapMSFR .sapUiIcon,
+.rsShellBar .sapMSFS .sapUiIcon {
+    color: rgba(255,255,255,0.75) !important;
+}
+
+/* 5. Static search icon (magnifying glass before input) */
+.rsShellBar .sapMSFSSI {
+    color: rgba(255,255,255,0.5) !important;
 }
 
 /* Avatar */
@@ -1195,7 +1202,7 @@ body > div {
     color: #0f172a !important;
 }
 
-/* Active / selected category pill */
+/* Active / selected category pill — intentionally kept here as fallback */
 .rsCategoryPillActive.sapMBtn .sapMBtnInner,
 .rsCategoryPillActive .sapMBtnInner {
     background: #0064d9 !important;
@@ -1214,13 +1221,35 @@ body > div {
     border-color: #0052b3 !important;
 }
 
-/* rsCategoryPill as sap.m.Button */
-.rsCategoryPill.sapMBtn {
+/* rsCategoryPill — reset the OUTER <button.sapMBtn> to a bare, invisible wrapper.
+   all:unset strips every Horizon rule; we then re-add only layout properties. */
+.rsCategoryPill.sapMBtn,
+.rsCategoryPill.sapMBtn.sapMBtnTransparent,
+.rsCategoryPill.sapMBtn.sapMFocusable {
+    all: unset !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    cursor: pointer !important;
     height: 32px !important;
-    min-width: 0 !important;
     margin: 2px !important;
-    border-radius: 30px !important;
     flex-shrink: 0 !important;
+    /* Belt-and-suspenders — explicitly zero anything Horizon might re-inject */
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
+/* Kill ::before/::after pseudo-elements (Horizon focus ring) */
+.rsCategoryPill.sapMBtn::before,
+.rsCategoryPill.sapMBtn::after {
+    all: unset !important;
+    display: none !important;
+}
+
+.rsCategoryPill.sapMBtn .sapMBtnFocusBorder {
+    display: none !important;
 }
 
 .rsCategoryPill.sapMBtn .sapMBtnInner {
@@ -1233,9 +1262,31 @@ body > div {
     color: #1e293b !important;
 }
 
+.rsCategoryPill.sapMBtn:hover {
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+}
+
 .rsCategoryPill.sapMBtn:hover .sapMBtnInner {
     border-color: #0064d9 !important;
     background: #f0f7ff !important;
+}
+
+/* Active pill — higher specificity (0-3-0) beats base pill (0-2-0), regardless of source order */
+.rsCategoryPill.rsCategoryPillActive.sapMBtn .sapMBtnInner,
+.rsCategoryPill.rsCategoryPillActive .sapMBtnInner,
+.rsCategoryPillActive.sapMBtn.sapMFocusable .sapMBtnInner {
+    background: #0064d9 !important;
+    border-color: #0064d9 !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+.rsCategoryPill.rsCategoryPillActive.sapMBtn:hover .sapMBtnInner,
+.rsCategoryPillActive.sapMBtn.sapMFocusable:hover .sapMBtnInner {
+    background: #0052b3 !important;
+    border-color: #0052b3 !important;
 }
 
 /* Sort-Select in filter panel — force dark text so it's always visible */

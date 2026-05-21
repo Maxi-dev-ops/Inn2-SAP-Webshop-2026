@@ -33,6 +33,24 @@
           "localUri": "localService/mainService/metadata.xml",
           "odataVersion": "2.0"
         }
+      },
+      "cartService": {
+        "uri": "/sap/opu/odata/sap/ZINN2_UI_MY_SHOP_CART_O2/",
+        "type": "OData",
+        "settings": {
+          "annotations": [
+            "ZINN2_UI_MY_SHOP_CART_O2_VAN"
+          ],
+          "localUri": "localService/cartService/metadata.xml",
+          "odataVersion": "2.0"
+        }
+      },
+      "ZINN2_UI_MY_SHOP_CART_O2_VAN": {
+        "uri": "/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZINN2_UI_MY_SHOP_CART_O2_VAN',Version='0001')/$value/",
+        "type": "ODataAnnotation",
+        "settings": {
+          "localUri": "localService/cartService/ZINN2_UI_MY_SHOP_CART_O2_VAN.xml"
+        }
       }
     }
   },
@@ -77,6 +95,13 @@
       "": {
         "dataSource": "mainService",
         "preload": true,
+        "settings": {
+          "refreshAfterChange": false
+        }
+      },
+      "cartService": {
+        "dataSource": "cartService",
+        "preload": true,
         "settings": {}
       }
     },
@@ -101,12 +126,23 @@
         {
           "name": "RouteProductList",
           "pattern": "",
-          "target": ["TargetProductList"]
+          "target": [
+            "TargetProductList"
+          ]
         },
         {
           "name": "RouteProductDetail",
           "pattern": "product/{catalogItemUuid}",
-          "target": ["TargetProductDetail"]
+          "target": [
+            "TargetProductDetail"
+          ]
+        },
+        {
+          "name": "RouteCart",
+          "pattern": "cart",
+          "target": [
+            "TargetCart"
+          ]
         }
       ],
       "targets": {
@@ -123,6 +159,13 @@
           "clearControlAggregation": false,
           "viewId": "ProductDetail",
           "viewName": "ProductDetail"
+        },
+        "TargetCart": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "Cart",
+          "viewName": "Cart"
         }
       }
     },

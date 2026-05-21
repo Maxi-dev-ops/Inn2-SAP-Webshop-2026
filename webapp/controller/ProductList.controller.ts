@@ -24,7 +24,7 @@ export default class ProductListController extends Controller {
     public onInit(): void {
         // Warenkorb-Modell (session-lokal, persistiert über Navigation)
         if (!this.getOwnerComponent()!.getModel("cartModel")) {
-            const oCartModel = new JSONModel({ count: 0 });
+            const oCartModel = new JSONModel({ count: 0, items: [], loading: true });
             this.getOwnerComponent()!.setModel(oCartModel, "cartModel");
         }
 
@@ -181,6 +181,10 @@ export default class ProductListController extends Controller {
         UIComponent.getRouterFor(this).navTo("RouteProductList");
     }
 
+    public onNavToCart(): void {
+        UIComponent.getRouterFor(this).navTo("RouteCart");
+    }
+
     public onProductPress(oEvent: Event): void {
         const oItem = oEvent.getSource() as any;
         const oCtx = oItem.getBindingContext();
@@ -198,11 +202,17 @@ export default class ProductListController extends Controller {
         const oBtn = oEvent.getSource() as any;
         const oCtx = oBtn.getBindingContext();
         if (!oCtx) return;
-        const oData = oCtx.getObject() as { CatalogItemUuid: string; ProductName: string };
+        const oData = oCtx.getObject() as {
+            CatalogItemUuid: string;
+            ProductName: string;
+            Material: string;
+            NetPriceAmount: number;
+            TransactionCurrency: string;
+            ProductPictureUrl: string;
+        };
 
         oBtn.setBusy(true);
 
-        // getOwnerComponent().getModel() — nicht getView().getModel()
         const oModel = this.getOwnerComponent()!.getModel() as ODataModel;
 
         oModel.callFunction("/addToShoppingCart", {
@@ -211,13 +221,39 @@ export default class ProductListController extends Controller {
             success: () => {
                 oBtn.setBusy(false);
                 const oCartModel = this.getOwnerComponent()!.getModel("cartModel") as JSONModel;
-                const nCount = (oCartModel.getProperty("/count") as number) + 1;
-                oCartModel.setProperty("/count", nCount);
+                const aItems = oCartModel.getProperty("/items") as Array<{ uuid: string; name: string; material: string; price: number; currency: string; pictureUrl: string; quantity: number }>;
+                const oExisting = aItems.find((i) => i.uuid === oData.CatalogItemUuid);
+                if (oExisting) {
+                    oExisting.quantity += 1;
+                    oCartModel.setProperty("/items", aItems);
+                } else {
+                    aItems.push({
+                        uuid: oData.CatalogItemUuid,
+                        name: oData.ProductName,
+                        material: oData.Material,
+                        price: oData.NetPriceAmount,
+                        currency: oData.TransactionCurrency,
+                        pictureUrl: oData.ProductPictureUrl,
+                        quantity: 1
+                    });
+                    oCartModel.setProperty("/items", aItems);
+                }
+                oCartModel.setProperty("/count", aItems.reduce((s: number, i: { quantity: number }) => s + i.quantity, 0));
                 MessageToast.show(`„${oData.ProductName}" wurde in den Warenkorb gelegt`);
             },
-            error: () => {
+            error: (oErr: any) => {
                 oBtn.setBusy(false);
-                MessageToast.show("Fehler beim Hinzufügen zum Warenkorb");
+                console.error("addToShoppingCart error:", oErr);
+                let sMsg = "Fehler beim Hinzufügen zum Warenkorb";
+                const sResp = oErr?.responseText ?? "";
+                try {
+                    const oResp = JSON.parse(sResp);
+                    sMsg = oResp?.error?.message?.value ?? sMsg;
+                } catch {
+                    const oMatch = sResp.match(/<message[^>]*>([^<]+)<\/message>/i);
+                    if (oMatch?.[1]) sMsg = oMatch[1];
+                }
+                MessageToast.show(sMsg);
             }
         });
     }
