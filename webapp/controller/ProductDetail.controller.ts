@@ -3,26 +3,37 @@ import ODataModel from "sap/ui/model/odata/v2/ODataModel";
 import JSONModel from "sap/ui/model/json/JSONModel";
 import UIComponent from "sap/ui/core/UIComponent";
 import MessageToast from "sap/m/MessageToast";
+import Log from "sap/base/Log";
 import Event from "sap/ui/base/Event";
+import Control from "sap/ui/core/Control";
+import Button from "sap/m/Button";
+import ResourceBundle from "sap/base/i18n/ResourceBundle";
+import ResourceModel from "sap/ui/model/resource/ResourceModel";
 import formatter from "../model/formatter";
 
 export default class ProductDetailController extends Controller {
     public readonly formatter = formatter;
 
-    // ─── Lifecycle ─────────────────────────────────────────────────────────────
+    // -- Lifecycle --
 
     public onInit(): void {
         // Lokales Modell für Bundle-Sichtbarkeit
         const oDetailModel = new JSONModel({ hasBundleItems: false });
-        this.getView()!.setModel(oDetailModel, "detailModel");
+        this.getView().setModel(oDetailModel, "detailModel");
 
         // Auf Route-Match reagieren
         UIComponent.getRouterFor(this)
-            .getRoute("RouteProductDetail")!
-            .attachPatternMatched(this._onRouteMatched, this);
+            .getRoute("RouteProductDetail")
+            .attachPatternMatched(this._onRouteMatched.bind(this));
     }
 
-    // ─── Routing ───────────────────────────────────────────────────────────────
+    /** Liest einen Text aus dem i18n-ResourceBundle, optional mit Platzhaltern {0}, {1}, … */
+    private _getText(sKey: string, aArgs?: (string | number)[]): string {
+        const oBundle = (this.getOwnerComponent().getModel("i18n") as ResourceModel).getResourceBundle() as ResourceBundle;
+        return oBundle.getText(sKey, aArgs);
+    }
+
+    // -- Routing --
 
     private _onRouteMatched(oEvent: Event): void {
         const sUuid = (oEvent.getParameter("arguments") as { catalogItemUuid: string }).catalogItemUuid;
@@ -30,7 +41,7 @@ export default class ProductDetailController extends Controller {
         // OData-Key für Guid-Typ aufbauen
         const sPath = `/CatalogItem(guid'${sUuid}')`;
 
-        this.getView()!.bindElement({
+        this.getView().bindElement({
             path: sPath,
             parameters: {
                 expand: "to_BundleItem"
@@ -50,15 +61,15 @@ export default class ProductDetailController extends Controller {
         // Prüfen ob Daten vorhanden sind (404-Fall)
         const oData = oEvent.getParameter("data") as { CatalogItemUuid?: string } | undefined;
         if (!oData || !oData.CatalogItemUuid) {
-            MessageToast.show("Produkt nicht gefunden");
+            MessageToast.show(this._getText("productNotFound"));
             UIComponent.getRouterFor(this).navTo("RouteProductList");
         }
     }
 
     private _checkBundleItems(sPath: string): void {
         // getOwnerComponent().getModel() — nicht getView().getModel()
-        const oModel = this.getOwnerComponent()!.getModel() as ODataModel;
-        const oDetailModel = this.getView()!.getModel("detailModel") as JSONModel;
+        const oModel = this.getOwnerComponent().getModel() as ODataModel;
+        const oDetailModel = this.getView().getModel("detailModel") as JSONModel;
 
         // Bundle-Items aus dem expandierten Pfad lesen
         const aBundleItems = oModel.getProperty(`${sPath}/to_BundleItem`) as unknown[] | undefined;
@@ -66,14 +77,14 @@ export default class ProductDetailController extends Controller {
         oDetailModel.setProperty("/hasBundleItems", bHasBundles);
     }
 
-    // ─── Navigation ───────────────────────────────────────────────────────────
+    // -- Navigation --
 
     public onNavBack(): void {
         UIComponent.getRouterFor(this).navTo("RouteProductList");
     }
 
     public onNavHome(): void {
-        UIComponent.getRouterFor(this).navTo("RouteProductList");
+        UIComponent.getRouterFor(this).navTo("RouteHome");
     }
 
     public onNavToCart(): void {
@@ -87,11 +98,11 @@ export default class ProductDetailController extends Controller {
         }
     }
 
-    // ─── Warenkorb ─────────────────────────────────────────────────────────────
+    // -- Warenkorb --
 
     public onAddToCart(): void {
-        const oCtx = this.getView()!.getBindingContext();
-        if (!oCtx) return;
+        const oCtx = this.getView().getBindingContext();
+        if (!oCtx) {return;}
 
         const oData = oCtx.getObject() as {
             CatalogItemUuid: string;
@@ -101,10 +112,10 @@ export default class ProductDetailController extends Controller {
             TransactionCurrency: string;
             ProductPictureUrl: string;
         };
-        const oBtn = this.byId("addToCartBtn") as any;
+        const oBtn = this.byId("addToCartBtn") as Button;
         oBtn.setBusy(true);
 
-        const oModel = this.getOwnerComponent()!.getModel() as ODataModel;
+        const oModel = this.getOwnerComponent().getModel() as ODataModel;
         oModel.callFunction("/addToShoppingCart", {
             method: "POST",
             urlParameters: { CatalogItemUuid: oData.CatalogItemUuid },
@@ -131,82 +142,43 @@ export default class ProductDetailController extends Controller {
                     }
                     oCartModel.setProperty("/count", aItems.reduce((s: number, i: { quantity: number }) => s + i.quantity, 0));
                 }
-                MessageToast.show(`„${oData.ProductName}" wurde in den Warenkorb gelegt`);
+                MessageToast.show(this._getText("addedToCart", [oData.ProductName]));
             },
-            error: (oErr: any) => {
+            error: (oErr: unknown) => {
                 oBtn.setBusy(false);
-                console.error("addToShoppingCart error:", oErr);
-                let sMsg = "Fehler beim Hinzufügen zum Warenkorb";
-                const sResp = oErr?.responseText ?? "";
+                const sResp = (oErr as { responseText?: string })?.responseText ?? "";
+                Log.error("addToShoppingCart error", sResp);
+                let sMsg = this._getText("addToCartError");
                 try {
                     // Versuche JSON-Response
-                    const oResp = JSON.parse(sResp);
+                    const oResp = JSON.parse(sResp) as { error?: { message?: { value?: string } } };
                     sMsg = oResp?.error?.message?.value ?? sMsg;
                 } catch {
                     // Versuche XML-Response (SAP OData V2 Standard)
                     const oMatch = sResp.match(/<message[^>]*>([^<]+)<\/message>/i);
-                    if (oMatch?.[1]) sMsg = oMatch[1];
+                    if (oMatch?.[1]) {sMsg = oMatch[1];}
                 }
                 MessageToast.show(sMsg);
             }
         });
     }
 
-    // ─── Bundle-Navigation ────────────────────────────────────────────────────
-
-    public onBundleItemPress(oEvent: Event): void {
-        const oCtx = (oEvent.getSource() as any).getBindingContext();
-        if (!oCtx) return;
-        const sMaterial = (oCtx.getObject() as { BillOfMaterialComponent: string }).BillOfMaterialComponent;
-        if (!sMaterial) {
-            MessageToast.show("Kein Artikel hinterlegt");
-            return;
-        }
-
-        // SAP MATNR is CHAR18 — CatalogItem.Material may be zero-padded while
-        // BillOfMaterialComponent may be the short numeric value. Try both forms.
-        const sMaterialPadded = sMaterial.padStart(18, '0');
-        const sFilter = sMaterial === sMaterialPadded
-            ? `Material eq '${sMaterial}'`
-            : `Material eq '${sMaterial}' or Material eq '${sMaterialPadded}'`;
-
-        const oModel = this.getOwnerComponent()!.getModel() as ODataModel;
-        oModel.read("/CatalogItem", {
-            urlParameters: {
-                $filter: sFilter,
-                $top: "1",
-                $select: "CatalogItemUuid"
-            },
-            success: (oData: { results: Array<{ CatalogItemUuid: string }> }) => {
-                const sUuid = oData.results?.[0]?.CatalogItemUuid;
-                if (sUuid) {
-                    UIComponent.getRouterFor(this).navTo("RouteProductDetail", { catalogItemUuid: sUuid });
-                } else {
-                    MessageToast.show(`Kein Katalog-Eintrag für Artikel ${sMaterial} gefunden`);
-                }
-            },
-            error: () => {
-                MessageToast.show("Fehler beim Laden der Komponentendaten");
-            }
-        });
-    }
-
-    // ─── Bilder ───────────────────────────────────────────────────────────────
+    // -- Bilder --
 
     public onImageError(oEvent: Event): void {
-        (oEvent.getSource() as any).addStyleClass("webshopImageBroken");
+        (oEvent.getSource() as Control).addStyleClass("webshopImageBroken");
     }
 
     public onBundleImageError(oEvent: Event): void {
-        (oEvent.getSource() as any).addStyleClass("webshopImageBroken");
+        (oEvent.getSource() as Control).addStyleClass("webshopImageBroken");
     }
 
-    // ─── Downloads ────────────────────────────────────────────────────────────
+    // -- Downloads --
 
     public onDownload(): void {
-        const oCtx = this.getView()!.getBindingContext();
+        const oCtx = this.getView().getBindingContext();
         if (!oCtx) {
-            MessageToast.show("Produktdaten noch nicht geladen");
+            MessageToast.show(this._getText("productDataNotLoaded"));
             return;
         }
 
@@ -221,17 +193,24 @@ export default class ProductDetailController extends Controller {
 
         const sName   = oData.ProductName ?? "–";
         const sMat    = oData.Material ?? "–";
-        const sPrice  = oData.NetPriceAmount != null
+        const sPrice  = oData.NetPriceAmount !== undefined && oData.NetPriceAmount !== null
             ? `${Number(oData.NetPriceAmount).toFixed(2)} ${oData.TransactionCurrency ?? ""}`
             : "–";
         const sDesc   = oData.ProductSalesDescription ?? "";
         const sImgSrc = oData.ProductPictureUrl ?? "";
 
+        // Lokalisierte Texte für das (clientseitig erzeugte) HTML-Datenblatt
+        const sTitle       = this._getText("datasheetTitle", [sName]);
+        const sSubtitle    = this._getText("datasheetSubtitle");
+        const sArticleNo   = this._getText("datasheetArticleNo");
+        const sListPrice   = this._getText("datasheetListPrice");
+        const sDescHeading = this._getText("datasheetDescription");
+
         const sHtml = `<!DOCTYPE html>
-<html lang="de">
+<html>
 <head>
 <meta charset="UTF-8"/>
-<title>Datenblatt – ${sName}</title>
+<title>${sTitle}</title>
 <style>
   body { font-family: Arial, sans-serif; margin: 40px; color: #1a2b4a; }
   h1   { font-size: 1.6rem; margin-bottom: 4px; }
@@ -247,12 +226,12 @@ export default class ProductDetailController extends Controller {
 <body>
 ${sImgSrc ? `<img src="${sImgSrc}" alt="${sName}"/>` : ""}
 <h1>${sName}</h1>
-<div class="sub">Inn2 Shop – Produktdatenblatt</div>
+<div class="sub">${sSubtitle}</div>
 <table>
-  <tr><td>Artikelnummer</td><td>${sMat}</td></tr>
-  <tr><td>Listenpreis (netto)</td><td>${sPrice}</td></tr>
+  <tr><td>${sArticleNo}</td><td>${sMat}</td></tr>
+  <tr><td>${sListPrice}</td><td>${sPrice}</td></tr>
 </table>
-${sDesc ? `<div class="desc"><strong>Beschreibung</strong><p>${sDesc}</p></div>` : ""}
+${sDesc ? `<div class="desc"><strong>${sDescHeading}</strong><p>${sDesc}</p></div>` : ""}
 <script>window.onload = function(){ window.print(); }<\/script>
 </body></html>`;
 
@@ -261,7 +240,7 @@ ${sDesc ? `<div class="desc"><strong>Beschreibung</strong><p>${sDesc}</p></div>`
             oWin.document.write(sHtml);
             oWin.document.close();
         } else {
-            MessageToast.show("Popup wurde blockiert – bitte Popup-Blocker deaktivieren");
+            MessageToast.show(this._getText("popupBlocked"));
         }
     }
 }

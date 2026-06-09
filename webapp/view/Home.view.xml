@@ -1,0 +1,166 @@
+<mvc:View
+    controllerName="com.sapwebshop2026.sapwebshop.controller.Home"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    displayBlock="true">
+
+    <Page id="homePage" showHeader="true" backgroundDesign="Solid">
+
+        <!-- SHELL BAR -->
+        <customHeader>
+            <Bar class="rsShellBar">
+                <contentLeft>
+                    <Button
+                        icon="sap-icon://home"
+                        text="{i18n>shopName}"
+                        type="Transparent"
+                        press="onNavHome"
+                        class="rsShellLogoBtn"/>
+                </contentLeft>
+                <contentMiddle>
+                    <SearchField
+                        placeholder="{i18n>searchPlaceholder}"
+                        width="400px"
+                        search="onSearch"
+                        class="rsShellSearch"/>
+                </contentMiddle>
+                <contentRight>
+                    <Button
+                        icon="sap-icon://cart"
+                        type="Transparent"
+                        tooltip="{i18n>cartTooltip}"
+                        press="onNavToCart"
+                        class="rsShellBtn">
+                        <customData>
+                            <BadgeCustomData value="{= ${cartModel>/count} > 0 ? ${cartModel>/count} : ''}"/>
+                        </customData>
+                    </Button>
+                </contentRight>
+            </Bar>
+        </customHeader>
+
+        <content>
+
+            <!-- HERO BANNER -->
+            <Panel backgroundDesign="Transparent" class="rsHeroBanner">
+                <content>
+                    <HBox justifyContent="SpaceBetween" alignItems="Center" class="rsHeroBannerInner">
+                        <VBox class="rsHeroContent">
+                            <Text text="{= ${config>/customerName} + ' · ' + ${i18n>heroBrandSuffix}}" class="rsHeroLabel"/>
+                            <Title
+                                text="{i18n>heroTitle}"
+                                level="H1"
+                                wrapping="true"
+                                class="rsHeroTitle"/>
+                            <Text
+                                text="{i18n>heroText}"
+                                wrapping="true"
+                                class="rsHeroText"/>
+                            <HBox class="sapUiMediumMarginTop">
+                                <Button
+                                    text="{i18n>heroExplore}"
+                                    type="Emphasized"
+                                    press="onExplore"
+                                    class="sapUiSmallMarginEnd"/>
+                                <Button
+                                    text="{i18n>toCart}"
+                                    type="Default"
+                                    press="onNavToCart"
+                                    class="rsHeroCatalogBtn"/>
+                            </HBox>
+                        </VBox>
+                        <!-- Kunden-Logo (White-Label): Bild unter webapp/images/ ablegen
+                             und in config>/customerLogo verweisen. Fehlt das Bild, bleibt der Container leer. -->
+                        <VBox class="rsHeroCustomerBox" justifyContent="Center" alignItems="Center">
+                            <Image src="{config>/customerLogo}" class="rsHeroCustomerLogo" error="onImageError"/>
+                        </VBox>
+                    </HBox>
+                </content>
+            </Panel>
+
+            <!-- KATEGORIEN -->
+            <VBox class="sapUiMediumMarginBeginEnd sapUiMediumMarginTop">
+                <Title text="{i18n>categories}" level="H4" class="rsPremiumTitle sapUiSmallMarginBottom"/>
+                <HBox wrap="Wrap" class="rsCategoryRow" items="{home>/categories}">
+                    <Button
+                        text="{home>title}"
+                        type="Transparent"
+                        press="onCategoryPress"
+                        class="rsCategoryPill"/>
+                </HBox>
+            </VBox>
+
+            <!-- BELIEBTE PRODUKTE -->
+            <VBox class="sapUiMediumMarginBeginEnd sapUiMediumMarginTop">
+                <HBox justifyContent="SpaceBetween" alignItems="Center" class="sapUiSmallMarginBottom">
+                    <Title text="{i18n>popularProducts}" level="H3" class="rsPremiumTitle"/>
+                    <Link text="{i18n>allProducts}" press="onExplore"/>
+                </HBox>
+
+                <List
+                    items="{home>/featured}"
+                    mode="None"
+                    showSeparators="None"
+                    class="rsProductGrid">
+                    <CustomListItem type="Active" press="onProductPress">
+                        <VBox class="rsProductCard">
+                            <VBox class="rsProductCardImageWrap">
+                                <Image src="{home>pictureUrl}" width="100%" error="onImageError"/>
+                            </VBox>
+                            <VBox class="rsProductCardBody">
+                                <VBox class="rsProductCardTitle">
+                                    <Title text="{home>name}" level="H5" wrapping="true"/>
+                                </VBox>
+                                <VBox class="rsProductCardId">
+                                    <Text text="{= ${i18n>articleNo} + ' ' + ${home>material}}"/>
+                                </VBox>
+                                <VBox class="rsProductPrice sapUiTinyMarginTop">
+                                    <Text text="{
+                                        parts: [
+                                            { path: 'home>price' },
+                                            { path: 'home>currency' }
+                                        ],
+                                        formatter: '.formatter.formatPrice'
+                                    }"/>
+                                </VBox>
+                            </VBox>
+                        </VBox>
+                    </CustomListItem>
+                </List>
+            </VBox>
+
+            <!-- INFO-BOXEN -->
+            <HBox wrap="Wrap" class="sapUiMediumMarginBeginEnd sapUiMediumMarginTop sapUiMediumMarginBottom rsInfoRow">
+                <VBox class="rsInfoBox">
+                    <HBox alignItems="Center">
+                        <core:Icon src="sap-icon://shipping-status" size="2rem" class="sapUiSmallMarginEnd rsInfoIcon"/>
+                        <VBox>
+                            <Title text="{i18n>infoShippingTitle}" level="H6"/>
+                            <Text text="{i18n>infoShippingText}" class="sapUiTinyMarginTop"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+                <VBox class="rsInfoBox">
+                    <HBox alignItems="Center">
+                        <core:Icon src="sap-icon://wrench" size="2rem" class="sapUiSmallMarginEnd rsInfoIcon"/>
+                        <VBox>
+                            <Title text="{i18n>infoSupportTitle}" level="H6"/>
+                            <Text text="{i18n>infoSupportText}" class="sapUiTinyMarginTop"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+                <VBox class="rsInfoBox">
+                    <HBox alignItems="Center">
+                        <core:Icon src="sap-icon://locked" size="2rem" class="sapUiSmallMarginEnd rsInfoIcon"/>
+                        <VBox>
+                            <Title text="{i18n>infoWarrantyTitle}" level="H6"/>
+                            <Text text="{i18n>infoWarrantyText}" class="sapUiTinyMarginTop"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </HBox>
+
+        </content>
+    </Page>
+</mvc:View>

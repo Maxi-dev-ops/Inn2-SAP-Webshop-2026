@@ -1,4 +1,5 @@
 import BaseComponent from "sap/ui/core/UIComponent";
+import JSONModel from "sap/ui/model/json/JSONModel";
 import { createDeviceModel } from "./model/models";
 
 /**
@@ -24,5 +25,18 @@ export default class Component extends BaseComponent {
 
         // set the device model
         this.setModel(createDeviceModel(), "device");
+
+        // Customer/white-label config — swap customerLogo (drop a file in webapp/images/)
+        // and customerName to re-brand the shop per customer.
+        // toUrl resolves against the app namespace, so the image loads both standalone
+        // (index.html at /) and in the FLP sandbox (flp.html under /test/).
+        const oConfigModel = new JSONModel({
+            customerName: "Maxis Backstube",
+            customerLogo: sap.ui.require.toUrl("com/sapwebshop2026/sapwebshop/images/customer-logo.png")
+        });
+        this.setModel(oConfigModel, "config");
+
+        // Hinweis: Das cartModel und der Cart-Preload werden im Root-View-Controller
+        // (controller/App.controller.ts) über model/CartService.ts angelegt/gestartet.
 	}
 }

@@ -4,13 +4,42 @@ import JSONModel from "sap/ui/model/json/JSONModel";
 import Filter from "sap/ui/model/Filter";
 import FilterOperator from "sap/ui/model/FilterOperator";
 import Sorter from "sap/ui/model/Sorter";
+import ListBinding from "sap/ui/model/ListBinding";
 import UIComponent from "sap/ui/core/UIComponent";
 import MessageToast from "sap/m/MessageToast";
+import Log from "sap/base/Log";
 import Event from "sap/ui/base/Event";
+import Control from "sap/ui/core/Control";
 import Button from "sap/m/Button";
 import HBox from "sap/m/HBox";
 import Text from "sap/m/Text";
+import List from "sap/m/List";
+import Input from "sap/m/Input";
+import SearchField from "sap/m/SearchField";
+import CheckBox from "sap/m/CheckBox";
+import Select from "sap/m/Select";
+import ResourceBundle from "sap/base/i18n/ResourceBundle";
+import ResourceModel from "sap/ui/model/resource/ResourceModel";
 import formatter from "../model/formatter";
+
+interface CartItemLite {
+    uuid: string;
+    name: string;
+    material: string;
+    price: number;
+    currency: string;
+    pictureUrl: string;
+    quantity: number;
+}
+
+interface CatalogItemData {
+    CatalogItemUuid: string;
+    ProductName: string;
+    Material: string;
+    NetPriceAmount: number;
+    TransactionCurrency: string;
+    ProductPictureUrl: string;
+}
 
 export default class ProductListController extends Controller {
     public readonly formatter = formatter;
@@ -18,16 +47,13 @@ export default class ProductListController extends Controller {
     private _searchQuery: string = "";
     private _catalogFilter: string = "";
     private _activeChip: Button | null = null;
+    private _priceMin: number = 0;
+    private _priceMax: number = Number.POSITIVE_INFINITY;
+    private _onlyPriced: boolean = false;
 
-    // ─── Lifecycle ─────────────────────────────────────────────────────────────
+    // -- Lifecycle --
 
     public onInit(): void {
-        // Warenkorb-Modell (session-lokal, persistiert über Navigation)
-        if (!this.getOwnerComponent()!.getModel("cartModel")) {
-            const oCartModel = new JSONModel({ count: 0, items: [], loading: true });
-            this.getOwnerComponent()!.setModel(oCartModel, "cartModel");
-        }
-
         // "Alle"-Button als initialer aktiver Chip merken
         this._activeChip = this.byId("btnAllCategories") as Button;
 
@@ -35,31 +61,35 @@ export default class ProductListController extends Controller {
 
         // Bei jedem Zurücknavigieren Binding aktualisieren, damit die Liste nicht leer bleibt
         UIComponent.getRouterFor(this)
-            .getRoute("RouteProductList")!
-            .attachPatternMatched(this._onRouteMatched, this);
+            .getRoute("RouteProductList")
+            .attachPatternMatched(this._onRouteMatched.bind(this));
     }
 
     private _onRouteMatched(): void {
-        const oBinding = (this.byId("productGrid") as any)?.getBinding("items");
+        const oBinding = (this.byId("productGrid") as List).getBinding("items") as ListBinding | undefined;
         if (oBinding && !oBinding.isSuspended()) {
             oBinding.refresh();
         }
     }
 
-    // ─── Katalog-Filterleiste ──────────────────────────────────────────────────
+    /** Liest einen Text aus dem i18n-ResourceBundle, optional mit Platzhaltern {0}, {1}, … */
+    private _getText(sKey: string, aArgs?: (string | number)[]): string {
+        const oBundle = (this.getOwnerComponent().getModel("i18n") as ResourceModel).getResourceBundle() as ResourceBundle;
+        return oBundle.getText(sKey, aArgs);
+    }
 
-    /**
-     * Lädt alle Kataloge aus /Catalog und rendert Chip-Buttons in der Filterleiste.
-     */
+    // -- Katalog-Filterleiste --
+
+    /** Lädt alle Kataloge aus /Catalog und rendert Chip-Buttons in der Filterleiste. */
     private _loadCatalogFilter(): void {
-        const oModel = this.getOwnerComponent()!.getModel() as ODataModel;
-        if (!oModel) return;
+        const oModel = this.getOwnerComponent().getModel() as ODataModel;
+        if (!oModel) {return;}
         oModel.read("/Catalog", {
             urlParameters: { $orderby: "CatalogId asc" },
             success: (oData: { results: Array<{ CatalogUuid: string; Title: string; CatalogId: string }> }) => {
                 const oCategoryBar = this.byId("categoryBar") as HBox;
                 oData.results.forEach((oCatalog) => {
-                    const sLabel = oCatalog.Title || `Katalog ${oCatalog.CatalogId}`;
+                    const sLabel = oCatalog.Title || this._getText("catalogFallback", [oCatalog.CatalogId]);
                     const oChip = new Button({
                         text: sLabel,
                         type: "Transparent",
@@ -93,9 +123,15 @@ export default class ProductListController extends Controller {
         }
         oNewActive.addStyleClass("rsCategoryPillActive");
         this._activeChip = oNewActive;
+
+        // Horizon-Fokusring durch Blur des DOM-Elements entfernen
+        const oDom = oNewActive.getDomRef();
+        if (oDom) {
+            (oDom as HTMLElement).blur();
+        }
     }
 
-    // ─── Suche ─────────────────────────────────────────────────────────────────
+    // -- Suche --
 
     public onSearch(oEvent: Event): void {
         this._searchQuery = (oEvent.getParameter("query") as string) ?? "";
@@ -107,10 +143,26 @@ export default class ProductListController extends Controller {
         this._applyFilters();
     }
 
-    // ─── Filter & Sortierung ───────────────────────────────────────────────────
+    // -- Filter & Sortierung --
+
+    public onPriceInputChange(): void {
+        const sMin = (this.byId("priceMinInput") as Input).getValue().trim();
+        const sMax = (this.byId("priceMaxInput") as Input).getValue().trim();
+        const nMin = parseFloat(sMin);
+        const nMax = parseFloat(sMax);
+        this._priceMin = sMin === "" || isNaN(nMin) ? 0 : Math.max(0, nMin);
+        this._priceMax = sMax === "" || isNaN(nMax) ? Number.POSITIVE_INFINITY : nMax;
+        this._applyFilters();
+    }
+
+    public onTogglePriced(oEvent: Event): void {
+        this._onlyPriced = (oEvent.getParameter("selected") as boolean) ?? false;
+        this._applyFilters();
+    }
 
     private _applyFilters(): void {
-        const oBinding = (this.byId("productGrid") as any).getBinding("items");
+        const oBinding = (this.byId("productGrid") as List).getBinding("items") as ListBinding | undefined;
+        if (!oBinding) {return;}
         const aFilters: Filter[] = [];
 
         if (this._searchQuery.trim()) {
@@ -129,56 +181,79 @@ export default class ProductListController extends Controller {
             aFilters.push(new Filter("CatalogUuid", FilterOperator.EQ, this._catalogFilter));
         }
 
+        // Preisbereich (von/bis) — je nach gesetzten Grenzen
+        const bHasMin = this._priceMin > 0;
+        const bHasMax = isFinite(this._priceMax);
+        if (bHasMin && bHasMax) {
+            aFilters.push(new Filter("NetPriceAmount", FilterOperator.BT, this._priceMin, this._priceMax));
+        } else if (bHasMin) {
+            aFilters.push(new Filter("NetPriceAmount", FilterOperator.GE, this._priceMin));
+        } else if (bHasMax) {
+            aFilters.push(new Filter("NetPriceAmount", FilterOperator.LE, this._priceMax));
+        }
+
+        if (this._onlyPriced) {
+            aFilters.push(new Filter("NetPriceAmount", FilterOperator.GT, 0));
+        }
+
         oBinding.filter(aFilters);
     }
 
     public onSort(oEvent: Event): void {
-        const sKey = (oEvent.getSource() as any).getSelectedKey() as string;
+        const sKey = (oEvent.getSource() as Select).getSelectedKey();
         const parts = sKey.split("-");
         const sPath = parts[0];
         const bDesc = parts[1] === "desc";
         const oSorter = new Sorter(sPath, bDesc);
-        const oBinding = (this.byId("productGrid") as any).getBinding("items");
-        oBinding.sort(oSorter);
+        const oBinding = (this.byId("productGrid") as List).getBinding("items") as ListBinding | undefined;
+        if (oBinding) {
+            oBinding.sort(oSorter);
+        }
     }
 
     public onResetFilters(): void {
         this._searchQuery = "";
         this._catalogFilter = "";
+        this._priceMin = 0;
+        this._priceMax = Number.POSITIVE_INFINITY;
+        this._onlyPriced = false;
 
         const oBtnAll = this.byId("btnAllCategories") as Button;
-        if (oBtnAll) this._setActiveChip(oBtnAll);
+        if (oBtnAll) {this._setActiveChip(oBtnAll);}
 
         // Suchfeld leeren
-        const oSearch = this.byId("searchField") as any;
-        if (oSearch) oSearch.setValue("");
+        (this.byId("searchField") as SearchField)?.setValue("");
+
+        // Preisfelder und Checkbox zurücksetzen
+        (this.byId("priceMinInput") as Input)?.setValue("");
+        (this.byId("priceMaxInput") as Input)?.setValue("");
+        (this.byId("cbOnlyPriced") as CheckBox)?.setSelected(false);
 
         // Sort-Select zurücksetzen
-        const oSortSelect = this.byId("sortSelect") as any;
-        if (oSortSelect) oSortSelect.setSelectedKey("ProductName-asc");
+        (this.byId("sortSelect") as Select)?.setSelectedKey("ProductName-asc");
 
         // Filter UND Sortierung aus der Binding entfernen
-        const oBinding = (this.byId("productGrid") as any)?.getBinding("items");
+        const oBinding = (this.byId("productGrid") as List).getBinding("items") as ListBinding | undefined;
         if (oBinding) {
-            oBinding.filter(null);
+            oBinding.filter([]);
             oBinding.sort(new Sorter("ProductName", false));
         }
     }
 
-    // ─── Ergebnis-Anzeige ─────────────────────────────────────────────────────
+    // -- Ergebnis-Anzeige --
 
     public onListUpdateFinished(oEvent: Event): void {
         const nTotal = oEvent.getParameter("total") as number;
         const oText = this.byId("resultCountText") as Text;
         if (oText) {
-            oText.setText(`${nTotal} Produkt${nTotal !== 1 ? "e" : ""}`);
+            oText.setText(this._getText(nTotal === 1 ? "resultCountOne" : "resultCountMany", [nTotal]));
         }
     }
 
-    // ─── Navigation ───────────────────────────────────────────────────────────
+    // -- Navigation --
 
     public onNavHome(): void {
-        UIComponent.getRouterFor(this).navTo("RouteProductList");
+        UIComponent.getRouterFor(this).navTo("RouteHome");
     }
 
     public onNavToCart(): void {
@@ -186,9 +261,8 @@ export default class ProductListController extends Controller {
     }
 
     public onProductPress(oEvent: Event): void {
-        const oItem = oEvent.getSource() as any;
-        const oCtx = oItem.getBindingContext();
-        if (!oCtx) return;
+        const oCtx = (oEvent.getSource() as Control).getBindingContext();
+        if (!oCtx) {return;}
         const oData = oCtx.getObject() as { CatalogItemUuid: string };
 
         UIComponent.getRouterFor(this).navTo("RouteProductDetail", {
@@ -196,32 +270,25 @@ export default class ProductListController extends Controller {
         });
     }
 
-    // ─── Warenkorb ─────────────────────────────────────────────────────────────
+    // -- Warenkorb --
 
     public onAddToCart(oEvent: Event): void {
-        const oBtn = oEvent.getSource() as any;
+        const oBtn = oEvent.getSource() as Button;
         const oCtx = oBtn.getBindingContext();
-        if (!oCtx) return;
-        const oData = oCtx.getObject() as {
-            CatalogItemUuid: string;
-            ProductName: string;
-            Material: string;
-            NetPriceAmount: number;
-            TransactionCurrency: string;
-            ProductPictureUrl: string;
-        };
+        if (!oCtx) {return;}
+        const oData = oCtx.getObject() as CatalogItemData;
 
         oBtn.setBusy(true);
 
-        const oModel = this.getOwnerComponent()!.getModel() as ODataModel;
+        const oModel = this.getOwnerComponent().getModel() as ODataModel;
 
         oModel.callFunction("/addToShoppingCart", {
             method: "POST",
             urlParameters: { CatalogItemUuid: oData.CatalogItemUuid },
             success: () => {
                 oBtn.setBusy(false);
-                const oCartModel = this.getOwnerComponent()!.getModel("cartModel") as JSONModel;
-                const aItems = oCartModel.getProperty("/items") as Array<{ uuid: string; name: string; material: string; price: number; currency: string; pictureUrl: string; quantity: number }>;
+                const oCartModel = this.getOwnerComponent().getModel("cartModel") as JSONModel;
+                const aItems = oCartModel.getProperty("/items") as CartItemLite[];
                 const oExisting = aItems.find((i) => i.uuid === oData.CatalogItemUuid);
                 if (oExisting) {
                     oExisting.quantity += 1;
@@ -238,36 +305,36 @@ export default class ProductListController extends Controller {
                     });
                     oCartModel.setProperty("/items", aItems);
                 }
-                oCartModel.setProperty("/count", aItems.reduce((s: number, i: { quantity: number }) => s + i.quantity, 0));
-                MessageToast.show(`„${oData.ProductName}" wurde in den Warenkorb gelegt`);
+                oCartModel.setProperty("/count", aItems.reduce((s, i) => s + i.quantity, 0));
+                MessageToast.show(this._getText("addedToCart", [oData.ProductName]));
             },
-            error: (oErr: any) => {
+            error: (oErr: unknown) => {
                 oBtn.setBusy(false);
-                console.error("addToShoppingCart error:", oErr);
-                let sMsg = "Fehler beim Hinzufügen zum Warenkorb";
-                const sResp = oErr?.responseText ?? "";
+                const sResp = (oErr as { responseText?: string })?.responseText ?? "";
+                Log.error("addToShoppingCart error", sResp);
+                let sMsg = this._getText("addToCartError");
                 try {
-                    const oResp = JSON.parse(sResp);
+                    const oResp = JSON.parse(sResp) as { error?: { message?: { value?: string } } };
                     sMsg = oResp?.error?.message?.value ?? sMsg;
                 } catch {
                     const oMatch = sResp.match(/<message[^>]*>([^<]+)<\/message>/i);
-                    if (oMatch?.[1]) sMsg = oMatch[1];
+                    if (oMatch?.[1]) {sMsg = oMatch[1];}
                 }
                 MessageToast.show(sMsg);
             }
         });
     }
 
-    // ─── Bilder ───────────────────────────────────────────────────────────────
+    // -- Bilder --
 
     /** Versteckt das img-Element bei Ladefehler → CSS-Platzhalter sichtbar. */
     public onImageError(oEvent: Event): void {
-        (oEvent.getSource() as any).addStyleClass("webshopImageBroken");
+        (oEvent.getSource() as Control).addStyleClass("webshopImageBroken");
     }
 
-    // ─── Stub-Handler (für künftige Erweiterungen) ────────────────────────────
+    // -- Stub-Handler (für künftige Erweiterungen) --
 
     public onDownload(): void {
-        MessageToast.show("Download nicht verfügbar");
+        MessageToast.show(this._getText("downloadUnavailable"));
     }
 }

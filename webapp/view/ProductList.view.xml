@@ -7,15 +7,13 @@
 
     <Page id="productListPage" showHeader="true" backgroundDesign="Solid">
 
-        <!-- ═══════════════════════════════════════════════════════════
-             SHELL BAR  (orientiert am ReferenceProject rsShellBar)
-             ═══════════════════════════════════════════════════════════ -->
+        <!-- SHELL BAR  (orientiert am ReferenceProject rsShellBar) -->
         <customHeader>
             <Bar class="rsShellBar">
                 <contentLeft>
                     <Button
                         icon="sap-icon://home"
-                        text="Inn2 Shop"
+                        text="{i18n>shopName}"
                         type="Transparent"
                         press="onNavHome"
                         class="rsShellLogoBtn"/>
@@ -23,7 +21,7 @@
                 <contentMiddle>
                     <SearchField
                         id="searchField"
-                        placeholder="Produkte suchen..."
+                        placeholder="{i18n>searchPlaceholder}"
                         width="400px"
                         liveChange="onSearchLive"
                         search="onSearch"
@@ -33,7 +31,7 @@
                     <Button
                         icon="sap-icon://cart"
                         type="Transparent"
-                        tooltip="Warenkorb"
+                        tooltip="{i18n>cartTooltip}"
                         press="onNavToCart"
                         class="rsShellBtn">
                         <customData>
@@ -44,23 +42,21 @@
             </Bar>
         </customHeader>
 
-        <!-- ═══════════════════════════════════════════════════════════
-             HAUPTINHALT:  Filter-Sidebar  |  Produktgrid
-             ═══════════════════════════════════════════════════════════ -->
+        <!-- HAUPTINHALT:  Filter-Sidebar  |  Produktgrid -->
         <content>
             <HBox class="rsProductListLayout" alignItems="Start">
 
-                <!-- ─── LINKE SIDEBAR ──────────────────────────────── -->
+                <!-- LINKE SIDEBAR -->
                 <VBox
                     id="filterPanel"
                     class="rsFilterPanel sapUiMediumMarginTop sapUiMediumMarginBegin">
 
                     <!-- Katalog-Chips (werden per Controller aus /Catalog geladen) -->
-                    <Title text="Kategorie" level="H5" class="rsFilterPanelTitle sapUiSmallMarginBottom"/>
+                    <Title text="{i18n>filterCategory}" level="H5" class="rsFilterPanelTitle sapUiSmallMarginBottom"/>
                     <HBox id="categoryBar" wrap="Wrap" class="rsCategoryRow sapUiSmallMarginBottom">
                         <Button
                             id="btnAllCategories"
-                            text="Alle"
+                            text="{i18n>filterAll}"
                             type="Transparent"
                             press="onAllCatalogsPress"
                             class="rsCategoryPill rsCategoryPillActive"/>
@@ -69,34 +65,63 @@
                     <!-- Trennlinie -->
                     <HBox class="sapUiMediumMarginTopBottom rsFilterDivider"/>
 
-                    <!-- Sortierung -->
-                    <Title text="Sortierung" level="H5" class="rsFilterPanelTitle sapUiSmallMarginBottom"/>
-                    <Select id="sortSelect" change="onSort" width="200px">
-                        <core:Item key="ProductName-asc"     text="Name A–Z"/>
-                        <core:Item key="ProductName-desc"    text="Name Z–A"/>
-                        <core:Item key="NetPriceAmount-asc"  text="Preis aufsteigend"/>
-                        <core:Item key="NetPriceAmount-desc" text="Preis absteigend"/>
-                    </Select>
+                    <!-- Preisfilter -->
+                    <Title text="{i18n>filterPrice}" level="H5" class="rsFilterPanelTitle sapUiSmallMarginBottom"/>
+                    <HBox alignItems="Center" class="rsPriceInputs sapUiSmallMarginBottom">
+                        <Input
+                            id="priceMinInput"
+                            type="Number"
+                            placeholder="{i18n>priceFrom}"
+                            change="onPriceInputChange"
+                            submit="onPriceInputChange"
+                            class="rsPriceInput"/>
+                        <Text text="–" class="sapUiTinyMarginBegin sapUiTinyMarginEnd"/>
+                        <Input
+                            id="priceMaxInput"
+                            type="Number"
+                            placeholder="{i18n>priceTo}"
+                            change="onPriceInputChange"
+                            submit="onPriceInputChange"
+                            class="rsPriceInput"/>
+                    </HBox>
+                    <CheckBox
+                        id="cbOnlyPriced"
+                        text="{i18n>onlyPriced}"
+                        select="onTogglePriced"/>
+
+                    <!-- Trennlinie -->
+                    <HBox class="sapUiMediumMarginTopBottom rsFilterDivider"/>
 
                     <!-- Filter zurücksetzen -->
                     <Button
-                        text="Filter zurücksetzen"
+                        text="{i18n>resetFilters}"
                         type="Transparent"
-                        press="onResetFilters"
-                        class="sapUiMediumMarginTop"/>
+                        press="onResetFilters"/>
                 </VBox>
 
-                <!-- ─── RECHTS: Ergebnis + Produktgrid ──────────────── -->
+                <!-- RECHTS: Ergebnis + Produktgrid -->
                 <VBox
                     class="rsProductListContent sapUiMediumMarginTop sapUiMediumMarginBeginEnd"
                     width="100%">
 
-                    <!-- Ergebnis-Zähler -->
+                    <!-- Ergebnis-Bar: Titel + Anzahl links, Sortierung rechts -->
                     <HBox
                         justifyContent="SpaceBetween"
                         alignItems="Center"
-                        class="sapUiSmallMarginBottom">
-                        <Text id="resultCountText" text=""/>
+                        class="rsResultBar">
+                        <VBox>
+                            <Title text="{i18n>products}" level="H4" class="rsResultBarTitle"/>
+                            <Text id="resultCountText" text="" class="rsResultCountText"/>
+                        </VBox>
+                        <HBox alignItems="Center" class="rsResultBarSort">
+                            <Text text="{i18n>sortBy}" class="rsResultSortLabel sapUiTinyMarginEnd"/>
+                            <Select id="sortSelect" change="onSort" width="200px">
+                                <core:Item key="ProductName-asc"     text="{i18n>sortNameAsc}"/>
+                                <core:Item key="ProductName-desc"    text="{i18n>sortNameDesc}"/>
+                                <core:Item key="NetPriceAmount-asc"  text="{i18n>sortPriceAsc}"/>
+                                <core:Item key="NetPriceAmount-desc" text="{i18n>sortPriceDesc}"/>
+                            </Select>
+                        </HBox>
                     </HBox>
 
                     <!-- Produktkacheln  (sap.m.List mit CSS-Grid via .rsProductGrid) -->
@@ -107,7 +132,7 @@
                             parameters: { operationMode: 'Server' }
                         }"
                         mode="None"
-                        noDataText="Keine Produkte gefunden"
+                        noDataText="{i18n>noProducts}"
                         busyIndicatorDelay="0"
                         growing="true"
                         growingThreshold="24"
@@ -132,9 +157,6 @@
                                 <!-- Karten-Body -->
                                 <VBox class="rsProductCardBody">
 
-                                    <!-- Badge-Zeile (Platzhalter für zukünftige Badges) -->
-                                    <HBox class="rsProductBadgeRow"/>
-
                                     <!-- Titel-Wrapper → CSS .rsProductCardTitle .sapMTitle -->
                                     <VBox class="rsProductCardTitle">
                                         <Title
@@ -145,7 +167,7 @@
 
                                     <!-- Artikelnummer-Wrapper → CSS .rsProductCardId .sapMText -->
                                     <VBox class="rsProductCardId">
-                                        <Text text="{= 'Art.-Nr. ' + ${Material}}"/>
+                                        <Text text="{= ${i18n>articleNo} + ' ' + ${Material}}"/>
                                     </VBox>
 
                                     <!-- Preis-Wrapper → CSS .rsProductPrice .sapMText -->
@@ -161,7 +183,7 @@
 
                                     <!-- In den Warenkorb -->
                                     <Button
-                                        text="In den Warenkorb"
+                                        text="{i18n>addToCartFull}"
                                         icon="sap-icon://cart"
                                         type="Emphasized"
                                         enabled="{addToShoppingCart_ac}"

@@ -56,6 +56,7 @@
   },
   "sap.ui": {
     "technology": "UI5",
+    "fullWidth": true,
     "icons": {
       "icon": "",
       "favIcon": "",
@@ -89,7 +90,9 @@
       "i18n": {
         "type": "sap.ui.model.resource.ResourceModel",
         "settings": {
-          "bundleName": "com.sapwebshop2026.sapwebshop.i18n.i18n"
+          "bundleName": "com.sapwebshop2026.sapwebshop.i18n.i18n",
+          "supportedLocales": ["de", "en"],
+          "fallbackLocale": "de"
         }
       },
       "": {
@@ -115,17 +118,25 @@
     "routing": {
       "config": {
         "routerClass": "sap.m.routing.Router",
+        "type": "View",
         "viewType": "XML",
         "async": true,
-        "viewPath": "com.sapwebshop2026.sapwebshop.view",
+        "path": "com.sapwebshop2026.sapwebshop.view",
         "controlAggregation": "pages",
         "controlId": "app",
         "clearControlAggregation": false
       },
       "routes": [
         {
-          "name": "RouteProductList",
+          "name": "RouteHome",
           "pattern": "",
+          "target": [
+            "TargetHome"
+          ]
+        },
+        {
+          "name": "RouteProductList",
+          "pattern": "products",
           "target": [
             "TargetProductList"
           ]
@@ -146,26 +157,37 @@
         }
       ],
       "targets": {
-        "TargetProductList": {
+        "TargetHome": {
+          "type": "View",
           "viewType": "XML",
           "transition": "slide",
           "clearControlAggregation": false,
-          "viewId": "ProductList",
-          "viewName": "ProductList"
+          "id": "Home",
+          "name": "Home"
+        },
+        "TargetProductList": {
+          "type": "View",
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "id": "ProductList",
+          "name": "ProductList"
         },
         "TargetProductDetail": {
+          "type": "View",
           "viewType": "XML",
           "transition": "slide",
           "clearControlAggregation": false,
-          "viewId": "ProductDetail",
-          "viewName": "ProductDetail"
+          "id": "ProductDetail",
+          "name": "ProductDetail"
         },
         "TargetCart": {
+          "type": "View",
           "viewType": "XML",
           "transition": "slide",
           "clearControlAggregation": false,
-          "viewId": "Cart",
-          "viewName": "Cart"
+          "id": "Cart",
+          "name": "Cart"
         }
       }
     },

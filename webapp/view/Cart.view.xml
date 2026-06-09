@@ -1,0 +1,257 @@
+<mvc:View
+    controllerName="com.sapwebshop2026.sapwebshop.controller.Cart"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    displayBlock="true">
+
+    <Page id="cartPage" showHeader="true" backgroundDesign="Solid">
+
+        <!-- SHELL BAR -->
+        <customHeader>
+            <Bar class="rsShellBar">
+                <contentLeft>
+                    <Button
+                        icon="sap-icon://nav-back"
+                        type="Transparent"
+                        tooltip="{i18n>back}"
+                        press="onNavBack"
+                        class="rsShellBtn"/>
+                    <Button
+                        icon="sap-icon://home"
+                        text="{i18n>shopName}"
+                        type="Transparent"
+                        press="onNavHome"
+                        class="rsShellLogoBtn"/>
+                </contentLeft>
+                <contentMiddle>
+                    <Title text="{i18n>cart}" level="H4" class="rsShellTitle"/>
+                </contentMiddle>
+                <contentRight>
+                    <Button
+                        icon="sap-icon://cart"
+                        type="Transparent"
+                        tooltip="{i18n>cartTooltip}"
+                        class="rsShellBtn">
+                        <customData>
+                            <BadgeCustomData value="{= ${cartModel>/count} > 0 ? ${cartModel>/count} : ''}"/>
+                        </customData>
+                    </Button>
+                </contentRight>
+            </Bar>
+        </customHeader>
+
+        <content>
+
+            <!-- LOADING INDICATOR -->
+            <VBox
+                visible="{cartModel>/loading}"
+                class="rsEmptyState"
+                alignItems="Center"
+                justifyContent="Center">
+                <BusyIndicator size="2rem" class="sapUiMediumMarginBottom"/>
+                <Text text="{i18n>cartLoading}" class="sapUiSmallMarginTop"/>
+            </VBox>
+
+            <!-- LEERER WARENKORB (nur zeigen wenn NICHT loading UND count === 0) -->
+            <VBox
+                visible="{= !${cartModel>/loading} &amp;&amp; ${cartModel>/count} === 0}"
+                class="rsEmptyState"
+                alignItems="Center"
+                justifyContent="Center">
+                <core:Icon src="sap-icon://cart" size="4rem" color="#9ca3af"/>
+                <Title text="{i18n>cartEmpty}" level="H3" class="sapUiMediumMarginTop"/>
+                <Text text="{i18n>cartEmptyHint}" class="sapUiSmallMarginTop"/>
+                <Button
+                    text="{i18n>toCatalog}"
+                    type="Emphasized"
+                    press="onContinueShopping"
+                    class="sapUiMediumMarginTop"/>
+            </VBox>
+
+            <!-- WARENKORB MIT INHALT -->
+            <HBox
+                visible="{= !${cartModel>/loading} &amp;&amp; ${cartModel>/count} > 0}"
+                class="sapUiMediumMarginBeginEnd sapUiMediumMarginTop"
+                wrap="Wrap"
+                alignItems="Start">
+
+                <!-- Artikel-Liste -->
+                <VBox class="rsCartItemsColumn sapUiMediumMarginEnd">
+
+                    <Title
+                        text="{= ${cartModel>/count} + ' ' + ${i18n>cartItemsInCart}}"
+                        level="H4"
+                        class="sapUiSmallMarginBottom"/>
+
+                    <List
+                        id="cartList"
+                        items="{cartModel>/items}"
+                        mode="None"
+                        showNoData="false"
+                        showSeparators="None">
+
+                        <CustomListItem class="rsCartListItem">
+                            <HBox class="rsCartItem rsCartItemGrid" alignItems="Center">
+
+                                <!-- Produktbild -->
+                                <Image
+                                    src="{cartModel>pictureUrl}"
+                                    width="80px"
+                                    height="80px"
+                                    class="rsCartItemImage"
+                                    error="onCartImageError"/>
+
+                                <!-- Produktinfo -->
+                                <VBox class="rsCartItemInfo">
+                                    <Title text="{cartModel>name}" level="H5" wrapping="true"/>
+                                    <Text text="{= ${i18n>articleNo} + ' ' + ${cartModel>material}}" class="sapUiTinyMarginTop"/>
+                                </VBox>
+
+                                <!-- Menge-Steuerung -->
+                                <HBox class="rsQtyBox" alignItems="Center" justifyContent="Center">
+                                    <Button
+                                        icon="sap-icon://less"
+                                        type="Transparent"
+                                        press="onDecreaseQty"
+                                        tooltip="{i18n>qtyDecrease}"/>
+                                    <Text class="rsQtyText" text="{cartModel>quantity}"/>
+                                    <Button
+                                        icon="sap-icon://add"
+                                        type="Transparent"
+                                        press="onIncreaseQty"
+                                        tooltip="{i18n>qtyIncrease}"/>
+                                </HBox>
+
+                                <!-- Zeilenpreis -->
+                                <VBox class="rsCartItemPrice" alignItems="End">
+                                    <Text
+                                        visible="{= ${cartModel>quantity} > 1}"
+                                        text="{
+                                            parts: [
+                                                { path: 'cartModel>price' },
+                                                { path: 'cartModel>currency' },
+                                                { path: 'cartModel>quantity' }
+                                            ],
+                                            formatter: '.formatter.formatUnitLine'
+                                        }"
+                                        class="rsCartUnitLine"/>
+                                    <Title
+                                        text="{
+                                            parts: [
+                                                { path: 'cartModel>price' },
+                                                { path: 'cartModel>currency' },
+                                                { path: 'cartModel>quantity' }
+                                            ],
+                                            formatter: '.formatter.formatLinePrice'
+                                        }"
+                                        level="H5"/>
+                                    <Button
+                                        icon="sap-icon://delete"
+                                        type="Transparent"
+                                        press="onRemoveItem"
+                                        tooltip="{i18n>removeItem}"
+                                        class="sapUiTinyMarginTop"/>
+                                </VBox>
+
+                            </HBox>
+                        </CustomListItem>
+                    </List>
+                </VBox>
+
+                <!-- Zusammenfassung -->
+                <Panel class="rsCartSummaryPanel" backgroundDesign="Transparent">
+                    <headerToolbar>
+                        <Toolbar>
+                            <Title text="{i18n>summary}" level="H5"/>
+                        </Toolbar>
+                    </headerToolbar>
+                    <content>
+                        <VBox class="sapUiSmallMarginBeginEnd sapUiSmallMarginBottom">
+
+                            <HBox justifyContent="SpaceBetween" class="sapUiTinyMarginTop">
+                                <Text text="{i18n>itemsTotal}"/>
+                                <Text text="{cartModel>/count}"/>
+                            </HBox>
+                            <HBox justifyContent="SpaceBetween" class="sapUiTinyMarginTop">
+                                <Text text="{i18n>ofWhichPriced}"/>
+                                <Text text="{
+                                    path: 'cartModel>/',
+                                    formatter: '.formatter.formatPricedCount'
+                                }"/>
+                            </HBox>
+                            <HBox justifyContent="SpaceBetween" class="sapUiTinyMarginTop">
+                                <Text text="{i18n>subtotalNet}"/>
+                                <Text text="{
+                                    path: 'cartModel>/',
+                                    formatter: '.formatter.formatCartTotal'
+                                }"/>
+                            </HBox>
+                            <HBox
+                                justifyContent="SpaceBetween"
+                                class="sapUiTinyMarginTop"
+                                visible="{
+                                    path: 'cartModel>/',
+                                    formatter: '.formatter.hasUnpricedItems'
+                                }">
+                                <Text text="{i18n>priceOnRequest}"/>
+                                <Text text="{
+                                    path: 'cartModel>/',
+                                    formatter: '.formatter.formatUnpricedCount'
+                                }"/>
+                            </HBox>
+                            <HBox justifyContent="SpaceBetween" class="sapUiTinyMarginTop rsGreen">
+                                <Text text="{i18n>shipping}" class="rsGreen"/>
+                                <Text text="{i18n>free}" class="rsGreen"/>
+                            </HBox>
+
+                            <HBox class="rsFilterDivider sapUiSmallMarginTopBottom"/>
+
+                            <HBox justifyContent="SpaceBetween" class="sapUiTinyMarginTop">
+                                <Title text="{i18n>totalNet}" level="H5"/>
+                                <Title text="{
+                                    path: 'cartModel>/',
+                                    formatter: '.formatter.formatCartTotal'
+                                }" level="H5" class="rsPriceHighlight"/>
+                            </HBox>
+
+                            <Button
+                                text="{i18n>orderNow}"
+                                type="Emphasized"
+                                icon="sap-icon://accept"
+                                press="onOrder"
+                                width="100%"
+                                class="sapUiSmallMarginTop"/>
+
+                            <Button
+                                text="{i18n>continueShopping}"
+                                type="Transparent"
+                                press="onContinueShopping"
+                                width="100%"
+                                class="sapUiTinyMarginTop"/>
+
+                            <!-- Trust badges -->
+                            <VBox class="rsCartTrustBadges sapUiSmallMarginTop">
+                                <HBox alignItems="Center" class="sapUiTinyMarginBottom">
+                                    <core:Icon src="sap-icon://locked" class="sapUiTinyMarginEnd rsGreen"/>
+                                    <Text text="{i18n>trustSsl}" class="rsGreen"/>
+                                </HBox>
+                                <HBox alignItems="Center" class="sapUiTinyMarginBottom">
+                                    <core:Icon src="sap-icon://shipping-status" class="sapUiTinyMarginEnd"/>
+                                    <Text text="{i18n>trustShipping}"/>
+                                </HBox>
+                                <HBox alignItems="Center">
+                                    <core:Icon src="sap-icon://undo" class="sapUiTinyMarginEnd"/>
+                                    <Text text="{i18n>trustReturns}"/>
+                                </HBox>
+                            </VBox>
+
+                        </VBox>
+                    </content>
+                </Panel>
+
+            </HBox>
+
+        </content>
+    </Page>
+</mvc:View>

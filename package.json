@@ -2,6 +2,7 @@
   "name": "sap-webshop",
   "version": "0.0.1",
   "description": "An B2B SAP Fiori Webshop",
+  "private": "true",
   "keywords": [
     "ui5",
     "openui5",
@@ -20,7 +21,8 @@
     "@sap-ux/ui5-middleware-fe-mockserver": "2"
   },
   "scripts": {
-    "start": "fiori run --open \"test/flp.html#app-preview\"",
+    "start": "fiori run --open \"index.html?sap-ui-xx-viewCache=false\"",
+    "start-flp": "fiori run --open \"test/flp.html#app-preview\"",
     "start-local": "fiori run --config ./ui5-local.yaml --open \"test/flp.html#app-preview\"",
     "build": "ui5 build --config=ui5.yaml --clean-dest --dest dist",
     "lint": "eslint ./",

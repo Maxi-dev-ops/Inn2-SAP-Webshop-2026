@@ -4,7 +4,7 @@ QUnit.config.autostart = false;
 
 // import all your QUnit tests here
 void Promise.all([
-import("unit/controller/View1Page.controller")
+	// Add unit test modules here as the app grows
 ]).then(() => {
 	QUnit.start();
 });
