@@ -5,7 +5,6 @@
     "skipLibCheck": true,
     "allowJs": true,
     "strict": true,
-    "strictPropertyInitialization": false,
     "moduleResolution": "node",
     "rootDir": "./webapp",
     "outDir": "./dist",
@@ -23,7 +22,7 @@
     },
     "typeRoots": [
       "./node_modules/@types",
-      "./node_modules/@sapui5/ts-types-esm"
+      "./node_modules/@sapui5/types"
     ]
   },
   "include": [

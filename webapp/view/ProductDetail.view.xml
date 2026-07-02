@@ -7,48 +7,32 @@
 
     <Page id="productDetailPage" showHeader="true" backgroundDesign="Solid">
 
-        <!-- SHELL BAR -->
+        <!-- Shell bar -->
         <customHeader>
             <Bar class="rsShellBar">
                 <contentLeft>
-                    <Button
-                        icon="sap-icon://nav-back"
-                        type="Transparent"
-                        tooltip="{i18n>back}"
-                        press="onNavBack"
-                        class="rsShellBtn"/>
-                    <Button
-                        icon="sap-icon://home"
-                        text="{i18n>shopName}"
-                        type="Transparent"
-                        press="onNavHome"
-                        class="rsShellLogoBtn"/>
+                    <core:Fragment fragmentName="com.sapwebshop2026.sapwebshop.view.ShellBarLeftNav" type="XML"/>
                 </contentLeft>
                 <contentMiddle>
+                    <core:InvisibleText id="pdpSearchLabel" text="{i18n>searchAriaLabel}"/>
                     <SearchField
+                        id="pdpSearchField"
                         placeholder="{i18n>searchPlaceholder}"
+                        tooltip="{i18n>searchAriaLabel}"
+                        ariaLabelledBy="pdpSearchLabel"
                         width="400px"
                         search="onSearch"
                         class="rsShellSearch"/>
                 </contentMiddle>
                 <contentRight>
-                    <Button
-                        icon="sap-icon://cart"
-                        type="Transparent"
-                        tooltip="{i18n>cartTooltip}"
-                        press="onNavToCart"
-                        class="rsShellBtn">
-                        <customData>
-                            <BadgeCustomData value="{= ${cartModel>/count} > 0 ? ${cartModel>/count} : ''}"/>
-                        </customData>
-                    </Button>
+                    <core:Fragment fragmentName="com.sapwebshop2026.sapwebshop.view.ShellBarRight" type="XML"/>
                 </contentRight>
             </Bar>
         </customHeader>
 
         <content>
 
-            <!-- PRODUKT-KOPFZEILE  (Name | Preis) -->
+            <!-- Product header -->
             <HBox
                 class="sapUiMediumMarginBeginEnd sapUiSmallMarginBottom sapUiMediumMarginTop"
                 justifyContent="SpaceBetween"
@@ -56,18 +40,23 @@
                 <VBox>
                     <Title id="productName" text="{ProductName}" level="H2"/>
                     <HBox alignItems="Center" class="sapUiTinyMarginTop">
-                        <!-- ID-Wrapper → CSS .rsProductDetailId .sapMText -->
-                        <VBox class="rsProductDetailId sapUiSmallMarginEnd">
+                            <VBox class="rsProductDetailId sapUiSmallMarginEnd">
                             <Text text="{= ${i18n>articleNo} + ' ' + ${Material}}"/>
                         </VBox>
                     </HBox>
                 </VBox>
                 <VBox alignItems="End">
-                    <!-- Preis-Label-Wrapper → CSS .rsProductPriceLabel .sapMText -->
+                    <!-- Wishlist heart -->
+                    <Button
+                        id="pdpWishlistBtn"
+                        icon="sap-icon://heart-2"
+                        type="Transparent"
+                        tooltip="{i18n>addToWishlist}"
+                        press="onToggleWishlist"
+                        class="rsCardHeartBtn rsPdpHeartBtn sapUiTinyMarginBottom"/>
                     <VBox class="rsProductPriceLabel">
                         <Text text="{i18n>listPriceNet}"/>
                     </VBox>
-                    <!-- Preis-Wrapper → CSS .rsProductPriceMain .sapMTitle -->
                     <VBox class="rsProductPriceMain">
                         <Title id="productPrice" text="{
                             parts: [
@@ -83,29 +72,28 @@
                 </VBox>
             </HBox>
 
-            <!-- HAUPTLAYOUT: Bild-Spalte | Konfigurations-Panel -->
+            <!-- Main content: Image | Configuration panel -->
             <HBox
                 class="sapUiMediumMarginBeginEnd sapUiMediumMarginBottom rsDetailLayout"
                 alignItems="Start"
                 wrap="Wrap">
 
-                <!-- Bild-Spalte -->
                 <VBox class="rsDetailImageColumn sapUiSmallMarginEnd">
-                    <!-- Thumbnail-Leiste (leer – bei Bedarf per Controller befüllbar) -->
                     <VBox id="thumbnailContainer" class="rsDetailImageThumbs"/>
 
-                    <!-- Hauptbild -->
                     <Panel class="rsDetailMainImagePanel">
                         <Image
                             id="mainProductImage"
                             src="{ProductPictureUrl}"
+                            alt="{ProductName}"
+                            tooltip="{ProductName}"
                             width="100%"
                             class="rsDetailMainImage"
                             error="onImageError"/>
                     </Panel>
                 </VBox>
 
-                <!-- Konfigurations-Panel -->
+                <!-- Configuration panel -->
                 <Panel class="rsDetailConfigPanel" backgroundDesign="Transparent">
                     <headerToolbar>
                         <Toolbar>
@@ -115,7 +103,7 @@
                     <content>
                         <VBox class="sapUiSmallMarginBeginEnd sapUiSmallMarginBottom">
 
-                            <!-- Preisübersicht -->
+                            <!-- Price overview -->
                             <HBox justifyContent="SpaceBetween" class="sapUiSmallMarginTop">
                                 <Text text="{i18n>basePriceNet}"/>
                                 <Title id="basePriceText" text="{
@@ -127,18 +115,29 @@
                                 }" level="H5" class="rsPriceHighlight"/>
                             </HBox>
 
-                            <!-- CTA Buttons -->
-                            <Button
-                                id="addToCartBtn"
-                                text="{i18n>addToCartFull}"
-                                type="Emphasized"
-                                icon="sap-icon://cart"
-                                enabled="{= ${addToShoppingCart_ac} !== false}"
-                                press="onAddToCart"
-                                width="100%"
-                                class="sapUiSmallMarginTop rsCartBtn"/>
+                            <!-- Buy box -->
+                            <VBox class="rsPdpBuyBox sapUiSmallMarginTop">
+                                <HBox class="rsPdpQtyLine" alignItems="Center">
+                                    <Label text="{i18n>qtyLabel}" class="rsPdpQtyLabel"/>
+                                    <StepInput
+                                        id="pdpQtyInput"
+                                        min="1"
+                                        max="99"
+                                        value="1"
+                                        width="130px"/>
+                                </HBox>
+                                <Button
+                                    id="addToCartBtn"
+                                    text="{i18n>addToCartFull}"
+                                    type="Emphasized"
+                                    icon="sap-icon://cart"
+                                    enabled="{= ${addToShoppingCart_ac} !== false}"
+                                    press="onAddToCart"
+                                    width="100%"
+                                    class="rsPdpCartBtn sapUiSmallMarginTop"/>
+                            </VBox>
 
-                            <!-- Lieferinfos -->
+                            <!-- Delivery info -->
                             <VBox class="sapUiSmallMarginTop rsDeliveryInfo">
                                 <HBox alignItems="Center" class="sapUiTinyMarginBottom">
                                     <core:Icon src="sap-icon://accept" color="Positive" class="sapUiTinyMarginEnd"/>
@@ -163,7 +162,7 @@
                 </Panel>
             </HBox>
 
-            <!-- TABS: Beschreibung | Downloads -->
+            <!-- Tabs -->
             <VBox class="sapUiMediumMarginBeginEnd sapUiMediumMarginBottom">
                 <IconTabBar id="productTabs" expanded="true" selectedKey="desc">
                     <items>
@@ -178,17 +177,9 @@
                         </IconTabFilter>
                         <IconTabFilter text="{i18n>tabDownloads}" key="downloads">
                             <VBox class="sapUiSmallMarginTop">
-                                <HBox alignItems="Center" class="sapUiSmallMarginBottom">
+                                                <HBox alignItems="Center" class="sapUiSmallMarginBottom">
                                     <core:Icon src="sap-icon://pdf-attachment" size="1.5rem" class="sapUiSmallMarginEnd"/>
                                     <Link text="{i18n>downloadDatasheet}" press="onDownload"/>
-                                </HBox>
-                                <HBox alignItems="Center" class="sapUiSmallMarginBottom">
-                                    <core:Icon src="sap-icon://pdf-attachment" size="1.5rem" class="sapUiSmallMarginEnd"/>
-                                    <Link text="{i18n>downloadManual}" press="onDownload"/>
-                                </HBox>
-                                <HBox alignItems="Center">
-                                    <core:Icon src="sap-icon://excel-attachment" size="1.5rem" class="sapUiSmallMarginEnd"/>
-                                    <Link text="{i18n>downloadCad}" press="onDownload"/>
                                 </HBox>
                             </VBox>
                         </IconTabFilter>
@@ -196,7 +187,7 @@
                 </IconTabBar>
             </VBox>
 
-            <!-- BUNDLE-KOMPONENTEN  (nur bei Stückliste) -->
+            <!-- Bundle components (visible only for BOM products) -->
             <VBox
                 id="bundleSection"
                 class="sapUiMediumMarginBeginEnd sapUiMediumMarginBottom"
@@ -222,6 +213,8 @@
                             <VBox class="rsBundleCardImageWrap">
                                 <Image
                                     src="{ProductPictureUrl}"
+                                    alt="{ComponentDescription}"
+                                    tooltip="{ComponentDescription}"
                                     width="100%"
                                     error="onBundleImageError"/>
                             </VBox>

@@ -1,6 +1,10 @@
 import BaseComponent from "sap/ui/core/UIComponent";
 import JSONModel from "sap/ui/model/json/JSONModel";
+import ResourceModel from "sap/ui/model/resource/ResourceModel";
+import ResourceBundle from "sap/base/i18n/ResourceBundle";
 import { createDeviceModel } from "./model/models";
+import Formatter from "./model/formatter";
+import ErrorHandler from "./controller/ErrorHandler";
 
 /**
  * @namespace com.sapwebshop2026.sapwebshop
@@ -11,32 +15,36 @@ export default class Component extends BaseComponent {
 		manifest: "json"
 	};
 
-    /**
-     * The component is initialized by UI5 automatically during the startup of the app and calls the init method once.
-     * @public
-     * @override
-     */
+	private _oErrorHandler?: ErrorHandler;
+
 	public init() : void {
-		// call the base component's init function
 		super.init();
 
-        // enable routing
-        this.getRouter().initialize();
+		// Central handler for fatal OData errors (service/metadata unreachable)
+		this._oErrorHandler = new ErrorHandler(this);
 
-        // set the device model
-        this.setModel(createDeviceModel(), "device");
+		// Reuse the already-loaded i18n bundle in the formatter
+		const oBundle = (this.getModel("i18n") as ResourceModel).getResourceBundle();
+		if (oBundle instanceof Promise) {
+			void oBundle.then((oResolved: ResourceBundle) => Formatter.setBundle(oResolved));
+		} else {
+			Formatter.setBundle(oBundle);
+		}
 
-        // Customer/white-label config — swap customerLogo (drop a file in webapp/images/)
-        // and customerName to re-brand the shop per customer.
-        // toUrl resolves against the app namespace, so the image loads both standalone
-        // (index.html at /) and in the FLP sandbox (flp.html under /test/).
+		this.getRouter().initialize();
+		this.setModel(createDeviceModel(), "device");
+
+        // Demo mode shows placeholder data
+        const demoMode = new URLSearchParams(window.location.search).get("demo") === "true";
         const oConfigModel = new JSONModel({
-            customerName: "Maxis Backstube",
+            demoMode: demoMode,
+            customerName: demoMode ? "Demo GmbH" : "",
             customerLogo: sap.ui.require.toUrl("com/sapwebshop2026/sapwebshop/images/customer-logo.png")
         });
         this.setModel(oConfigModel, "config");
+	}
 
-        // Hinweis: Das cartModel und der Cart-Preload werden im Root-View-Controller
-        // (controller/App.controller.ts) über model/CartService.ts angelegt/gestartet.
+	public exit(): void {
+		this._oErrorHandler?.destroy();
 	}
 }

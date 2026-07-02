@@ -58,7 +58,7 @@
     "technology": "UI5",
     "fullWidth": true,
     "icons": {
-      "icon": "",
+      "icon": "sap-icon://cart",
       "favIcon": "",
       "phone": "",
       "phone@2": "",
@@ -74,12 +74,10 @@
   "sap.ui5": {
     "flexEnabled": false,
     "dependencies": {
-      "minUI5Version": "1.102.8",
+      "minUI5Version": "1.136.0",
       "libs": {
         "sap.m": {},
-        "sap.ui.core": {},
-        "sap.ui.layout": {},
-        "sap.f": {}
+        "sap.ui.core": {}
       }
     },
     "contentDensities": {
@@ -91,8 +89,11 @@
         "type": "sap.ui.model.resource.ResourceModel",
         "settings": {
           "bundleName": "com.sapwebshop2026.sapwebshop.i18n.i18n",
-          "supportedLocales": ["de", "en"],
-          "fallbackLocale": "de"
+          "supportedLocales": [
+            "de",
+            "en"
+          ],
+          "fallbackLocale": "en"
         }
       },
       "": {
@@ -136,7 +137,7 @@
         },
         {
           "name": "RouteProductList",
-          "pattern": "products",
+          "pattern": "products:?query:",
           "target": [
             "TargetProductList"
           ]
@@ -153,6 +154,34 @@
           "pattern": "cart",
           "target": [
             "TargetCart"
+          ]
+        },
+        {
+          "name": "RouteWishlist",
+          "pattern": "wishlist",
+          "target": [
+            "TargetWishlist"
+          ]
+        },
+        {
+          "name": "RouteOrderConfirm",
+          "pattern": "order-confirm",
+          "target": [
+            "TargetOrderConfirm"
+          ]
+        },
+        {
+          "name": "RouteOrderHistory",
+          "pattern": "order-history",
+          "target": [
+            "TargetOrderHistory"
+          ]
+        },
+        {
+          "name": "RouteProfile",
+          "pattern": "profile",
+          "target": [
+            "TargetProfile"
           ]
         }
       ],
@@ -188,6 +217,38 @@
           "clearControlAggregation": false,
           "id": "Cart",
           "name": "Cart"
+        },
+        "TargetWishlist": {
+          "type": "View",
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "id": "Wishlist",
+          "name": "Wishlist"
+        },
+        "TargetOrderConfirm": {
+          "type": "View",
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "id": "OrderConfirm",
+          "name": "OrderConfirm"
+        },
+        "TargetOrderHistory": {
+          "type": "View",
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "id": "OrderHistory",
+          "name": "OrderHistory"
+        },
+        "TargetProfile": {
+          "type": "View",
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "id": "Profile",
+          "name": "Profile"
         }
       }
     },

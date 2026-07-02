@@ -9,7 +9,7 @@ server:
     - name: fiori-tools-proxy
       afterMiddleware: compression
       configuration:
-        ignoreCertErrors: false # If set to true, certificate errors will be ignored. E.g. self-signed certificates will be accepted
+        ignoreCertErrors: false
         ui5:
           path:
             - /resources
@@ -34,7 +34,7 @@ server:
     - name: ui5-tooling-transpile-middleware
       afterMiddleware: compression
       configuration:
-        debug: true
+        debug: false
         transformModulesToUI5:
           overridesToOverride: true
         excludePatterns:
@@ -44,6 +44,6 @@ builder:
     - name: ui5-tooling-transpile-task
       afterTask: replaceVersion
       configuration:
-        debug: true
+        debug: false
         transformModulesToUI5:
           overridesToOverride: true

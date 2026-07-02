@@ -1,14 +1,13 @@
 import JSONModel from "sap/ui/model/json/JSONModel";
 import ODataModel from "sap/ui/model/odata/v2/ODataModel";
 import UIComponent from "sap/ui/core/UIComponent";
+import Log from "sap/base/Log";
+import Constants from "./Constants";
 
-/**
- * Eine Warenkorb-Position in der schlanken Frontend-Struktur,
- * wie sie im "cartModel" (JSONModel) liegt.
- */
 export interface CartItem {
     uuid: string;
-    cartItemUuid: string;
+    /** Backend key of the cart position; empty for optimistic items until the next backend load. */
+    cartItemUuid?: string;
     name: string;
     material: string;
     price: number;
@@ -17,20 +16,15 @@ export interface CartItem {
     quantity: number;
 }
 
-/**
- * CartService — kapselt die Warenkorb-Logik, die sonst doppelt in
- * Component.ts und Cart.controller.ts lag:
- *
- *  - mapRawItems():            OData-Rohzeilen → CartItem-Struktur
- *  - preload():                Cart beim App-Start vorladen (Badge sofort korrekt)
- *  - enrichPricesFromCatalog(): fehlende Preise (NetPriceAmount=0) aus dem
- *                              Katalog-Service nach Material-Nummer nachladen
- *
- * Wird mit der UIComponent instanziiert und holt sich die Models selbst:
- *   cartModel   (JSONModel)  – Frontend-Warenkorb
- *   cartService (ODataModel) – ZINN2_UI_MY_SHOP_CART_O2
- *   ""          (ODataModel) – ZINN2_UI_MY_SHOP_CATA_O2 (Katalog, Default-Model)
- */
+export interface CatalogProduct {
+    CatalogItemUuid: string;
+    ProductName: string;
+    Material: string;
+    NetPriceAmount: number | string;
+    TransactionCurrency: string;
+    ProductPictureUrl: string;
+}
+
 export default class CartService {
     private readonly _oComponent: UIComponent;
 
@@ -38,39 +32,48 @@ export default class CartService {
         this._oComponent = oComponent;
     }
 
-    // -- Model-Zugriff --
+    // -- Internal model access --
 
     private _getCartModel(): JSONModel | null {
-        return this._oComponent.getModel("cartModel") as JSONModel | null;
+        return this._oComponent.getModel(Constants.MODELS.CART) as JSONModel | null;
     }
 
     private _getCartODataModel(): ODataModel | null {
-        return this._oComponent.getModel("cartService") as ODataModel | null;
+        return this._oComponent.getModel(Constants.MODELS.CART_SERVICE) as ODataModel | null;
     }
 
     private _getCatalogModel(): ODataModel | null {
         return this._oComponent.getModel() as ODataModel | null;
     }
 
-    // -- Mapping --
+    // -- Static utilities (no component state) --
 
-    /** Sichere String-Konvertierung eines untypisierten OData-Feldwerts. */
     private static toStr(v: unknown): string {
         if (typeof v === "string") {return v;}
         if (typeof v === "number" || typeof v === "boolean") {return String(v);}
         return "";
     }
 
-    /** Sichere Float-Konvertierung (OData V2 liefert Decimals als String). */
-    private static toNum(v: unknown): number {
+    private static errText(oErr: unknown): string {
+        return (oErr as { responseText?: string })?.responseText ?? "";
+    }
+
+    public static updateVisibility(oCartModel: JSONModel): void {
+        const bLoading = oCartModel.getProperty("/loading") as boolean;
+        const nCount = oCartModel.getProperty("/count") as number;
+        oCartModel.setProperty("/showEmpty", !bLoading && nCount === 0);
+        oCartModel.setProperty("/showItems", !bLoading && nCount > 0);
+    }
+
+    /** Safe float conversion (OData V2 delivers Edm.Decimal as string). */
+    public static toNum(v: unknown): number {
         const n = parseFloat(CartService.toStr(v));
         return isNaN(n) ? 0 : n;
     }
 
-    /** Wandelt OData-Rohzeilen (/ShoppingCartItem) in die Frontend-Struktur um. */
     public static mapRawItems(aRaw: Array<Record<string, unknown>>): CartItem[] {
         return aRaw.map((r) => ({
-            uuid: CartService.toStr(r.ShoppingCartItemUuid),
+            uuid: CartService.toStr(r.CatalogItemUuid ?? r.ShoppingCartItemUuid),
             cartItemUuid: CartService.toStr(r.ShoppingCartItemUuid),
             name: CartService.toStr(r.ProductName),
             material: CartService.toStr(r.Material),
@@ -81,20 +84,43 @@ export default class CartService {
         }));
     }
 
-    // -- Preload beim App-Start --
+    // -- Instance API (reads/writes the component models) --
 
-    /**
-     * Liest die Warenkorb-Positionen aus dem Cart-Service und füllt das cartModel.
-     * Wird beim App-Start (App.controller) aufgerufen, damit das Badge im
-     * Shell-Header sofort die korrekte Anzahl zeigt und der erste Cart-Klick
-     * ohne Ladewartezeit reagiert.
-     */
+    /** Adds a product to the frontend cart model (or increases quantity if already present). */
+    public addItem(oProduct: CatalogProduct, nQuantity = 1): void {
+        const oCartModel = this._getCartModel();
+        if (!oCartModel) {return;}
+
+        const nQty = Math.max(1, Math.round(nQuantity));
+        const aItems = (oCartModel.getProperty("/items") as CartItem[] | undefined) ?? [];
+        const oExisting = aItems.find((i) => i.uuid === oProduct.CatalogItemUuid);
+        if (oExisting) {
+            oExisting.quantity += nQty;
+        } else {
+            aItems.push({
+                uuid: oProduct.CatalogItemUuid,
+                name: oProduct.ProductName,
+                material: oProduct.Material,
+                price: CartService.toNum(oProduct.NetPriceAmount),
+                currency: oProduct.TransactionCurrency || "EUR",
+                pictureUrl: oProduct.ProductPictureUrl,
+                quantity: nQty
+            });
+        }
+        oCartModel.setProperty("/items", aItems);
+        oCartModel.setProperty("/count", aItems.reduce((s, i) => s + i.quantity, 0));
+        CartService.updateVisibility(oCartModel);
+        oCartModel.refresh(true);
+    }
+
+    /** Preloads cart items from the backend so the shell badge is correct on app start. */
     public preload(): void {
         const oCartODataModel = this._getCartODataModel();
         const oCartModel = this._getCartModel();
         if (!oCartODataModel || !oCartModel) {return;}
 
-        oCartODataModel.read("/ShoppingCartItem", {
+        oCartODataModel.read(Constants.ODATA.ENTITY_CART_ITEM, {
+            urlParameters: { $select: Constants.ODATA.SELECT_CART_ITEM },
             success: (oData: { results: Array<Record<string, unknown>> }) => {
                 const aItems = CartService.mapRawItems(oData.results ?? []);
                 oCartModel.setProperty("/items", aItems);
@@ -104,22 +130,16 @@ export default class CartService {
 
                 this.enrichPricesFromCatalog(aItems);
             },
-            error: () => {
+            error: (oErr: unknown) => {
+                Log.warning("Cart preload failed.", CartService.errText(oErr));
                 oCartModel.setProperty("/loading", false);
+                CartService.updateVisibility(oCartModel);
             }
         });
     }
 
-    // -- Preis-Anreicherung aus dem Katalog --
-
     /**
-     * Wenn Cart-Items NetPriceAmount=0 haben, werden die Preise aus dem
-     * Katalog-Service (/CatalogItem) per Material-Nummer nachgeladen und
-     * direkt ins cartModel zurückgeschrieben.
-     *
-     * SAP MATNR ist CHAR18 — der Cart-Service liefert u.U. kurze Nummern ("2"),
-     * der Katalog speichert sie zero-padded ("000000000000000002"). Beide Formen
-     * werden gefiltert und gematcht.
+     * Fills in missing prices (NetPriceAmount=0) from the catalog service.
      */
     public enrichPricesFromCatalog(aItems: CartItem[]): void {
         const aUnpriced = aItems.filter((i) => !i.price || i.price === 0);
@@ -133,14 +153,15 @@ export default class CartService {
 
         const aFilterParts: string[] = [];
         for (const m of aMaterials) {
-            aFilterParts.push(`Material eq '${m}'`);
-            const sPadded = m.padStart(18, "0");
-            if (sPadded !== m) {
+            const sSafe = m.replace(/'/g, "''");
+            aFilterParts.push(`Material eq '${sSafe}'`);
+            const sPadded = sSafe.padStart(18, "0");
+            if (sPadded !== sSafe) {
                 aFilterParts.push(`Material eq '${sPadded}'`);
             }
         }
 
-        oCatalogModel.read("/CatalogItem", {
+        oCatalogModel.read(Constants.ODATA.ENTITY_CATALOG_ITEM, {
             urlParameters: {
                 $filter: aFilterParts.join(" or "),
                 $select: "Material,NetPriceAmount,TransactionCurrency"
@@ -174,6 +195,9 @@ export default class CartService {
                         oCartModel.refresh(true);
                     }
                 }
+            },
+            error: (oErr: unknown) => {
+                Log.warning("enrichPricesFromCatalog failed", CartService.errText(oErr));
             }
         });
     }

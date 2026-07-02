@@ -7,43 +7,24 @@
 
     <Page id="cartPage" showHeader="true" backgroundDesign="Solid">
 
-        <!-- SHELL BAR -->
+        <!-- Shell bar -->
         <customHeader>
             <Bar class="rsShellBar">
                 <contentLeft>
-                    <Button
-                        icon="sap-icon://nav-back"
-                        type="Transparent"
-                        tooltip="{i18n>back}"
-                        press="onNavBack"
-                        class="rsShellBtn"/>
-                    <Button
-                        icon="sap-icon://home"
-                        text="{i18n>shopName}"
-                        type="Transparent"
-                        press="onNavHome"
-                        class="rsShellLogoBtn"/>
+                    <core:Fragment fragmentName="com.sapwebshop2026.sapwebshop.view.ShellBarLeftNav" type="XML"/>
                 </contentLeft>
                 <contentMiddle>
                     <Title text="{i18n>cart}" level="H4" class="rsShellTitle"/>
                 </contentMiddle>
                 <contentRight>
-                    <Button
-                        icon="sap-icon://cart"
-                        type="Transparent"
-                        tooltip="{i18n>cartTooltip}"
-                        class="rsShellBtn">
-                        <customData>
-                            <BadgeCustomData value="{= ${cartModel>/count} > 0 ? ${cartModel>/count} : ''}"/>
-                        </customData>
-                    </Button>
+                    <core:Fragment fragmentName="com.sapwebshop2026.sapwebshop.view.ShellBarRight" type="XML"/>
                 </contentRight>
             </Bar>
         </customHeader>
 
         <content>
 
-            <!-- LOADING INDICATOR -->
+            <!-- Loading indicator -->
             <VBox
                 visible="{cartModel>/loading}"
                 class="rsEmptyState"
@@ -53,34 +34,38 @@
                 <Text text="{i18n>cartLoading}" class="sapUiSmallMarginTop"/>
             </VBox>
 
-            <!-- LEERER WARENKORB (nur zeigen wenn NICHT loading UND count === 0) -->
+            <!-- Empty cart -->
             <VBox
-                visible="{= !${cartModel>/loading} &amp;&amp; ${cartModel>/count} === 0}"
+                visible="{cartModel>/showEmpty}"
                 class="rsEmptyState"
                 alignItems="Center"
                 justifyContent="Center">
-                <core:Icon src="sap-icon://cart" size="4rem" color="#9ca3af"/>
-                <Title text="{i18n>cartEmpty}" level="H3" class="sapUiMediumMarginTop"/>
-                <Text text="{i18n>cartEmptyHint}" class="sapUiSmallMarginTop"/>
-                <Button
-                    text="{i18n>toCatalog}"
-                    type="Emphasized"
-                    press="onContinueShopping"
-                    class="sapUiMediumMarginTop"/>
+                <IllustratedMessage
+                    illustrationType="sapIllus-NoData"
+                    illustrationSize="Auto"
+                    title="{i18n>cartEmpty}"
+                    description="{i18n>cartEmptyHint}">
+                    <additionalContent>
+                        <Button
+                            text="{i18n>toCatalog}"
+                            type="Emphasized"
+                            press="onContinueShopping"/>
+                    </additionalContent>
+                </IllustratedMessage>
             </VBox>
 
-            <!-- WARENKORB MIT INHALT -->
+            <!-- Cart with items -->
             <HBox
-                visible="{= !${cartModel>/loading} &amp;&amp; ${cartModel>/count} > 0}"
+                visible="{cartModel>/showItems}"
                 class="sapUiMediumMarginBeginEnd sapUiMediumMarginTop"
                 wrap="Wrap"
                 alignItems="Start">
 
-                <!-- Artikel-Liste -->
+                <!-- Item list -->
                 <VBox class="rsCartItemsColumn sapUiMediumMarginEnd">
 
                     <Title
-                        text="{= ${cartModel>/count} + ' ' + ${i18n>cartItemsInCart}}"
+                        text="{path: 'cartModel>/count', formatter: '.formatCartItemsTitle'}"
                         level="H4"
                         class="sapUiSmallMarginBottom"/>
 
@@ -94,21 +79,20 @@
                         <CustomListItem class="rsCartListItem">
                             <HBox class="rsCartItem rsCartItemGrid" alignItems="Center">
 
-                                <!-- Produktbild -->
                                 <Image
                                     src="{cartModel>pictureUrl}"
+                                    alt="{cartModel>name}"
+                                    tooltip="{cartModel>name}"
                                     width="80px"
                                     height="80px"
                                     class="rsCartItemImage"
-                                    error="onCartImageError"/>
+                                    error="onImageError"/>
 
-                                <!-- Produktinfo -->
                                 <VBox class="rsCartItemInfo">
                                     <Title text="{cartModel>name}" level="H5" wrapping="true"/>
                                     <Text text="{= ${i18n>articleNo} + ' ' + ${cartModel>material}}" class="sapUiTinyMarginTop"/>
                                 </VBox>
 
-                                <!-- Menge-Steuerung -->
                                 <HBox class="rsQtyBox" alignItems="Center" justifyContent="Center">
                                     <Button
                                         icon="sap-icon://less"
@@ -123,7 +107,6 @@
                                         tooltip="{i18n>qtyIncrease}"/>
                                 </HBox>
 
-                                <!-- Zeilenpreis -->
                                 <VBox class="rsCartItemPrice" alignItems="End">
                                     <Text
                                         visible="{= ${cartModel>quantity} > 1}"
@@ -159,7 +142,7 @@
                     </List>
                 </VBox>
 
-                <!-- Zusammenfassung -->
+                <!-- Summary -->
                 <Panel class="rsCartSummaryPanel" backgroundDesign="Transparent">
                     <headerToolbar>
                         <Toolbar>

@@ -1,0 +1,30 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <Button
+        icon="sap-icon://employee"
+        type="Transparent"
+        tooltip="{i18n>profileTooltip}"
+        press="onNavToProfile"
+        class="rsShellBtn"/>
+    <Button
+        icon="sap-icon://heart"
+        type="Transparent"
+        tooltip="{i18n>wishlistTooltip}"
+        press="onNavToWishlist"
+        class="rsShellBtn">
+        <customData>
+            <BadgeCustomData value="{= ${wishlistModel>/count} > 0 ? ${wishlistModel>/count} : ''}"/>
+        </customData>
+    </Button>
+    <Button
+        icon="sap-icon://cart"
+        type="Transparent"
+        tooltip="{i18n>cartTooltip}"
+        press="onNavToCart"
+        class="rsShellBtn">
+        <customData>
+            <BadgeCustomData value="{= ${cartModel>/count} > 0 ? ${cartModel>/count} : ''}"/>
+        </customData>
+    </Button>
+</core:FragmentDefinition>

@@ -1,0 +1,114 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <Dialog
+        title="{i18n>addToCartDialogTitle}"
+        contentWidth="660px"
+        class="rsCartDialog">
+        <content>
+            <VBox class="rsCartDialogBody">
+
+                <!-- Product info -->
+                <HBox class="rsCartDialogProduct" alignItems="Center">
+                    <VBox class="rsCartDialogImageWrap" justifyContent="Center" alignItems="Center">
+                        <Image src="{cartDialog>/pictureUrl}" error="onImageError" class="rsCartDialogImage"/>
+                    </VBox>
+                    <VBox class="rsCartDialogInfo">
+                        <Title text="{cartDialog>/name}" level="H4" wrapping="true"/>
+                        <Text text="{= ${i18n>articleNo} + ' ' + ${cartDialog>/material}}" class="sapUiTinyMarginTop"/>
+                        <Text
+                            text="{
+                                parts: [
+                                    { path: 'cartDialog>/price' },
+                                    { path: 'cartDialog>/currency' }
+                                ],
+                                formatter: '.formatter.formatPrice'
+                            }"
+                            class="rsCartDialogPrice sapUiSmallMarginTop"/>
+                    </VBox>
+                </HBox>
+
+                <!-- Description (if available) -->
+                <VBox class="rsCartDialogSection" visible="{cartDialog>/hasDescription}">
+                    <Label text="{i18n>tabDescription}" class="rsCartDialogSectionLabel"/>
+                    <Text text="{cartDialog>/description}" class="rsCartDialogDesc"/>
+                </VBox>
+
+                <!-- Bundle components checklist (if available) -->
+                <VBox class="rsCartDialogSection" visible="{cartDialog>/hasBundleItems}">
+                    <Label text="{i18n>bundleComponents}" class="rsCartDialogSectionLabel"/>
+                    <List
+                        items="{cartDialog>/bundleItems}"
+                        showSeparators="None"
+                        class="rsCartDialogBundleList">
+                        <CustomListItem type="Inactive">
+                            <HBox alignItems="Center" class="rsBundleCheckItem">
+                                <core:Icon src="sap-icon://accept" color="Positive" class="sapUiTinyMarginEnd rsBundleCheckIcon"/>
+                                <Text text="{cartDialog>text}"/>
+                            </HBox>
+                        </CustomListItem>
+                    </List>
+                </VBox>
+
+                <!-- Quantity selection -->
+                <VBox class="rsCartDialogQtyBlock">
+                    <Label text="{i18n>qtyLabel}" class="rsCartDialogQtyLabel"/>
+                    <HBox alignItems="Center" wrap="Wrap">
+                        <StepInput
+                            min="1"
+                            max="99"
+                            value="{cartDialog>/quantity}"
+                            width="140px"
+                            class="rsQtyHighlight"/>
+                        <Text text="{i18n>qtyCheckHint}" class="rsQtyHint sapUiSmallMarginBegin"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Live subtotal -->
+                <HBox class="rsCartDialogSubtotal" justifyContent="SpaceBetween" alignItems="Center">
+                    <Text text="{i18n>subtotalNet}" class="rsCartDialogSubtotalLabel"/>
+                    <Title
+                        level="H4"
+                        text="{
+                            parts: [
+                                { path: 'cartDialog>/price' },
+                                { path: 'cartDialog>/currency' },
+                                { path: 'cartDialog>/quantity' }
+                            ],
+                            formatter: '.formatter.formatLinePrice'
+                        }"
+                        class="rsCartDialogSubtotalValue"/>
+                </HBox>
+
+                <!-- Delivery info -->
+                <VBox class="rsCartDialogDelivery">
+                    <HBox alignItems="Center" class="sapUiTinyMarginBottom">
+                        <core:Icon src="sap-icon://accept" color="Positive" class="sapUiTinyMarginEnd"/>
+                        <Text text="{i18n>deliveryInStock}"/>
+                    </HBox>
+                    <HBox alignItems="Center" class="sapUiTinyMarginBottom">
+                        <core:Icon src="sap-icon://shipping-status" class="sapUiTinyMarginEnd"/>
+                        <Text text="{i18n>deliveryFreeShipping}"/>
+                    </HBox>
+                    <HBox alignItems="Center">
+                        <core:Icon src="sap-icon://locked" class="sapUiTinyMarginEnd"/>
+                        <Text text="{i18n>deliveryWarranty}"/>
+                    </HBox>
+                </VBox>
+
+            </VBox>
+        </content>
+        <beginButton>
+            <Button
+                text="{i18n>addToCartFull}"
+                type="Emphasized"
+                icon="sap-icon://cart"
+                press="onConfirmAddToCart"/>
+        </beginButton>
+        <endButton>
+            <Button
+                text="{i18n>cancel}"
+                press="onCancelCartDialog"/>
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

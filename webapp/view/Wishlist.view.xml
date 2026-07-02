@@ -1,0 +1,105 @@
+<mvc:View
+    controllerName="com.sapwebshop2026.sapwebshop.controller.Wishlist"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    displayBlock="true">
+
+    <Page id="wishlistPage" showHeader="true" backgroundDesign="Solid">
+
+        <!-- Shell bar -->
+        <customHeader>
+            <Bar class="rsShellBar">
+                <contentLeft>
+                    <core:Fragment fragmentName="com.sapwebshop2026.sapwebshop.view.ShellBarLeftNav" type="XML"/>
+                </contentLeft>
+                <contentMiddle>
+                    <Title text="{i18n>wishlist}" level="H4" class="rsShellTitle"/>
+                </contentMiddle>
+                <contentRight>
+                    <core:Fragment fragmentName="com.sapwebshop2026.sapwebshop.view.ShellBarRight" type="XML"/>
+                </contentRight>
+            </Bar>
+        </customHeader>
+
+        <content>
+
+            <!-- Empty wishlist -->
+            <VBox
+                visible="{wishlistView>/showEmpty}"
+                class="rsWishlistEmptyState"
+                alignItems="Center"
+                justifyContent="Center">
+                <IllustratedMessage
+                    illustrationType="sapIllus-NoSavedItems"
+                    illustrationSize="Auto"
+                    title="{i18n>wishlistEmpty}"
+                    description="{i18n>wishlistEmptyHint}">
+                    <additionalContent>
+                        <Button
+                            text="{i18n>showAllProducts}"
+                            type="Emphasized"
+                            press="onNavToProducts"/>
+                    </additionalContent>
+                </IllustratedMessage>
+            </VBox>
+
+            <!-- Wishlist with items -->
+            <VBox
+                visible="{wishlistView>/showItems}"
+                class="sapUiMediumMarginBeginEnd sapUiMediumMarginTop">
+
+                <Title
+                    text="{= ${wishlistView>/count} + ' · ' + ${i18n>wishlist}}"
+                    level="H4"
+                    class="sapUiSmallMarginBottom"/>
+
+                <List
+                    items="{wishlistView>/items}"
+                    mode="None"
+                    showSeparators="None"
+                    class="rsProductGrid rsWishlistGrid">
+                    <CustomListItem type="Active" press="onProductPress">
+                        <VBox class="rsProductCard">
+                            <VBox class="rsProductCardImageWrap">
+                                <Image src="{wishlistView>pictureUrl}" alt="{wishlistView>name}" tooltip="{wishlistView>name}" width="100%" error="onImageError"/>
+                            </VBox>
+                            <VBox class="rsProductCardBody">
+                                <VBox class="rsProductCardTitle">
+                                    <Title text="{wishlistView>name}" level="H5" wrapping="true"/>
+                                </VBox>
+                                <VBox class="rsProductCardId">
+                                    <Text text="{= ${i18n>articleNo} + ' ' + ${wishlistView>material}}"/>
+                                </VBox>
+                                <VBox class="rsProductPrice sapUiTinyMarginTop">
+                                    <Text text="{
+                                        parts: [
+                                            { path: 'wishlistView>price' },
+                                            { path: 'wishlistView>currency' }
+                                        ],
+                                        formatter: '.formatter.formatPrice'
+                                    }"/>
+                                </VBox>
+                                <Button
+                                    text="{i18n>addToCartFull}"
+                                    icon="sap-icon://cart"
+                                    type="Emphasized"
+                                    press="onAddToCartFromWishlist"
+                                    width="100%"
+                                    class="sapUiTinyMarginTop rsAddToCartBtn"/>
+                                <Button
+                                    text="{i18n>removeFromWishlist}"
+                                    icon="sap-icon://decline"
+                                    type="Transparent"
+                                    press="onRemoveFromWishlist"
+                                    width="100%"
+                                    class="sapUiTinyMarginTop"/>
+                            </VBox>
+                        </VBox>
+                    </CustomListItem>
+                </List>
+            </VBox>
+
+        </content>
+    </Page>
+</mvc:View>

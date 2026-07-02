@@ -1,12 +1,18 @@
-import Controller from "sap/ui/core/mvc/Controller";
+import BaseController from "./BaseController";
 import ODataModel from "sap/ui/model/odata/v2/ODataModel";
 import JSONModel from "sap/ui/model/json/JSONModel";
 import UIComponent from "sap/ui/core/UIComponent";
+import Log from "sap/base/Log";
 import Event from "sap/ui/base/Event";
 import Control from "sap/ui/core/Control";
-import ResourceBundle from "sap/base/i18n/ResourceBundle";
-import ResourceModel from "sap/ui/model/resource/ResourceModel";
+import Button from "sap/m/Button";
+import SearchField, { type SearchField$SearchEvent } from "sap/m/SearchField";
+import { type ListBase$UpdateFinishedEvent } from "sap/m/ListBase";
 import formatter from "../model/formatter";
+import CartService from "../model/CartService";
+import Constants from "../model/Constants";
+import { WishlistItem } from "../model/WishlistService";
+import RecentlyViewedService from "../model/RecentlyViewedService";
 
 interface HomeCategory {
     uuid: string;
@@ -22,7 +28,6 @@ interface HomeProduct {
     pictureUrl: string;
 }
 
-/** OData-Rohzeilen (nur die per $select/Default gelesenen Felder). */
 interface RawCatalog {
     CatalogUuid?: string;
     Title?: string;
@@ -38,37 +43,78 @@ interface RawCatalogItem {
     ProductPictureUrl?: string;
 }
 
-export default class HomeController extends Controller {
+/**
+ * @namespace com.sapwebshop2026.sapwebshop.controller
+ */
+export default class HomeController extends BaseController {
     public readonly formatter = formatter;
+    private _loadFeaturedSeq: number = 0;
+
+    // -- Lifecycle & routing --
 
     public onInit(): void {
-        const oHomeModel = new JSONModel({ categories: [], featured: [] });
-        this.getView().setModel(oHomeModel, "home");
+        const aRecent = RecentlyViewedService.getAll();
+        const oHomeModel = new JSONModel({
+            categories: [],
+            featured: [],
+            featuredLoading: true,
+            featuredVisible: false,
+            recentlyViewed: aRecent,
+            recentlyViewedCount: aRecent.length,
+            hasRecentlyViewed: aRecent.length > 0
+        });
+        this.setModel(oHomeModel, "home");
         this._loadCategories();
         this._loadFeatured();
+
+        this._attachRoute(Constants.ROUTES.HOME, this._onRouteMatched.bind(this));
+    }
+
+    private _onRouteMatched(): void {
+        (this.byId("homeSearchField") as SearchField | undefined)?.setValue("");
+        const aRecent = RecentlyViewedService.getAll();
+        const oHome = this._getHomeModel();
+        oHome.setProperty("/recentlyViewed", aRecent);
+        oHome.setProperty("/recentlyViewedCount", aRecent.length);
+        oHome.setProperty("/hasRecentlyViewed", aRecent.length > 0);
     }
 
     private _getHomeModel(): JSONModel {
-        return this.getView().getModel("home") as JSONModel;
+        return this.getModel("home") as JSONModel;
     }
 
-    /** Liest einen Text aus dem i18n-ResourceBundle, optional mit Platzhaltern {0}, {1}, … */
-    private _getText(sKey: string, aArgs?: (string | number)[]): string {
-        const oBundle = (this.getOwnerComponent().getModel("i18n") as ResourceModel).getResourceBundle() as ResourceBundle;
-        return oBundle.getText(sKey, aArgs);
-    }
+    // -- Data loading --
 
     private _loadCategories(): void {
+        const oCatalogCache = this.getOwnerComponent().getModel(Constants.MODELS.CATALOG) as JSONModel | undefined;
+        if (oCatalogCache?.getProperty("/loaded") === true) {
+            const aRaw = oCatalogCache.getProperty("/results") as RawCatalog[];
+            const aCached: HomeCategory[] = aRaw.map((c) => ({
+                uuid: c.CatalogUuid ?? "",
+                title: c.Title || this._getText("catalogFallback", [c.CatalogId ?? ""])
+            }));
+            this._getHomeModel().setProperty("/categories", aCached);
+            return;
+        }
         const oModel = this.getOwnerComponent().getModel() as ODataModel;
         if (!oModel) {return;}
-        oModel.read("/Catalog", {
-            urlParameters: { $orderby: "CatalogId asc" },
+        oModel.read(Constants.ODATA.ENTITY_CATALOG, {
+            urlParameters: {
+                $orderby: "CatalogId asc",
+                $select: Constants.ODATA.SELECT_CATALOG
+            },
             success: (oData: { results?: RawCatalog[] }) => {
-                const aCats: HomeCategory[] = (oData.results ?? []).map((c) => ({
+                const aResults = oData.results ?? [];
+                const aCats: HomeCategory[] = aResults.map((c) => ({
                     uuid: c.CatalogUuid ?? "",
                     title: c.Title || this._getText("catalogFallback", [c.CatalogId ?? ""])
                 }));
                 this._getHomeModel().setProperty("/categories", aCats);
+                oCatalogCache?.setProperty("/results", aResults);
+                oCatalogCache?.setProperty("/loaded", true);
+            },
+            error: (oErr: unknown) => {
+                Log.warning("Home categories load failed.", this._errText(oErr));
             }
         });
     }
@@ -76,55 +122,93 @@ export default class HomeController extends Controller {
     private _loadFeatured(): void {
         const oModel = this.getOwnerComponent().getModel() as ODataModel;
         if (!oModel) {return;}
-        oModel.read("/CatalogItem", {
-            urlParameters: { $top: "8", $orderby: "ProductName asc" },
+        this._loadFeaturedSeq++;
+        const nSeq = this._loadFeaturedSeq;
+        this._getHomeModel().setProperty("/featuredLoading", true);
+        oModel.read(Constants.ODATA.ENTITY_CATALOG_ITEM, {
+            urlParameters: {
+                $top: "8",
+                $orderby: "ProductName asc",
+                $select: "CatalogItemUuid,ProductName,Material,NetPriceAmount,TransactionCurrency,ProductPictureUrl"
+            },
             success: (oData: { results?: RawCatalogItem[] }) => {
+                if (nSeq !== this._loadFeaturedSeq) { return; }
                 const aItems: HomeProduct[] = (oData.results ?? []).map((r) => ({
                     uuid: r.CatalogItemUuid ?? "",
                     name: r.ProductName ?? "",
                     material: r.Material ?? "",
-                    price: parseFloat(r.NetPriceAmount ?? "0"),
+                    price: CartService.toNum(r.NetPriceAmount),
                     currency: r.TransactionCurrency ?? "EUR",
                     pictureUrl: r.ProductPictureUrl ?? ""
                 }));
-                this._getHomeModel().setProperty("/featured", aItems);
+                const oHome = this._getHomeModel();
+                oHome.setProperty("/featured", aItems);
+                oHome.setProperty("/featuredLoading", false);
+                oHome.setProperty("/featuredVisible", true);
+            },
+            error: (oErr: unknown) => {
+                if (nSeq !== this._loadFeaturedSeq) { return; }
+                Log.warning("Home featured products load failed.", this._errText(oErr));
+                const oHome = this._getHomeModel();
+                oHome.setProperty("/featuredLoading", false);
+                oHome.setProperty("/featuredVisible", true);
             }
         });
     }
 
-    // -- Navigation --
+    // -- Event handlers --
 
-    public onProductPress(oEvent: Event): void {
-        const oCtx = (oEvent.getSource() as Control).getBindingContext("home");
+    public onProductPress(oEvent: Event<object, Control>): void {
+        const oCtx = oEvent.getSource().getBindingContext("home");
         if (!oCtx) {return;}
-        UIComponent.getRouterFor(this).navTo("RouteProductDetail", {
+        UIComponent.getRouterFor(this).navTo(Constants.ROUTES.PRODUCT_DETAIL, {
             catalogItemUuid: oCtx.getProperty("uuid") as string
         });
     }
 
-    public onCategoryPress(): void {
-        UIComponent.getRouterFor(this).navTo("RouteProductList");
+    public onCategoryPress(oEvent: Event<object, Control>): void {
+        const oCtx = oEvent.getSource().getBindingContext("home");
+        const sUuid = oCtx ? (oCtx.getProperty("uuid") as string) : "";
+        UIComponent.getRouterFor(this).navTo(Constants.ROUTES.PRODUCT_LIST, {
+            "?query": sUuid ? { catalog: sUuid } : {}
+        });
     }
 
     public onExplore(): void {
-        UIComponent.getRouterFor(this).navTo("RouteProductList");
+        UIComponent.getRouterFor(this).navTo(Constants.ROUTES.PRODUCT_LIST);
     }
 
-    public onSearch(): void {
-        UIComponent.getRouterFor(this).navTo("RouteProductList");
+    public onSearch(oEvent: SearchField$SearchEvent): void {
+        const sQuery = ((oEvent.getParameter("query") as string) ?? "").trim();
+        if (sQuery) {
+            UIComponent.getRouterFor(this).navTo(Constants.ROUTES.PRODUCT_LIST, {
+                "?query": { query: sQuery }
+            });
+        } else {
+            UIComponent.getRouterFor(this).navTo(Constants.ROUTES.PRODUCT_LIST);
+        }
     }
 
-    public onNavHome(): void {
-        UIComponent.getRouterFor(this).navTo("RouteHome");
+    // -- Wishlist --
+
+    public onListUpdateFinished(oEvent: ListBase$UpdateFinishedEvent): void {
+        this._updateHeartIcons(oEvent.getSource(), "home", "uuid");
     }
 
-    public onNavToCart(): void {
-        UIComponent.getRouterFor(this).navTo("RouteCart");
-    }
+    public onToggleWishlist(oEvent: Event<object, Button>): void {
+        const oBtn = oEvent.getSource();
+        const oCtx = oBtn.getBindingContext("home");
+        if (!oCtx) {return;}
+        const oProduct = oCtx.getObject() as HomeProduct;
 
-    // -- Bilder --
-
-    public onImageError(oEvent: Event): void {
-        (oEvent.getSource() as Control).addStyleClass("webshopImageBroken");
+        const oItem: WishlistItem = {
+            uuid: oProduct.uuid,
+            name: oProduct.name,
+            material: oProduct.material,
+            price: oProduct.price,
+            currency: oProduct.currency,
+            pictureUrl: oProduct.pictureUrl
+        };
+        this._toggleWishlistFromContext(oBtn, oItem, oProduct.name);
     }
 }

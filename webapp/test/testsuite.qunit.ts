@@ -1,7 +1,3 @@
-/*
- * QUnit-Testsuite-Bootstrap (Fiori-Generator). Registriert die Unit- und die
- * OPA-Testseite beim übergeordneten Test-Runner-Frame (parent.jsUnitTestSuite).
- */
 interface JsUnitTestSuite {
     addTestPage(sPath: string): void;
 }

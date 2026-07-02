@@ -1,0 +1,116 @@
+<mvc:View
+    controllerName="com.sapwebshop2026.sapwebshop.controller.Profile"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    displayBlock="true">
+
+    <Page id="profilePage" showHeader="true" backgroundDesign="Solid">
+
+        <!-- Shell bar -->
+        <customHeader>
+            <Bar class="rsShellBar">
+                <contentLeft>
+                    <core:Fragment fragmentName="com.sapwebshop2026.sapwebshop.view.ShellBarLeftNav" type="XML"/>
+                </contentLeft>
+                <contentMiddle>
+                    <Title text="{i18n>profileTitle}" level="H4" class="rsShellTitle"/>
+                </contentMiddle>
+                <contentRight>
+                    <core:Fragment fragmentName="com.sapwebshop2026.sapwebshop.view.ShellBarRight" type="XML"/>
+                </contentRight>
+            </Bar>
+        </customHeader>
+
+        <content>
+            <VBox class="rsProfilePage sapUiMediumMarginBeginEnd sapUiMediumMarginTop">
+
+                <!-- Profile header -->
+                <Panel class="rsProfileHeaderPanel sapUiSmallMarginBottom" backgroundDesign="Transparent">
+                    <content>
+                        <HBox alignItems="Center" class="rsProfileHeader">
+                            <Avatar
+                                initials="{profileModel>/initials}"
+                                displaySize="XL"
+                                class="rsProfileAvatar sapUiMediumMarginEnd"/>
+                            <VBox>
+                                <Title text="{profileModel>/name}" level="H2" class="rsProfileName"/>
+                                <Text text="{profileModel>/department}" class="rsProfileDept sapUiTinyMarginTop"/>
+                                <Text text="{profileModel>/company}" class="rsProfileCompany sapUiTinyMarginTop"/>
+                            </VBox>
+                        </HBox>
+                    </content>
+                </Panel>
+
+                <!-- Contact details -->
+                <Panel class="rsProfileInfoPanel sapUiSmallMarginBottom" backgroundDesign="Transparent">
+                    <headerToolbar>
+                        <Toolbar>
+                            <Title text="{i18n>profileContactTitle}" level="H5"/>
+                        </Toolbar>
+                    </headerToolbar>
+                    <content>
+                        <VBox class="sapUiSmallMarginBeginEnd sapUiSmallMarginBottom">
+                            <HBox alignItems="Center" class="rsProfileInfoRow">
+                                <core:Icon src="sap-icon://email" class="rsProfileInfoIcon sapUiMediumMarginEnd"/>
+                                <VBox>
+                                    <Label text="{i18n>profileEmail}"/>
+                                    <Text text="{profileModel>/email}"/>
+                                </VBox>
+                            </HBox>
+                            <HBox alignItems="Center" class="rsProfileInfoRow">
+                                <core:Icon src="sap-icon://addresses" class="rsProfileInfoIcon sapUiMediumMarginEnd"/>
+                                <VBox>
+                                    <Label text="{i18n>profileLocation}"/>
+                                    <Text text="{profileModel>/location}"/>
+                                </VBox>
+                            </HBox>
+                            <HBox alignItems="Center" class="rsProfileInfoRow rsProfileInfoRowLast">
+                                <core:Icon src="sap-icon://person-placeholder" class="rsProfileInfoIcon sapUiMediumMarginEnd"/>
+                                <VBox>
+                                    <Label text="{i18n>profileUserId}"/>
+                                    <Text text="{profileModel>/userId}"/>
+                                </VBox>
+                            </HBox>
+                        </VBox>
+                    </content>
+                </Panel>
+
+                <!-- Quick links -->
+                <Panel class="rsProfileLinksPanel" backgroundDesign="Transparent">
+                    <headerToolbar>
+                        <Toolbar>
+                            <Title text="{i18n>profileLinksTitle}" level="H5"/>
+                        </Toolbar>
+                    </headerToolbar>
+                    <content>
+                        <List showSeparators="None" mode="None" class="sapUiNoContentPadding">
+                            <CustomListItem type="Active" press="onNavToOrderHistory">
+                                <HBox alignItems="Center" justifyContent="SpaceBetween" class="rsProfileLinkItem">
+                                    <HBox alignItems="Center">
+                                        <core:Icon src="sap-icon://history" class="rsProfileLinkIcon sapUiMediumMarginEnd"/>
+                                        <Title text="{i18n>profileOrdersLink}" level="H5"/>
+                                    </HBox>
+                                    <core:Icon src="sap-icon://navigation-right-arrow" class="rsProfileLinkArrow"/>
+                                </HBox>
+                            </CustomListItem>
+                            <CustomListItem type="Active" press="onNavToWishlist">
+                                <HBox alignItems="Center" justifyContent="SpaceBetween" class="rsProfileLinkItem">
+                                    <HBox alignItems="Center">
+                                        <core:Icon src="sap-icon://heart" class="rsProfileLinkIcon sapUiMediumMarginEnd"/>
+                                        <VBox>
+                                            <Title text="{i18n>profileWishlistLink}" level="H5"/>
+                                            <Text text="{= ${wishlistModel>/count} + ' ' + ${i18n>wishlistItemsSuffix}}" class="rsProfileLinkSub"/>
+                                        </VBox>
+                                    </HBox>
+                                    <core:Icon src="sap-icon://navigation-right-arrow" class="rsProfileLinkArrow"/>
+                                </HBox>
+                            </CustomListItem>
+                        </List>
+                    </content>
+                </Panel>
+
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>

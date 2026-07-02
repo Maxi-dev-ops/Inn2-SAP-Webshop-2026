@@ -7,7 +7,7 @@
 
     <Page id="productListPage" showHeader="true" backgroundDesign="Solid">
 
-        <!-- SHELL BAR  (orientiert am ReferenceProject rsShellBar) -->
+        <!-- Shell bar -->
         <customHeader>
             <Bar class="rsShellBar">
                 <contentLeft>
@@ -19,53 +19,46 @@
                         class="rsShellLogoBtn"/>
                 </contentLeft>
                 <contentMiddle>
+                    <core:InvisibleText id="plpSearchLabel" text="{i18n>searchAriaLabel}"/>
                     <SearchField
                         id="searchField"
                         placeholder="{i18n>searchPlaceholder}"
+                        tooltip="{i18n>searchAriaLabel}"
+                        ariaLabelledBy="plpSearchLabel"
                         width="400px"
                         liveChange="onSearchLive"
                         search="onSearch"
                         class="rsShellSearch"/>
                 </contentMiddle>
                 <contentRight>
-                    <Button
-                        icon="sap-icon://cart"
-                        type="Transparent"
-                        tooltip="{i18n>cartTooltip}"
-                        press="onNavToCart"
-                        class="rsShellBtn">
-                        <customData>
-                            <BadgeCustomData value="{= ${cartModel>/count} > 0 ? ${cartModel>/count} : ''}"/>
-                        </customData>
-                    </Button>
+                    <core:Fragment fragmentName="com.sapwebshop2026.sapwebshop.view.ShellBarRight" type="XML"/>
                 </contentRight>
             </Bar>
         </customHeader>
 
-        <!-- HAUPTINHALT:  Filter-Sidebar  |  Produktgrid -->
+        <!-- Main content: Filter sidebar | Product grid -->
         <content>
             <HBox class="rsProductListLayout" alignItems="Start">
 
-                <!-- LINKE SIDEBAR -->
+                <!-- Filter sidebar -->
                 <VBox
                     id="filterPanel"
                     class="rsFilterPanel sapUiMediumMarginTop sapUiMediumMarginBegin">
 
-                    <!-- Katalog-Chips (werden per Controller aus /Catalog geladen) -->
+                    <!-- Catalog chips -->
                     <Title text="{i18n>filterCategory}" level="H5" class="rsFilterPanelTitle sapUiSmallMarginBottom"/>
-                    <HBox id="categoryBar" wrap="Wrap" class="rsCategoryRow sapUiSmallMarginBottom">
+                    <HBox id="categoryBar" wrap="Wrap" class="rsCategoryRow sapUiSmallMarginBottom" items="{plpView>/categoryChips}">
                         <Button
-                            id="btnAllCategories"
-                            text="{i18n>filterAll}"
+                            text="{plpView>title}"
                             type="Transparent"
-                            press="onAllCatalogsPress"
-                            class="rsCategoryPill rsCategoryPillActive"/>
+                            press="onCategoryChipPress"
+                            class="rsCategoryPill"/>
                     </HBox>
 
-                    <!-- Trennlinie -->
+                    <!-- Divider -->
                     <HBox class="sapUiMediumMarginTopBottom rsFilterDivider"/>
 
-                    <!-- Preisfilter -->
+                    <!-- Price filter -->
                     <Title text="{i18n>filterPrice}" level="H5" class="rsFilterPanelTitle sapUiSmallMarginBottom"/>
                     <HBox alignItems="Center" class="rsPriceInputs sapUiSmallMarginBottom">
                         <Input
@@ -89,22 +82,22 @@
                         text="{i18n>onlyPriced}"
                         select="onTogglePriced"/>
 
-                    <!-- Trennlinie -->
+                    <!-- Divider -->
                     <HBox class="sapUiMediumMarginTopBottom rsFilterDivider"/>
 
-                    <!-- Filter zurücksetzen -->
+                    <!-- Reset filters -->
                     <Button
                         text="{i18n>resetFilters}"
                         type="Transparent"
                         press="onResetFilters"/>
                 </VBox>
 
-                <!-- RECHTS: Ergebnis + Produktgrid -->
+                <!-- Right: Results + product grid -->
                 <VBox
                     class="rsProductListContent sapUiMediumMarginTop sapUiMediumMarginBeginEnd"
                     width="100%">
 
-                    <!-- Ergebnis-Bar: Titel + Anzahl links, Sortierung rechts -->
+                    <!-- Result bar -->
                     <HBox
                         justifyContent="SpaceBetween"
                         alignItems="Center"
@@ -124,15 +117,20 @@
                         </HBox>
                     </HBox>
 
-                    <!-- Produktkacheln  (sap.m.List mit CSS-Grid via .rsProductGrid) -->
+                    <!-- Product cards -->
                     <List
                         id="productGrid"
                         items="{
                             path: '/CatalogItem',
-                            parameters: { operationMode: 'Server' }
+                            parameters: {
+                                operationMode: 'Server',
+                                select: 'CatalogItemUuid,ProductName,Material,NetPriceAmount,TransactionCurrency,ProductPictureUrl,CatalogUuid,addToShoppingCart_ac'
+                            },
+                            events: {
+                                dataReceived: '.onProductDataReceived'
+                            }
                         }"
                         mode="None"
-                        noDataText="{i18n>noProducts}"
                         busyIndicatorDelay="0"
                         growing="true"
                         growingThreshold="24"
@@ -140,37 +138,43 @@
                         updateFinished="onListUpdateFinished"
                         class="rsProductGrid">
 
+                        <noData>
+                            <IllustratedMessage
+                                illustrationType="sapIllus-NoData"
+                                illustrationSize="Auto"
+                                title="{i18n>noProducts}"/>
+                        </noData>
+
                         <CustomListItem type="Active" press="onProductPress">
 
-                            <!-- rsProductCard liegt auf dem inneren VBox, nicht auf dem LI,
-                                 damit die CSS-Flex-Column korrekt funktioniert -->
                             <VBox class="rsProductCard">
 
-                                <!-- Bild-Bereich -->
                                 <VBox class="rsProductCardImageWrap">
                                     <Image
                                         src="{ProductPictureUrl}"
+                                        alt="{ProductName}"
+                                        tooltip="{ProductName}"
                                         width="100%"
                                         error="onImageError"/>
+                                    <Button
+                                        icon="sap-icon://heart-2"
+                                        type="Transparent"
+                                        tooltip="{i18n>wishlist}"
+                                        press="onToggleWishlist"
+                                        class="rsCardHeartBtn"/>
                                 </VBox>
 
-                                <!-- Karten-Body -->
+                                <!-- Card body -->
                                 <VBox class="rsProductCardBody">
-
-                                    <!-- Titel-Wrapper → CSS .rsProductCardTitle .sapMTitle -->
                                     <VBox class="rsProductCardTitle">
                                         <Title
                                             text="{ProductName}"
                                             level="H5"
                                             wrapping="true"/>
                                     </VBox>
-
-                                    <!-- Artikelnummer-Wrapper → CSS .rsProductCardId .sapMText -->
                                     <VBox class="rsProductCardId">
                                         <Text text="{= ${i18n>articleNo} + ' ' + ${Material}}"/>
                                     </VBox>
-
-                                    <!-- Preis-Wrapper → CSS .rsProductPrice .sapMText -->
                                     <VBox class="rsProductPrice sapUiTinyMarginTop">
                                         <Text text="{
                                             parts: [
@@ -180,21 +184,40 @@
                                             formatter: '.formatter.formatPrice'
                                         }"/>
                                     </VBox>
-
-                                    <!-- In den Warenkorb -->
                                     <Button
                                         text="{i18n>addToCartFull}"
                                         icon="sap-icon://cart"
                                         type="Emphasized"
-                                        enabled="{addToShoppingCart_ac}"
-                                        press="onAddToCart"
+                                        enabled="{= ${addToShoppingCart_ac} !== false}"
+                                        press="onOpenCartDialog"
                                         width="100%"
-                                        class="rsAddToCartBtn"/>
+                                        class="rsAddToCartBtn sapUiTinyMarginTop"/>
 
                                 </VBox>
                             </VBox>
                         </CustomListItem>
                     </List>
+
+                    <!-- Custom empty state (visible when filters are active and no results) -->
+                    <VBox
+                        id="emptyResultState"
+                        visible="false"
+                        class="rsEmptyResultState"
+                        alignItems="Center"
+                        justifyContent="Center">
+                        <IllustratedMessage
+                            illustrationType="sapIllus-NoSearchResults"
+                            illustrationSize="Auto"
+                            title="{i18n>noResultsTitle}"
+                            description="{i18n>noResultsHint}">
+                            <additionalContent>
+                                <Button
+                                    text="{i18n>resetFilters}"
+                                    type="Emphasized"
+                                    press="onResetFilters"/>
+                            </additionalContent>
+                        </IllustratedMessage>
+                    </VBox>
                 </VBox>
 
             </HBox>

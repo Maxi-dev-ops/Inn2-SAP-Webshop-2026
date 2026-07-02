@@ -1,0 +1,81 @@
+<mvc:View
+    controllerName="com.sapwebshop2026.sapwebshop.controller.OrderConfirm"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    displayBlock="true">
+
+    <Page id="orderConfirmPage" showHeader="true" backgroundDesign="Solid">
+
+        <!-- Shell bar -->
+        <customHeader>
+            <Bar class="rsShellBar">
+                <contentLeft>
+                    <Button
+                        icon="sap-icon://home"
+                        text="{i18n>shopName}"
+                        type="Transparent"
+                        press="onNavHome"
+                        class="rsShellLogoBtn"/>
+                </contentLeft>
+            </Bar>
+        </customHeader>
+
+        <content>
+            <VBox
+                class="rsOrderConfirmPage"
+                alignItems="Center"
+                justifyContent="Center">
+
+                <core:Icon
+                    src="sap-icon://accept"
+                    size="4rem"
+                    color="Positive"
+                    class="rsOrderConfirmIcon"/>
+
+                <Title
+                    text="{i18n>orderConfirmTitle}"
+                    level="H2"
+                    class="rsOrderConfirmTitle sapUiMediumMarginTop"/>
+
+                <Text
+                    text="{= ${i18n>orderConfirmSubmitted} + ' ' + ${orderConfirmModel>/submittedAt}}"
+                    visible="{= !!${orderConfirmModel>/submittedAt}}"
+                    class="sapUiSmallMarginTop rsOrderConfirmTimestamp"/>
+
+                <HBox
+                    alignItems="Center"
+                    class="sapUiSmallMarginTop"
+                    visible="{= !!${orderConfirmModel>/orderUuid}}">
+                    <Text text="{= ${i18n>orderConfirmOrderRef} + ': '}" class="sapUiTinyMarginEnd"/>
+                    <Text text="{orderConfirmModel>/orderUuid}" class="rsOrderConfirmRef"/>
+                </HBox>
+
+                <!-- Summary stats -->
+                <HBox class="rsOrderConfirmSummary sapUiMediumMarginTop" justifyContent="Center">
+                    <VBox class="rsOrderConfirmStat" alignItems="Center">
+                        <Title text="{orderConfirmModel>/itemCount}" level="H3"/>
+                        <Text text="{i18n>orderConfirmItems}"/>
+                    </VBox>
+                    <VBox class="rsOrderConfirmStat" alignItems="Center">
+                        <Title text="{
+                            parts: [
+                                { path: 'orderConfirmModel>/totalAmount' },
+                                { path: 'orderConfirmModel>/totalCurrency' }
+                            ],
+                            formatter: '.formatter.formatPrice'
+                        }" level="H3"/>
+                        <Text text="{i18n>orderConfirmTotal}"/>
+                    </VBox>
+                </HBox>
+
+                <Button
+                    text="{i18n>orderConfirmContinue}"
+                    type="Emphasized"
+                    press="onNavHome"
+                    class="sapUiMediumMarginTop"/>
+
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>

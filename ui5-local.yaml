@@ -6,7 +6,7 @@ metadata:
 type: application
 framework:
   name: SAPUI5
-  version: 1.102.8
+  version: 1.136.0
   libraries:
     - name: sap.m
     - name: sap.ui.core
@@ -36,7 +36,7 @@ server:
     - name: fiori-tools-proxy
       afterMiddleware: compression
       configuration:
-        ignoreCertErrors: false # If set to true, certificate errors will be ignored. E.g. self-signed certificates will be accepted
+        ignoreCertErrors: false
         backend:
           - path: /sap
             url: http://tld-vm-t4e.telekom.site:50000
@@ -55,6 +55,7 @@ server:
             metadataPath: ./webapp/localService/cartService/metadata.xml
             mockdataPath: ./webapp/localService/cartService/data
             generateMockData: true
+            resolveExternalServiceReferences: true
         annotations:
           - localPath: ./webapp/localService/mainService/ZINN2_UI_MY_SHOP_CATA_O2_VAN.xml
             urlPath: /sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZINN2_UI_MY_SHOP_CATA_O2_VAN',Version='0001')/$value/

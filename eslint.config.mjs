@@ -3,12 +3,8 @@ import fioriTools from '@sap-ux/eslint-plugin-fiori-tools';
 export default [
     ...fioriTools.configs.recommended,
     {
+        // no-redeclare false-positives on UI5 TS imports that shadow DOM globals (Event, History, Text, …)
         rules: {
-            // Die Basis-Regel meldet false-positives, wenn TS-Imports gleichnamige
-            // DOM-Globals überschatten (z. B. import Event from "sap/ui/base/Event",
-            // import Text from "sap/m/Text"). Für TypeScript ist das harmlos; echte
-            // Redeklarationen fängt der Compiler bzw. @typescript-eslint/no-redeclare ab.
-            // (Offizielle typescript-eslint-Empfehlung: Basis-Regel deaktivieren.)
             "no-redeclare": "off"
         }
     }
