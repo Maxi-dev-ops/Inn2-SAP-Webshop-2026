@@ -47,3 +47,7 @@ builder:
         debug: false
         transformModulesToUI5:
           overridesToOverride: true
+  resources:
+    excludes:
+      - /test/**
+      - /localService/**

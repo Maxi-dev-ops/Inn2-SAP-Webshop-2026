@@ -41,62 +41,62 @@
         <edmx:Include Namespace="com.sap.vocabularies.PDF.v1" Alias="SAP__PDF"/>
     </edmx:Reference>
     <edmx:DataServices m:DataServiceVersion="2.0">
-        <Schema Namespace="cds_zinn2_ui_my_shopping_catalog" xml:lang="en" sap:schema-version="1" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <Schema Namespace="cds_zinn2_ui_my_shopping_catalog" xml:lang="de" sap:schema-version="1" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
             <Annotation Term="Core.SchemaVersion" String="1.0.0" xmlns="http://docs.oasis-open.org/odata/ns/edm"/>
-            <EntityType Name="MaterialTextType" sap:label="Material Text" sap:content-version="1">
+            <EntityType Name="MaterialTextType" sap:label="Text zum Material" sap:content-version="1">
                 <Key>
                     <PropertyRef Name="Material"/>
                     <PropertyRef Name="Language"/>
                 </Key>
-                <Property Name="Material" Type="Edm.String" Nullable="false" MaxLength="18" sap:display-format="UpperCase" sap:label="Material" sap:quickinfo="Material Number"/>
-                <Property Name="Language" Type="Edm.String" Nullable="false" MaxLength="2" sap:label="Language Key"/>
-                <Property Name="MaterialName" Type="Edm.String" MaxLength="40" sap:label="Material Description"/>
+                <Property Name="Material" Type="Edm.String" Nullable="false" MaxLength="18" sap:display-format="UpperCase" sap:label="Material" sap:quickinfo="Materialnummer"/>
+                <Property Name="Language" Type="Edm.String" Nullable="false" MaxLength="2" sap:label="Sprachenschlüssel"/>
+                <Property Name="MaterialName" Type="Edm.String" MaxLength="40" sap:label="Materialkurztext"/>
             </EntityType>
-            <EntityType Name="ProductDescriptionType" sap:label="Product Descriptions" sap:content-version="1">
+            <EntityType Name="ProductDescriptionType" sap:label="Produktbeschreibungen" sap:content-version="1">
                 <Key>
                     <PropertyRef Name="Product"/>
                     <PropertyRef Name="Language"/>
                 </Key>
-                <Property Name="Product" Type="Edm.String" Nullable="false" MaxLength="18" sap:display-format="UpperCase" sap:label="Product" sap:quickinfo="Product Number"/>
-                <Property Name="Language" Type="Edm.String" Nullable="false" MaxLength="2" sap:label="Language Key"/>
-                <Property Name="ProductDescription" Type="Edm.String" MaxLength="40" sap:label="Product Description"/>
-                <Property Name="LanguageISOCode" Type="Edm.String" MaxLength="2" sap:display-format="UpperCase" sap:label="Language" sap:quickinfo="2-Character SAP Language Code"/>
+                <Property Name="Product" Type="Edm.String" Nullable="false" MaxLength="18" sap:display-format="UpperCase" sap:label="Produkt" sap:quickinfo="Produktnummer"/>
+                <Property Name="Language" Type="Edm.String" Nullable="false" MaxLength="2" sap:label="Sprachenschlüssel"/>
+                <Property Name="ProductDescription" Type="Edm.String" MaxLength="40" sap:label="Produktbeschreibung"/>
+                <Property Name="LanguageISOCode" Type="Edm.String" MaxLength="2" sap:display-format="UpperCase" sap:label="Sprache" sap:quickinfo="2-stelliger SAP-Sprachencode"/>
             </EntityType>
-            <EntityType Name="ProductTextType" sap:label="Product - Text" sap:content-version="1">
+            <EntityType Name="ProductTextType" sap:label="Produkt - Text" sap:content-version="1">
                 <Key>
                     <PropertyRef Name="Product"/>
                     <PropertyRef Name="Language"/>
                 </Key>
-                <Property Name="Product" Type="Edm.String" Nullable="false" MaxLength="18" sap:display-format="UpperCase" sap:label="Material" sap:quickinfo="Material Number"/>
-                <Property Name="Language" Type="Edm.String" Nullable="false" MaxLength="2" sap:label="Language Key"/>
-                <Property Name="ProductName" Type="Edm.String" MaxLength="40" sap:label="Product Description"/>
+                <Property Name="Product" Type="Edm.String" Nullable="false" MaxLength="18" sap:display-format="UpperCase" sap:label="Material" sap:quickinfo="Materialnummer"/>
+                <Property Name="Language" Type="Edm.String" Nullable="false" MaxLength="2" sap:label="Sprachenschlüssel"/>
+                <Property Name="ProductName" Type="Edm.String" MaxLength="40" sap:label="Produktbeschreibung"/>
             </EntityType>
-            <EntityType Name="ProductVHType" sap:label="Product Value Help" sap:value-list="true" sap:content-version="1">
+            <EntityType Name="ProductVHType" sap:label="Wertehilfe für Produkt" sap:value-list="true" sap:content-version="1">
                 <Key>
                     <PropertyRef Name="Product"/>
                 </Key>
-                <Property Name="Product" Type="Edm.String" Nullable="false" MaxLength="18" sap:display-format="UpperCase" sap:text="Product_Text" sap:label="Product" sap:quickinfo="Product Number"/>
-                <Property Name="Product_Text" Type="Edm.String" MaxLength="40" sap:label="Product Description" sap:creatable="false" sap:updatable="false"/>
-                <Property Name="ProductExternalID" Type="Edm.String" MaxLength="40" sap:display-format="UpperCase" sap:label="External Product ID" sap:quickinfo="External Representation of Material Number"/>
-                <Property Name="IndustrySector" Type="Edm.String" MaxLength="1" sap:display-format="UpperCase" sap:label="Industry Sector"/>
-                <Property Name="ProductType" Type="Edm.String" MaxLength="4" sap:display-format="UpperCase" sap:label="Product Type"/>
-                <Property Name="ProductGroup" Type="Edm.String" MaxLength="9" sap:display-format="UpperCase" sap:label="Product Group"/>
-                <Property Name="BaseUnit" Type="Edm.String" MaxLength="3" sap:label="Base Unit of Measure" sap:semantics="unit-of-measure"/>
-                <Property Name="GrossWeight" Type="Edm.Decimal" Precision="13" Scale="3" sap:unit="WeightUnit" sap:label="Gross Weight"/>
-                <Property Name="NetWeight" Type="Edm.Decimal" Precision="13" Scale="3" sap:unit="WeightUnit" sap:label="Net Weight"/>
-                <Property Name="WeightUnit" Type="Edm.String" MaxLength="3" sap:label="Unit of Weight" sap:semantics="unit-of-measure"/>
-                <Property Name="ManufacturerNumber" Type="Edm.String" MaxLength="10" sap:display-format="UpperCase" sap:label="Manufacturer" sap:quickinfo="Manufacturer number"/>
-                <Property Name="IsBatchManagementRequired" Type="Edm.Boolean" sap:display-format="UpperCase" sap:label="Batch Management" sap:quickinfo="Batch Management Requirement Indicator"/>
-                <Property Name="ProductManufacturerNumber" Type="Edm.String" MaxLength="40" sap:display-format="UpperCase" sap:label="Mfr Part Number" sap:quickinfo="Manufacturer Part Number"/>
-                <Property Name="ArticleCategory" Type="Edm.String" MaxLength="2" sap:display-format="UpperCase" sap:label="Product Category"/>
+                <Property Name="Product" Type="Edm.String" Nullable="false" MaxLength="18" sap:display-format="UpperCase" sap:text="Product_Text" sap:label="Produkt" sap:quickinfo="Produktnummer"/>
+                <Property Name="Product_Text" Type="Edm.String" MaxLength="40" sap:label="Produktbeschreibung" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ProductExternalID" Type="Edm.String" MaxLength="40" sap:display-format="UpperCase" sap:label="Externe Produkt-ID" sap:quickinfo="Externe Darstellung der Materialnummer"/>
+                <Property Name="IndustrySector" Type="Edm.String" MaxLength="1" sap:display-format="UpperCase" sap:label="Branche"/>
+                <Property Name="ProductType" Type="Edm.String" MaxLength="4" sap:display-format="UpperCase" sap:label="Produktart"/>
+                <Property Name="ProductGroup" Type="Edm.String" MaxLength="9" sap:display-format="UpperCase" sap:label="Produktgruppe"/>
+                <Property Name="BaseUnit" Type="Edm.String" MaxLength="3" sap:label="Basismengeneinheit" sap:semantics="unit-of-measure"/>
+                <Property Name="GrossWeight" Type="Edm.Decimal" Precision="13" Scale="3" sap:unit="WeightUnit" sap:label="Bruttogewicht"/>
+                <Property Name="NetWeight" Type="Edm.Decimal" Precision="13" Scale="3" sap:unit="WeightUnit" sap:label="Nettogewicht"/>
+                <Property Name="WeightUnit" Type="Edm.String" MaxLength="3" sap:label="Gewichtseinheit" sap:semantics="unit-of-measure"/>
+                <Property Name="ManufacturerNumber" Type="Edm.String" MaxLength="10" sap:display-format="UpperCase" sap:label="Hersteller" sap:quickinfo="Nummer eines Herstellers"/>
+                <Property Name="IsBatchManagementRequired" Type="Edm.Boolean" sap:display-format="UpperCase" sap:label="Chargenverwaltung" sap:quickinfo="Kennzeichen für Chargenpflicht"/>
+                <Property Name="ProductManufacturerNumber" Type="Edm.String" MaxLength="40" sap:display-format="UpperCase" sap:label="Herstellerteilenr." sap:quickinfo="Herstellerteilenummer"/>
+                <Property Name="ArticleCategory" Type="Edm.String" MaxLength="2" sap:display-format="UpperCase" sap:label="Produkttyp"/>
                 <NavigationProperty Name="to_Text" Relationship="cds_zinn2_ui_my_shopping_catalog.assoc_EB0CC7C740CCDAFFF8CA1788143D4C2D" FromRole="FromRole_assoc_EB0CC7C740CCDAFFF8CA1788143D4C2D" ToRole="ToRole_assoc_EB0CC7C740CCDAFFF8CA1788143D4C2D"/>
             </EntityType>
-            <EntityType Name="UserType" sap:label="User" sap:content-version="1">
+            <EntityType Name="UserType" sap:label="Benutzer" sap:content-version="1">
                 <Key>
                     <PropertyRef Name="UserID"/>
                 </Key>
-                <Property Name="UserID" Type="Edm.String" Nullable="false" MaxLength="12" sap:display-format="UpperCase" sap:text="UserDescription" sap:label="User ID"/>
-                <Property Name="UserDescription" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="User Description"/>
+                <Property Name="UserID" Type="Edm.String" Nullable="false" MaxLength="12" sap:display-format="UpperCase" sap:text="UserDescription" sap:label="Benutzer-ID"/>
+                <Property Name="UserDescription" Type="Edm.String" MaxLength="80" sap:label="Beschreibung" sap:quickinfo="Benutzerbeschreibung"/>
                 <Property Name="IsTechnicalUser" Type="Edm.String" MaxLength="1"/>
             </EntityType>
             <EntityType Name="CatalogType" sap:label="Inn2: Shop Katalog (Projektion Root)" sap:content-version="1">
@@ -107,12 +107,12 @@
                 <Property Name="CatalogId" Type="Edm.String" MaxLength="10" sap:display-format="NonNegative" sap:text="Title" sap:label="Shop Katalog ID" sap:quickinfo="Inn2: Shop Katalog ID" sap:creatable="false" sap:updatable="false"/>
                 <Property Name="Title" Type="Edm.String" MaxLength="255" sap:label="Shop Katalog Titel" sap:quickinfo="Inn2: Shop Katalog Titel"/>
                 <Property Name="CatalogPictureUrl" Type="Edm.String" MaxLength="255" sap:label="ProductPictureUrl" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="CreationDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:filter-restriction="interval" sap:label="Created On" sap:creatable="false" sap:updatable="false"/>
-                <Property Name="CreatedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="CreatedByUserDescription" sap:label="Created By" sap:creatable="false" sap:updatable="false" sap:value-list="standard"/>
-                <Property Name="CreatedByUserDescription" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="User Description" sap:creatable="false" sap:updatable="false"/>
-                <Property Name="LastChangeDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:filter-restriction="interval" sap:label="Last Changed On" sap:creatable="false" sap:updatable="false"/>
-                <Property Name="LastChangedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="LastChangedByUserDescription" sap:label="Last Changed By" sap:creatable="false" sap:updatable="false" sap:value-list="standard"/>
-                <Property Name="LastChangedByUserDescription" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="User Description" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="CreationDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:filter-restriction="interval" sap:label="Angelegt am" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="CreatedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="CreatedByUserDescription" sap:label="Angelegt von" sap:creatable="false" sap:updatable="false" sap:value-list="standard"/>
+                <Property Name="CreatedByUserDescription" Type="Edm.String" MaxLength="80" sap:label="Beschreibung" sap:quickinfo="Benutzerbeschreibung" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="LastChangeDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:filter-restriction="interval" sap:label="Zuletzt geändert am" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="LastChangedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="LastChangedByUserDescription" sap:label="Zuletzt geändert von" sap:creatable="false" sap:updatable="false" sap:value-list="standard"/>
+                <Property Name="LastChangedByUserDescription" Type="Edm.String" MaxLength="80" sap:label="Beschreibung" sap:quickinfo="Benutzerbeschreibung" sap:creatable="false" sap:updatable="false"/>
                 <NavigationProperty Name="to_CatalogItem" Relationship="cds_zinn2_ui_my_shopping_catalog.assoc_0B3FDE590C391920FC450AE9D9AF5762" FromRole="FromRole_assoc_0B3FDE590C391920FC450AE9D9AF5762" ToRole="ToRole_assoc_0B3FDE590C391920FC450AE9D9AF5762"/>
                 <NavigationProperty Name="to_CreatedByUser" Relationship="cds_zinn2_ui_my_shopping_catalog.assoc_0DCA0636ACF24F08B43A13286F6083AF" FromRole="FromRole_assoc_0DCA0636ACF24F08B43A13286F6083AF" ToRole="ToRole_assoc_0DCA0636ACF24F08B43A13286F6083AF"/>
                 <NavigationProperty Name="to_LastChangedByUser" Relationship="cds_zinn2_ui_my_shopping_catalog.assoc_8A4E791BCE3CDFDC9DEEED2B0BCA2CF3" FromRole="FromRole_assoc_8A4E791BCE3CDFDC9DEEED2B0BCA2CF3" ToRole="ToRole_assoc_8A4E791BCE3CDFDC9DEEED2B0BCA2CF3"/>
@@ -121,22 +121,22 @@
                 <Key>
                     <PropertyRef Name="CatalogItemUuid"/>
                 </Key>
-                <Property Name="addToShoppingCart_ac" Type="Edm.Boolean" sap:label="Dyn. Action Control" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="addToShoppingCart_ac" Type="Edm.Boolean" sap:label="Dyn. Aktions-Control" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="CatalogItemUuid" Type="Edm.Guid" Nullable="false" sap:label="SK Position UUID" sap:quickinfo="Inn2: Shop Katalog Position UUID" sap:creatable="false" sap:updatable="false"/>
                 <Property Name="CatalogItemId" Type="Edm.String" MaxLength="6" sap:display-format="NonNegative" sap:label="SK Position ID" sap:quickinfo="Inn2: Shop Katalog Position ID" sap:creatable="false" sap:updatable="false"/>
                 <Property Name="CatalogUuid" Type="Edm.Guid" sap:label="Shop Katalog UUID" sap:quickinfo="Inn2: Shop Katalog UUID" sap:creatable="false" sap:updatable="false" sap:value-list="standard"/>
-                <Property Name="Material" Type="Edm.String" MaxLength="18" sap:display-format="UpperCase" sap:text="ProductName" sap:label="Material" sap:quickinfo="Material Number" sap:value-list="standard"/>
-                <Property Name="ProductName" Type="Edm.String" MaxLength="40" sap:label="Product Description"/>
+                <Property Name="Material" Type="Edm.String" MaxLength="18" sap:display-format="UpperCase" sap:text="ProductName" sap:label="Material" sap:quickinfo="Materialnummer" sap:value-list="standard"/>
+                <Property Name="ProductName" Type="Edm.String" MaxLength="40" sap:label="Produktbeschreibung"/>
                 <Property Name="ProductPictureUrl" Type="Edm.String" MaxLength="255" sap:label="ProductPictureUrl" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ProductSalesDescription" Type="Edm.String" MaxLength="255" sap:label="Verkaufstext" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="NetPriceAmount" Type="Edm.Decimal" Precision="11" Scale="3" sap:unit="TransactionCurrency" sap:variable-scale="true" sap:label="Net Price" sap:creatable="false" sap:updatable="false"/>
-                <Property Name="TransactionCurrency" Type="Edm.String" MaxLength="5" sap:display-format="UpperCase" sap:label="Document Currency" sap:quickinfo="SD Document Currency" sap:creatable="false" sap:updatable="false" sap:semantics="currency-code"/>
-                <Property Name="CreationDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:filter-restriction="interval" sap:label="Created On" sap:creatable="false" sap:updatable="false"/>
-                <Property Name="CreatedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="CreatedByUserDescription" sap:label="Created By" sap:creatable="false" sap:updatable="false" sap:value-list="standard"/>
-                <Property Name="CreatedByUserDescription" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="User Description" sap:creatable="false" sap:updatable="false"/>
-                <Property Name="LastChangeDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:filter-restriction="interval" sap:label="Last Changed On" sap:creatable="false" sap:updatable="false"/>
-                <Property Name="LastChangedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="LastChangedByUserDescription" sap:label="Last Changed By" sap:creatable="false" sap:updatable="false" sap:value-list="standard"/>
-                <Property Name="LastChangedByUserDescription" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="User Description" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="NetPriceAmount" Type="Edm.Decimal" Precision="11" Scale="3" sap:unit="TransactionCurrency" sap:variable-scale="true" sap:label="Nettopreis" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="TransactionCurrency" Type="Edm.String" MaxLength="5" sap:display-format="UpperCase" sap:label="Belegwährung" sap:quickinfo="Währung des Vertriebsbelegs" sap:creatable="false" sap:updatable="false" sap:semantics="currency-code"/>
+                <Property Name="CreationDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:filter-restriction="interval" sap:label="Angelegt am" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="CreatedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="CreatedByUserDescription" sap:label="Angelegt von" sap:creatable="false" sap:updatable="false" sap:value-list="standard"/>
+                <Property Name="CreatedByUserDescription" Type="Edm.String" MaxLength="80" sap:label="Beschreibung" sap:quickinfo="Benutzerbeschreibung" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="LastChangeDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:filter-restriction="interval" sap:label="Zuletzt geändert am" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="LastChangedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="LastChangedByUserDescription" sap:label="Zuletzt geändert von" sap:creatable="false" sap:updatable="false" sap:value-list="standard"/>
+                <Property Name="LastChangedByUserDescription" Type="Edm.String" MaxLength="80" sap:label="Beschreibung" sap:quickinfo="Benutzerbeschreibung" sap:creatable="false" sap:updatable="false"/>
                 <NavigationProperty Name="to_Catalog" Relationship="cds_zinn2_ui_my_shopping_catalog.assoc_0B3FDE590C391920FC450AE9D9AF5762" FromRole="ToRole_assoc_0B3FDE590C391920FC450AE9D9AF5762" ToRole="FromRole_assoc_0B3FDE590C391920FC450AE9D9AF5762"/>
                 <NavigationProperty Name="to_BundleItem" Relationship="cds_zinn2_ui_my_shopping_catalog.assoc_E11480D02A97ECD5DFC3CA938CDEB675" FromRole="FromRole_assoc_E11480D02A97ECD5DFC3CA938CDEB675" ToRole="ToRole_assoc_E11480D02A97ECD5DFC3CA938CDEB675"/>
                 <NavigationProperty Name="to_CreatedByUser" Relationship="cds_zinn2_ui_my_shopping_catalog.assoc_2A7737C1223EDD0637E5B00946E3975C" FromRole="FromRole_assoc_2A7737C1223EDD0637E5B00946E3975C" ToRole="ToRole_assoc_2A7737C1223EDD0637E5B00946E3975C"/>
@@ -146,35 +146,35 @@
                 <Key>
                     <PropertyRef Name="BillOfMaterialItemUUID"/>
                 </Key>
-                <Property Name="BillOfMaterialItemUUID" Type="Edm.Guid" Nullable="false" sap:label="ID item chge status" sap:quickinfo="Global identification of an item's change status"/>
-                <Property Name="BillOfMaterialCategory" Type="Edm.String" MaxLength="1" sap:display-format="UpperCase" sap:label="BOM category"/>
-                <Property Name="Plant" Type="Edm.String" MaxLength="4" sap:display-format="UpperCase" sap:label="Plant"/>
-                <Property Name="Material" Type="Edm.String" MaxLength="18" sap:display-format="UpperCase" sap:label="Material" sap:quickinfo="Material Number"/>
-                <Property Name="BillOfMaterialComponent" Type="Edm.String" MaxLength="18" sap:display-format="UpperCase" sap:label="Component" sap:quickinfo="BOM component"/>
+                <Property Name="BillOfMaterialItemUUID" Type="Edm.Guid" Nullable="false" sap:label="ID PosÄnderungsstand" sap:quickinfo="Globale Identifikation eines Positionsänderungsstandes"/>
+                <Property Name="BillOfMaterialCategory" Type="Edm.String" MaxLength="1" sap:display-format="UpperCase" sap:label="Stücklistentyp"/>
+                <Property Name="Plant" Type="Edm.String" MaxLength="4" sap:display-format="UpperCase" sap:label="Werk"/>
+                <Property Name="Material" Type="Edm.String" MaxLength="18" sap:display-format="UpperCase" sap:label="Material" sap:quickinfo="Materialnummer"/>
+                <Property Name="BillOfMaterialComponent" Type="Edm.String" MaxLength="18" sap:display-format="UpperCase" sap:label="Komponente" sap:quickinfo="Stücklistenkomponente"/>
                 <Property Name="ProductPictureUrl" Type="Edm.String" MaxLength="255" sap:label="ProductPictureUrl" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ProductSalesDescription" Type="Edm.String" MaxLength="255" sap:label="Verkaufstext" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ComponentDescription" Type="Edm.String" MaxLength="40" sap:label="Item Text" sap:quickinfo="BOM Item Text (Line 1)"/>
-                <Property Name="BOMItemDescription" Type="Edm.String" MaxLength="40" sap:label="Item Text" sap:quickinfo="BOM Item Text (Line 1)"/>
-                <Property Name="BOMItemText2" Type="Edm.String" MaxLength="40" sap:label="Item Text 2" sap:quickinfo="BOM Item Text (Line 2)"/>
+                <Property Name="ComponentDescription" Type="Edm.String" MaxLength="40" sap:label="Positionstext" sap:quickinfo="Stücklistenpositionstext (Zeile 1)"/>
+                <Property Name="BOMItemDescription" Type="Edm.String" MaxLength="40" sap:label="Positionstext" sap:quickinfo="Stücklistenpositionstext (Zeile 1)"/>
+                <Property Name="BOMItemText2" Type="Edm.String" MaxLength="40" sap:label="Positionstext 2" sap:quickinfo="Stücklistenpositionstext (Zeile 2)"/>
             </EntityType>
             <EntityType Name="SAP__Currency" sap:content-version="1">
                 <Key>
                     <PropertyRef Name="CurrencyCode"/>
                 </Key>
-                <Property Name="CurrencyCode" Type="Edm.String" Nullable="false" MaxLength="5" sap:label="Currency" sap:semantics="currency-code"/>
-                <Property Name="ISOCode" Type="Edm.String" Nullable="false" MaxLength="3" sap:label="ISO code"/>
-                <Property Name="Text" Type="Edm.String" Nullable="false" MaxLength="15" sap:label="Short text"/>
-                <Property Name="DecimalPlaces" Type="Edm.Byte" Nullable="false" sap:label="Decimals"/>
+                <Property Name="CurrencyCode" Type="Edm.String" Nullable="false" MaxLength="5" sap:label="Währung" sap:semantics="currency-code"/>
+                <Property Name="ISOCode" Type="Edm.String" Nullable="false" MaxLength="3" sap:label="Iso-Code"/>
+                <Property Name="Text" Type="Edm.String" Nullable="false" MaxLength="15" sap:label="Kurztext"/>
+                <Property Name="DecimalPlaces" Type="Edm.Byte" Nullable="false" sap:label="Dezimalen"/>
             </EntityType>
             <EntityType Name="SAP__UnitOfMeasure" sap:content-version="1">
                 <Key>
                     <PropertyRef Name="UnitCode"/>
                 </Key>
-                <Property Name="UnitCode" Type="Edm.String" Nullable="false" MaxLength="3" sap:label="Internal UoM" sap:semantics="unit-of-measure"/>
-                <Property Name="ISOCode" Type="Edm.String" Nullable="false" MaxLength="3" sap:label="ISO Code"/>
-                <Property Name="ExternalCode" Type="Edm.String" Nullable="false" MaxLength="3" sap:label="Commercial"/>
-                <Property Name="Text" Type="Edm.String" Nullable="false" MaxLength="30" sap:label="Measurement Unit Txt"/>
-                <Property Name="DecimalPlaces" Type="Edm.Int16" sap:label="Decimal Places"/>
+                <Property Name="UnitCode" Type="Edm.String" Nullable="false" MaxLength="3" sap:label="Interne Maßeinheit" sap:semantics="unit-of-measure"/>
+                <Property Name="ISOCode" Type="Edm.String" Nullable="false" MaxLength="3" sap:label="ISO-Code"/>
+                <Property Name="ExternalCode" Type="Edm.String" Nullable="false" MaxLength="3" sap:label="Kaufmännisch"/>
+                <Property Name="Text" Type="Edm.String" Nullable="false" MaxLength="30" sap:label="Maßeinheitentext"/>
+                <Property Name="DecimalPlaces" Type="Edm.Int16" sap:label="Dezimalstellen"/>
             </EntityType>
             <EntityType Name="SAP__DocumentDescription" sap:content-version="1">
                 <Key>
@@ -182,7 +182,7 @@
                 </Key>
                 <Property Name="Id" Type="Edm.Guid" Nullable="false" sap:label="UUID"/>
                 <Property Name="CreatedBy" Type="Edm.String" Nullable="false" MaxLength="12"/>
-                <Property Name="CreatedAt" Type="Edm.DateTime" Nullable="false" Precision="0" sap:label="Time Stamp"/>
+                <Property Name="CreatedAt" Type="Edm.DateTime" Nullable="false" Precision="0" sap:label="Zeitstempel"/>
                 <Property Name="FileName" Type="Edm.String" Nullable="false" MaxLength="256"/>
                 <Property Name="Title" Type="Edm.String" Nullable="false" MaxLength="256"/>
                 <NavigationProperty Name="Format" Relationship="cds_zinn2_ui_my_shopping_catalog.to_format" FromRole="FromRole_to_format" ToRole="ToRole_to_format"/>
@@ -202,7 +202,7 @@
                 <Property Name="PaperSize" Type="Edm.String" Nullable="false" MaxLength="10" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="BorderSize" Type="Edm.Int32" Nullable="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="MarginSize" Type="Edm.Int32" Nullable="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="FontName" Type="Edm.String" Nullable="false" MaxLength="255" sap:label="Font Name" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="FontName" Type="Edm.String" Nullable="false" MaxLength="255" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
             </EntityType>
             <EntityType Name="SAP__PDFStandard" sap:content-version="1">
                 <Key>
@@ -210,7 +210,7 @@
                 </Key>
                 <Property Name="Id" Type="Edm.Guid" Nullable="false" sap:label="UUID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="UsePDFAConformance" Type="Edm.Boolean" Nullable="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="DoEnableAccessibility" Type="Edm.Boolean" Nullable="false" sap:label="Indicator" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="DoEnableAccessibility" Type="Edm.Boolean" Nullable="false" sap:label="Flag" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
             </EntityType>
             <EntityType Name="SAP__TableColumns" sap:content-version="1">
                 <Key>
@@ -239,7 +239,7 @@
                     <PropertyRef Name="Id"/>
                 </Key>
                 <Property Name="Id" Type="Edm.Guid" Nullable="false" sap:label="UUID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="DoSign" Type="Edm.Boolean" Nullable="false" sap:label="Indicator" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="DoSign" Type="Edm.Boolean" Nullable="false" sap:label="Flag" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="Reason" Type="Edm.String" Nullable="false" MaxLength="256" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
             </EntityType>
             <EntityType Name="SAP__ValueHelp" sap:content-version="1">
@@ -251,7 +251,7 @@
                 <Property Name="DESCRIPTION" Type="Edm.String"/>
             </EntityType>
             <ComplexType Name="SAP__FitToPage">
-                <Property Name="ErrorRecoveryBehavior" Type="Edm.String" Nullable="false" MaxLength="8" sap:label="Error behavior" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ErrorRecoveryBehavior" Type="Edm.String" Nullable="false" MaxLength="8" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="IsEnabled" Type="Edm.Boolean" Nullable="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="MinimumFontSize" Type="Edm.Int32" Nullable="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
             </ComplexType>

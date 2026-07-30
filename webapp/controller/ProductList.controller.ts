@@ -310,11 +310,8 @@ export default class ProductListController extends BaseController {
         (this.byId("cbOnlyPriced") as CheckBox)?.setSelected(false);
         (this.byId("sortSelect") as Select)?.setSelectedKey("ProductName-asc");
 
-        const oBinding = (this.byId("productGrid") as List).getBinding("items") as ListBinding | undefined;
-        if (oBinding) {
-            oBinding.filter([]);
-            oBinding.sort(new Sorter("ProductName", false));
-        }
+        // Rebind
+        this._rebindProducts();
     }
 
     public onProductDataReceived(oEvent: Event<{error?: unknown}>): void {

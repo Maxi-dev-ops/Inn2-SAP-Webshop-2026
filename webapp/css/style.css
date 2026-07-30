@@ -250,9 +250,9 @@
     box-shadow: var(--rs-shadow-card);
 }
 .rsProductCard:hover {
-    box-shadow: 0 10px 28px rgba(0,0,0,0.12), 0 4px 10px rgba(0,0,0,0.06);
-    transform: translateY(-4px);
-    border-color: #cbd5e1;
+    box-shadow: 0 22px 45px -16px rgba(16,24,40,0.28), 0 8px 18px -10px rgba(16,24,40,0.15);
+    transform: translateY(-6px);
+    border-color: var(--rs-color-primary);
 }
 
 .rsProductCardImageWrap {
@@ -463,8 +463,9 @@ body > div { height: auto !important; min-height: 100vh; overflow: visible !impo
 /* -- PRODUCT GRID as sapMList -- */
 .rsProductGrid.sapMList .sapMListItems { grid-template-columns: repeat(auto-fill, 260px) !important; gap: 20px !important; justify-content: center !important; }
 .rsProductGrid.sapMList .sapMListNoData { grid-column: 1 / -1; text-align: center; padding: 3rem; }
-.rsProductGrid.sapMList .sapMLIB { height: 100% !important; }
-.rsProductGrid.sapMList .sapMLIBContent { height: 100% !important; display: flex !important; flex-direction: column !important; }
+/* overflow:visible so the rounded card's hover shadow isn't clipped to the square list-item box */
+.rsProductGrid.sapMList .sapMLIB { height: 100% !important; overflow: visible !important; }
+.rsProductGrid.sapMList .sapMLIBContent { height: 100% !important; overflow: visible !important; display: flex !important; flex-direction: column !important; }
 .rsProductCard.sapMVBox { height: 100% !important; display: flex !important; flex-direction: column !important; }
 .rsProductPrice .sapMText { font-size: 1.25rem !important; font-weight: 700 !important; color: var(--rs-color-text) !important; }
 
