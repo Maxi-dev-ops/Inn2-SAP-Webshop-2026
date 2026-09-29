@@ -122,8 +122,9 @@
                                     <StepInput
                                         id="pdpQtyInput"
                                         min="1"
-                                        max="99"
+                                        max="20"
                                         value="1"
+                                        enabled="{= !${detailModel>/addBusy} }"
                                         width="130px"/>
                                 </HBox>
                                 <Button
@@ -131,10 +132,20 @@
                                     text="{i18n>addToCartFull}"
                                     type="Emphasized"
                                     icon="sap-icon://cart"
-                                    enabled="{= ${addToShoppingCart_ac} !== false}"
+                                    enabled="{= ${addToShoppingCart_ac} !== false &amp;&amp; !${detailModel>/addBusy} }"
                                     press="onAddToCart"
                                     width="100%"
                                     class="rsPdpCartBtn sapUiSmallMarginTop"/>
+
+                                <!-- One backend call per unit, so a larger quantity needs visible progress -->
+                                <HBox
+                                    alignItems="Center"
+                                    justifyContent="Center"
+                                    class="sapUiSmallMarginTop"
+                                    visible="{= ${detailModel>/addProgress} !== '' }">
+                                    <BusyIndicator size="1rem" class="sapUiTinyMarginEnd"/>
+                                    <Text text="{detailModel>/addProgress}" class="rsCartDialogSubtotalLabel"/>
+                                </HBox>
                             </VBox>
 
                             <!-- Delivery info -->
@@ -201,9 +212,15 @@
                     text="{i18n>bundleComponentsDesc}"
                     class="sapUiSmallMarginBottom"/>
 
+                <!-- The list binding is relative, but it is built while the element binding above
+                     is still in flight, so it asks the backend once on its own. $select keeps that
+                     request from pulling every field of the component. -->
                 <List
                     id="bundleGrid"
-                    items="{to_BundleItem}"
+                    items="{
+                        path: 'to_BundleItem',
+                        parameters: { select: 'BillOfMaterialItemUUID,BillOfMaterialComponent,ComponentDescription,ProductPictureUrl' }
+                    }"
                     mode="None"
                     showNoData="false"
                     class="rsBundleGrid">
@@ -216,7 +233,7 @@
                                     alt="{ComponentDescription}"
                                     tooltip="{ComponentDescription}"
                                     width="100%"
-                                    error="onBundleImageError"/>
+                                    error="onImageError"/>
                             </VBox>
                             <VBox class="rsBundleCardBody">
                                 <VBox class="rsProductCardTitle">

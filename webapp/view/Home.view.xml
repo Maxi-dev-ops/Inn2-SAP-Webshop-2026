@@ -42,7 +42,7 @@
                 <content>
                     <HBox justifyContent="SpaceBetween" alignItems="Center" class="rsHeroBannerInner">
                         <VBox class="rsHeroContent">
-                            <Text text="{= ${config>/customerName} ? ${config>/customerName} + ' · ' + ${i18n>heroBrandSuffix} : ${i18n>heroBrandSuffix}}" class="rsHeroLabel"/>
+                            <Text text="{i18n>heroBrandSuffix}" class="rsHeroLabel"/>
                             <Title
                                 text="{i18n>heroTitle}"
                                 level="H1"
@@ -89,7 +89,13 @@
             <VBox class="sapUiMediumMarginBeginEnd sapUiMediumMarginTop">
                 <HBox justifyContent="SpaceBetween" alignItems="Center" class="sapUiSmallMarginBottom">
                     <Title text="{i18n>popularProducts}" level="H3" class="rsPremiumTitle"/>
-                    <Link text="{i18n>allProducts}" press="onExplore"/>
+                    <Button
+                        text="{i18n>allProducts}"
+                        icon="sap-icon://slim-arrow-right"
+                        iconFirst="false"
+                        type="Transparent"
+                        press="onExplore"
+                        class="rsAllProductsLink"/>
                 </HBox>
 
                 <BusyIndicator

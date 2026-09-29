@@ -1,0 +1,23 @@
+[
+  {
+    "CatalogUuid": "00505683-96f7-1eed-a7b5-01fcbf670a64",
+    "CatalogId": "1",
+    "Title": "DV Bündel",
+    "CreationDateTime": "/Date(1675092757872+0000)/",
+    "CreatedByUser": "ISC_AMA"
+  },
+  {
+    "CatalogUuid": "00505683-96f7-1eed-a896-29e2b6f60a64",
+    "CatalogId": "2",
+    "Title": "Zubehör",
+    "CreationDateTime": "/Date(1675092757872+0000)/",
+    "CreatedByUser": "ISC_AMA"
+  },
+  {
+    "CatalogUuid": "00505683-96f7-1eed-b8b9-35c14b63ca64",
+    "CatalogId": "3",
+    "Title": "IFCO: Katalog",
+    "CreationDateTime": "/Date(1675092757872+0000)/",
+    "CreatedByUser": "ISC_AMA"
+  }
+]

@@ -1,8 +1,7 @@
 export interface DatasheetData {
     name: string;
     material: string;
-    price: number | null | undefined;
-    currency: string;
+    priceText: string;
     description: string;
     pictureUrl: string;
 }
@@ -16,7 +15,6 @@ export interface DatasheetLabels {
     printButton: string;
 }
 
-/** Escapes HTML special characters */
 export function escHtml(s: string): string {
     return s
         .replace(/&/g, "&amp;")
@@ -26,15 +24,11 @@ export function escHtml(s: string): string {
         .replace(/'/g, "&#39;");
 }
 
-/**
- * Builds a printable HTML datasheet for a product. The result is opened in a new window
- */
+// Builds a printable HTML datasheet for a product. The result is opened in a new window
 export function buildDatasheetHtml(oData: DatasheetData, oLabels: DatasheetLabels): string {
     const sName = escHtml(oData.name);
     const sMat = escHtml(oData.material);
-    const sPrice = oData.price !== undefined && oData.price !== null
-        ? escHtml(`${Number(oData.price).toFixed(2)} ${oData.currency}`)
-        : "–";
+    const sPrice = escHtml(oData.priceText || "–");
     const sDesc = escHtml(oData.description);
     const sImgSrc = escHtml(oData.pictureUrl);
 

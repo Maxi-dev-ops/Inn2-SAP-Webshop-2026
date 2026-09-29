@@ -16,20 +16,10 @@
       "toolsId": "716f26d6-e3f2-42e1-8878-a53bb3fc08e2"
     },
     "dataSources": {
-      "ZINN2_UI_MY_SHOP_CATA_O2_VAN": {
-        "uri": "/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZINN2_UI_MY_SHOP_CATA_O2_VAN',Version='0001')/$value/",
-        "type": "ODataAnnotation",
-        "settings": {
-          "localUri": "localService/mainService/ZINN2_UI_MY_SHOP_CATA_O2_VAN.xml"
-        }
-      },
       "mainService": {
         "uri": "/sap/opu/odata/sap/ZINN2_UI_MY_SHOP_CATA_O2/",
         "type": "OData",
         "settings": {
-          "annotations": [
-            "ZINN2_UI_MY_SHOP_CATA_O2_VAN"
-          ],
           "localUri": "localService/mainService/metadata.xml",
           "odataVersion": "2.0"
         }
@@ -38,18 +28,8 @@
         "uri": "/sap/opu/odata/sap/ZINN2_UI_MY_SHOP_CART_O2/",
         "type": "OData",
         "settings": {
-          "annotations": [
-            "ZINN2_UI_MY_SHOP_CART_O2_VAN"
-          ],
           "localUri": "localService/cartService/metadata.xml",
           "odataVersion": "2.0"
-        }
-      },
-      "ZINN2_UI_MY_SHOP_CART_O2_VAN": {
-        "uri": "/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZINN2_UI_MY_SHOP_CART_O2_VAN',Version='0001')/$value/",
-        "type": "ODataAnnotation",
-        "settings": {
-          "localUri": "localService/cartService/ZINN2_UI_MY_SHOP_CART_O2_VAN.xml"
         }
       }
     }
@@ -100,7 +80,8 @@
         "dataSource": "mainService",
         "preload": true,
         "settings": {
-          "refreshAfterChange": false
+          "refreshAfterChange": false,
+          "defaultCountMode": "Inline"
         }
       },
       "cartService": {
@@ -154,6 +135,13 @@
           "pattern": "cart",
           "target": [
             "TargetCart"
+          ]
+        },
+        {
+          "name": "RouteCheckout",
+          "pattern": "checkout",
+          "target": [
+            "TargetCheckout"
           ]
         },
         {
@@ -217,6 +205,14 @@
           "clearControlAggregation": false,
           "id": "Cart",
           "name": "Cart"
+        },
+        "TargetCheckout": {
+          "type": "View",
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "id": "Checkout",
+          "name": "Checkout"
         },
         "TargetWishlist": {
           "type": "View",

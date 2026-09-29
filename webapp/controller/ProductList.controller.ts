@@ -5,8 +5,6 @@ import Filter from "sap/ui/model/Filter";
 import FilterOperator from "sap/ui/model/FilterOperator";
 import Sorter from "sap/ui/model/Sorter";
 import ListBinding from "sap/ui/model/ListBinding";
-import UIComponent from "sap/ui/core/UIComponent";
-import MessageToast from "sap/m/MessageToast";
 import MessageBox from "sap/m/MessageBox";
 import Log from "sap/base/Log";
 import Event from "sap/ui/base/Event";
@@ -27,7 +25,10 @@ import { type ListBase$UpdateFinishedEvent } from "sap/m/ListBase";
 import { type Route$PatternMatchedEvent } from "sap/ui/core/routing/Route";
 import formatter from "../model/formatter";
 import CartService, { CatalogProduct } from "../model/CartService";
+import CatalogService, { CatalogEntry } from "../model/CatalogService";
 import { WishlistItem } from "../model/WishlistService";
+import { parseNumberInRange } from "../model/validation";
+import { readOnce } from "../model/odata";
 import Constants from "../model/Constants";
 
 /**
@@ -39,27 +40,29 @@ export default class ProductListController extends BaseController {
     private _cartService: CartService | undefined;
     private _oCartDialog: Dialog | undefined;
     private _searchQuery: string = "";
-    /** true when _searchQuery came from a ?query= nav param; auto-resets on the next plain route match. */
-    private _searchFromNav: boolean = false;
     private _catalogFilter: string = "";
     private _priceMin: number = 0;
     private _priceMax: number = Number.POSITIVE_INFINITY;
     private _onlyPriced: boolean = false;
-    /** XML item template, captured so the product list can be rebound from scratch (see _rebindProducts). */
+    private _searchTimer: ReturnType<typeof setTimeout> | undefined;
+    // XML item template, captured so the product list can be rebound from scratch
     private _oProductTemplate: Control | undefined;
+    // Filter state the binding currently carries. Several controls ask the same list
+    private _sAppliedFilter: string | undefined;
 
-    // -- Lifecycle --
+    // -- Lifecycle -- //
 
     public onInit(): void {
         this._cartService = new CartService(this.getOwnerComponent());
 
         const oCartDialogModel = new JSONModel({
             uuid: "", name: "", material: "", price: 0, currency: "EUR", pictureUrl: "", quantity: 1,
-            description: "", hasDescription: false, bundleItems: [], hasBundleItems: false
+            description: "", hasDescription: false, bundleItems: [], hasBundleItems: false,
+            busy: false, progress: ""
         });
         this.setModel(oCartDialogModel, "cartDialog");
 
-        // Seed the "All" chip so it shows before the catalog request returns.
+        // Show All filter before catalog request returns
         const oViewModel = new JSONModel({ categoryChips: [{ uuid: "", title: this._getText("filterAll") }] });
         this.setModel(oViewModel, "plpView");
 
@@ -70,39 +73,40 @@ export default class ProductListController extends BaseController {
 
     public onExit(): void {
         super.onExit();
+        if (this._searchTimer !== undefined) {
+            clearTimeout(this._searchTimer);
+            this._searchTimer = undefined;
+        }
         if (this._oCartDialog) {
             this._oCartDialog.destroy();
             this._oCartDialog = undefined;
         }
     }
 
-    // -- Routing & product binding --
+    // -- Routing & product binding -- //
 
     private _onRouteMatched(oEvent: Route$PatternMatchedEvent): void {
         const oArgs = oEvent.getParameter("arguments") as { "?query"?: { query?: string; catalog?: string } } | undefined;
         const sQuery = oArgs?.["?query"]?.query ?? "";
         const sCatalogUuid = oArgs?.["?query"]?.catalog ?? "";
 
-        if (sQuery) {
-            this._searchQuery = sQuery;
-            this._searchFromNav = true;
-            (this.byId("searchField") as SearchField)?.setValue(sQuery);
-        } else if (sCatalogUuid) {
-            this._catalogFilter = sCatalogUuid;
-        } else if (this._searchFromNav) {
-            this._searchQuery = "";
-            this._searchFromNav = false;
-            (this.byId("searchField") as SearchField)?.setValue("");
-        }
+        // The hash is the whole truth on entry. What it does not name is not filtered
+        this._searchQuery = sQuery;
+        this._catalogFilter = sCatalogUuid;
+        (this.byId("searchField") as SearchField)?.setValue(sQuery);
 
-        // Rebind from scratch on every entry: with view caching, a binding that first fired
-        // before the SAP session was active stays stuck at "0 / done" and refresh() won't revive it.
-        this._rebindProducts();
+        this._syncProducts();
         this._highlightActiveChip();
     }
 
-    /** (Re)binds the product grid from scratch with the current filters + sort order.
-     *  Replaces a potentially stuck declarative binding (see _onRouteMatched). */
+    // Binds on the first entry and after that only when the filter set changes
+    private _syncProducts(): void {
+        const oBinding = (this.byId("productGrid") as List).getBinding("items") as ListBinding | undefined;
+        if (oBinding && this._sAppliedFilter === this._filterKey()) {return;}
+        this._rebindProducts();
+    }
+
+    // binds the product grid from scratch with the current filters + sort order
     private _rebindProducts(): void {
         const oList = this.byId("productGrid") as List;
         if (!this._oProductTemplate) {
@@ -112,8 +116,14 @@ export default class ProductListController extends BaseController {
                 this._oProductTemplate = oInfo.template;
             }
         }
-        if (!this._oProductTemplate) { return; }
+        if (!this._oProductTemplate) {
+            // resume what the XML declared
+            Log.error("Product list template missing - falling back to the declarative binding");
+            (oList.getBinding("items") as ListBinding | undefined)?.resume();
+            return;
+        }
 
+        this._sAppliedFilter = this._filterKey();
         oList.bindItems({
             path: Constants.ODATA.ENTITY_CATALOG_ITEM,
             template: this._oProductTemplate,
@@ -133,36 +143,16 @@ export default class ProductListController extends BaseController {
         return new Sorter(aParts[0], aParts[1] === "desc");
     }
 
-    // -- Catalog filter bar --
+    // -- Catalog filter bar -- //
 
     private _loadCatalogFilter(): void {
-        const oCatalogCache = this.getOwnerComponent().getModel(Constants.MODELS.CATALOG) as JSONModel | undefined;
-        if (oCatalogCache?.getProperty("/loaded") === true) {
-            const aResults = oCatalogCache.getProperty("/results") as Array<{ CatalogUuid: string; Title: string; CatalogId: string }>;
-            this._setCatalogChips(aResults);
-            return;
-        }
-        const oModel = this.getOwnerComponent().getModel() as ODataModel;
-        if (!oModel) {return;}
-        oModel.read(Constants.ODATA.ENTITY_CATALOG, {
-            urlParameters: {
-                $orderby: "CatalogId asc",
-                $select: Constants.ODATA.SELECT_CATALOG
-            },
-            success: (oData: { results: Array<{ CatalogUuid: string; Title: string; CatalogId: string }> }) => {
-                const aResults = oData.results ?? [];
-                this._setCatalogChips(aResults);
-                oCatalogCache?.setProperty("/results", aResults);
-                oCatalogCache?.setProperty("/loaded", true);
-            },
-            error: (oErr: unknown) => {
-                Log.warning("Catalog filter load failed.", this._errText(oErr));
-            }
-        });
+        CatalogService.load(this.getOwnerComponent())
+            .then((aResults) => { this._setCatalogChips(aResults); })
+            .catch(() => undefined); // CatalogService already logged it
     }
 
-    /** Fills the declaratively bound chip bar; the first entry ("All") clears the catalog filter. */
-    private _setCatalogChips(aResults: Array<{ CatalogUuid: string; Title: string; CatalogId: string }>): void {
+    // Fills the bound chip bar
+    private _setCatalogChips(aResults: CatalogEntry[]): void {
         const aChips = [
             { uuid: "", title: this._getText("filterAll") },
             ...aResults.map((oCatalog) => ({
@@ -170,18 +160,24 @@ export default class ProductListController extends BaseController {
                 title: oCatalog.Title || this._getText("catalogFallback", [oCatalog.CatalogId])
             }))
         ];
-        (this.getModel("plpView") as JSONModel).setProperty("/categoryChips", aChips);
+        this._json("plpView").setProperty("/categoryChips", aChips);
         this._highlightActiveChip();
     }
 
     public onCategoryChipPress(oEvent: Event<object, Control>): void {
         const oCtx = oEvent.getSource().getBindingContext("plpView");
-        this._catalogFilter = oCtx ? (oCtx.getProperty("uuid") as string) : "";
-        this._highlightActiveChip();
-        this._applyFilters();
+        const sUuid = oCtx ? (oCtx.getProperty("uuid") as string) : "";
+        if (sUuid === this._catalogFilter) {return;}
+
+        // Goes through the hash instead of filtering in place
+        const oParams: Record<string, string> = {};
+        const sQuery = this._searchQuery.trim();
+        if (sQuery) {oParams.query = sQuery;}
+        if (sUuid) {oParams.catalog = sUuid;}
+        this._navTo(Constants.ROUTES.PRODUCT_LIST, { "?query": oParams }, true);
     }
 
-    /** Reflects the current catalog filter on the chips. */
+    // Reflects active catalog filter
     private _highlightActiveChip(): void {
         (this.byId("categoryBar") as HBox).getItems().forEach((oItem) => {
             const oBtn = oItem as Button;
@@ -192,47 +188,58 @@ export default class ProductListController extends BaseController {
     }
 
     public onAfterRendering(): void {
-        // Re-apply after async chip load / cached-view re-render on back navigation.
         this._highlightActiveChip();
     }
 
-    // -- Search --
+    // -- Search -- //
 
     public onSearch(oEvent: SearchField$SearchEvent): void {
         this._searchQuery = (oEvent.getParameter("query") as string) ?? "";
-        this._searchFromNav = false;
+        if (this._searchTimer !== undefined) {
+            clearTimeout(this._searchTimer);
+            this._searchTimer = undefined;
+        }
         this._applyFilters();
     }
 
     public onSearchLive(oEvent: SearchField$LiveChangeEvent): void {
         this._searchQuery = (oEvent.getParameter("newValue") as string) ?? "";
-        this._searchFromNav = false;
-        this._applyFilters();
+        if (this._searchTimer !== undefined) {clearTimeout(this._searchTimer);}
+        // eslint-disable-next-line @sap-ux/fiori-tools/sap-timeout-usage -- debounce
+        this._searchTimer = setTimeout(() => {
+            this._searchTimer = undefined;
+            this._applyFilters();
+        }, Constants.UI.SEARCH_DEBOUNCE_MS);
     }
 
-    // -- Filter & sort --
+    // -- Filter & sort -- //
+
+    // A price the user typed
+    private _priceBound(oInput: Input, nFallback: number): number | null {
+        const sValue = oInput.getValue().trim();
+        if (sValue === "") {return nFallback;}
+        return parseNumberInRange(sValue, 0, Constants.UI.PRICE_FILTER_MAX);
+    }
 
     public onPriceInputChange(): void {
         const oMinInput = this.byId("priceMinInput") as Input;
         const oMaxInput = this.byId("priceMaxInput") as Input;
-        const sMin = oMinInput.getValue().trim();
-        const sMax = oMaxInput.getValue().trim();
-        const nMin = parseFloat(sMin);
-        const nMax = parseFloat(sMax);
-        this._priceMin = sMin === "" || isNaN(nMin) ? 0 : Math.max(0, nMin);
-        this._priceMax = sMax === "" || isNaN(nMax) ? Number.POSITIVE_INFINITY : nMax;
+        const nMin = this._priceBound(oMinInput, 0);
+        const nMax = this._priceBound(oMaxInput, Number.POSITIVE_INFINITY);
 
-        // Invalid range (min > max): show a ValueState hint instead of silently emptying the list.
-        if (isFinite(this._priceMax) && this._priceMin > this._priceMax) {
-            const sMsg = this._getText("priceRangeInvalid");
-            oMinInput.setValueState(ValueState.Error);
-            oMinInput.setValueStateText(sMsg);
-            oMaxInput.setValueState(ValueState.Error);
-            oMaxInput.setValueStateText(sMsg);
-            return;
-        }
-        oMinInput.setValueState(ValueState.None);
-        oMaxInput.setValueState(ValueState.None);
+        // Unusable input or an inverted range
+        const bBadRange = nMin !== null && nMax !== null && isFinite(nMax) && nMin > nMax;
+        const sMsg = this._getText(bBadRange ? "priceRangeInvalid" : "priceValueInvalid");
+        const mark = (oInput: Input, bError: boolean): void => {
+            oInput.setValueState(bError ? ValueState.Error : ValueState.None);
+            if (bError) {oInput.setValueStateText(sMsg);}
+        };
+        mark(oMinInput, nMin === null || bBadRange);
+        mark(oMaxInput, nMax === null || bBadRange);
+        if (nMin === null || nMax === null || bBadRange) {return;}
+
+        this._priceMin = nMin;
+        this._priceMax = nMax;
         this._applyFilters();
     }
 
@@ -241,13 +248,23 @@ export default class ProductListController extends BaseController {
         this._applyFilters();
     }
 
+    // Everything the current filter set consists of
+    private _filterKey(): string {
+        return JSON.stringify([
+            this._searchQuery.trim(), this._catalogFilter, this._priceMin, this._priceMax, this._onlyPriced
+        ]);
+    }
+
     private _applyFilters(): void {
         const oBinding = (this.byId("productGrid") as List).getBinding("items") as ListBinding | undefined;
         if (!oBinding) {return;}
+        const sKey = this._filterKey();
+        if (sKey === this._sAppliedFilter) {return;}
+        this._sAppliedFilter = sKey;
         oBinding.filter(this._buildFilters());
     }
 
-    /** Builds the active OData filters from search/catalog/price/onlyPriced state. */
+    // Builds the active OData filters
     private _buildFilters(): Filter[] {
         const aFilters: Filter[] = [];
 
@@ -294,7 +311,6 @@ export default class ProductListController extends BaseController {
 
     public onResetFilters(): void {
         this._searchQuery = "";
-        this._searchFromNav = false;
         this._catalogFilter = "";
         this._priceMin = 0;
         this._priceMax = Number.POSITIVE_INFINITY;
@@ -310,17 +326,17 @@ export default class ProductListController extends BaseController {
         (this.byId("cbOnlyPriced") as CheckBox)?.setSelected(false);
         (this.byId("sortSelect") as Select)?.setSelectedKey("ProductName-asc");
 
-        // Rebind
-        this._rebindProducts();
+        // Clears the hash too, otherwise the next entry would filter by a catalog the user just
+        // reset away. When the hash was already bare the route does not fire, so _syncProducts()
+        // does the rebind; when it does fire, it is already done and the call below is a no-op.
+        this._navTo(Constants.ROUTES.PRODUCT_LIST, {}, true);
+        this._syncProducts();
     }
 
     public onProductDataReceived(oEvent: Event<{error?: unknown}>): void {
         const oError = oEvent.getParameter("error");
         if (oError) {
-            Log.error("CatalogItem list load failed", this._errText(oError));
-            MessageBox.error(this._extractODataError(oError, this._getText("productsLoadError")), {
-                title: this._getText("productsLoadError")
-            });
+            this._reportError(oError, "productsLoadError", "CatalogItem list load failed");
         }
     }
 
@@ -345,19 +361,15 @@ export default class ProductListController extends BaseController {
         this._updateHeartIcons(this.byId("productGrid") as List, undefined, "CatalogItemUuid");
     }
 
-    // -- Navigation --
+    // -- Navigation -- //
 
     public onProductPress(oEvent: Event<object, Control>): void {
-        const oCtx = oEvent.getSource().getBindingContext();
-        if (!oCtx) {return;}
-        const oData = oCtx.getObject() as { CatalogItemUuid: string };
-
-        UIComponent.getRouterFor(this).navTo(Constants.ROUTES.PRODUCT_DETAIL, {
-            catalogItemUuid: oData.CatalogItemUuid
-        });
+        const oData = this._ctxObject<{ CatalogItemUuid: string }>(oEvent);
+        if (!oData) {return;}
+        this._navTo(Constants.ROUTES.PRODUCT_DETAIL, { catalogItemUuid: oData.CatalogItemUuid });
     }
 
-    // -- Cart dialog --
+    // -- Cart dialog -- //
 
     private _getCartDialog(): Promise<Dialog> {
         if (this._oCartDialog) {
@@ -378,11 +390,10 @@ export default class ProductListController extends BaseController {
     }
 
     public onOpenCartDialog(oEvent: Event<object, Control>): void {
-        const oCtx = oEvent.getSource().getBindingContext();
-        if (!oCtx) {return;}
-        const oData = oCtx.getObject() as CatalogProduct;
+        const oData = this._ctxObject<CatalogProduct>(oEvent);
+        if (!oData) {return;}
 
-        const oModel = this.getModel("cartDialog") as JSONModel;
+        const oModel = this._json("cartDialog");
         oModel.setData({
             uuid: oData.CatalogItemUuid,
             name: oData.ProductName,
@@ -394,7 +405,9 @@ export default class ProductListController extends BaseController {
             description: "",
             hasDescription: false,
             bundleItems: [],
-            hasBundleItems: false
+            hasBundleItems: false,
+            busy: false,
+            progress: ""
         });
 
         this._loadDialogDetails(oData.CatalogItemUuid);
@@ -406,41 +419,39 @@ export default class ProductListController extends BaseController {
 
     private _loadDialogDetails(sUuid: string): void {
         const oODataModel = this.getOwnerComponent().getModel() as ODataModel;
-        const oDialogModel = this.getModel("cartDialog") as JSONModel;
-        oODataModel.read(`${Constants.ODATA.ENTITY_CATALOG_ITEM}(guid'${sUuid}')`, {
-            urlParameters: {
-                $expand: "to_BundleItem",
-                $select: "CatalogItemUuid,ProductSalesDescription,to_BundleItem/BillOfMaterialComponent,to_BundleItem/ComponentDescription,to_BundleItem/BOMItemDescription"
-            },
-            success: (oData: {
-                ProductSalesDescription?: string;
-                to_BundleItem?: { results?: Array<Record<string, unknown>> };
-            }) => {
-                if (oDialogModel.getProperty("/uuid") !== sUuid) {return;}
+        const oDialogModel = this._json("cartDialog");
 
-                const sDesc = (oData.ProductSalesDescription ?? "").trim();
-                const aBundle = (oData.to_BundleItem?.results ?? [])
-                    .map((r) => {
-                        const sText = [r.ComponentDescription, r.BOMItemDescription, r.BillOfMaterialComponent]
-                            .map((v) => (typeof v === "string" ? v.trim() : ""))
-                            .find((v) => v.length > 0) ?? "";
-                        return { text: sText };
-                    })
-                    .filter((b) => b.text);
+        readOnce<{
+            ProductSalesDescription?: string;
+            to_BundleItem?: { results?: Array<Record<string, unknown>> };
+        }>(oODataModel, `${Constants.ODATA.ENTITY_CATALOG_ITEM}(guid'${sUuid}')`, {
+            $expand: "to_BundleItem",
+            $select: "CatalogItemUuid,ProductSalesDescription,to_BundleItem/BillOfMaterialComponent,to_BundleItem/ComponentDescription,to_BundleItem/BOMItemDescription"
+        }).then((oData) => {
+            // The user may have opened the next dialog while this was in flight
+            if (oDialogModel.getProperty("/uuid") !== sUuid) {return;}
 
-                oDialogModel.setProperty("/description", sDesc);
-                oDialogModel.setProperty("/hasDescription", !!sDesc);
-                oDialogModel.setProperty("/bundleItems", aBundle);
-                oDialogModel.setProperty("/hasBundleItems", aBundle.length > 0);
-            },
-            error: (oErr: unknown) => {
-                Log.warning("Dialog details load failed.", this._errText(oErr));
-            }
+            const sDesc = (oData.ProductSalesDescription ?? "").trim();
+            const aBundle = (oData.to_BundleItem?.results ?? [])
+                .map((r) => {
+                    const sText = [r.ComponentDescription, r.BOMItemDescription, r.BillOfMaterialComponent]
+                        .map((v) => (typeof v === "string" ? v.trim() : ""))
+                        .find((v) => v.length > 0) ?? "";
+                    return { text: sText };
+                })
+                .filter((b) => b.text);
+
+            oDialogModel.setProperty("/description", sDesc);
+            oDialogModel.setProperty("/hasDescription", !!sDesc);
+            oDialogModel.setProperty("/bundleItems", aBundle);
+            oDialogModel.setProperty("/hasBundleItems", aBundle.length > 0);
+        }, (oErr: unknown) => {
+            Log.warning("Dialog details load failed.", String(oErr));
         });
     }
 
     public onConfirmAddToCart(): void {
-        const oModel = this.getModel("cartDialog") as JSONModel;
+        const oModel = this._json("cartDialog");
         const oProduct: CatalogProduct = {
             CatalogItemUuid: oModel.getProperty("/uuid") as string,
             ProductName: oModel.getProperty("/name") as string,
@@ -449,44 +460,29 @@ export default class ProductListController extends BaseController {
             TransactionCurrency: oModel.getProperty("/currency") as string,
             ProductPictureUrl: oModel.getProperty("/pictureUrl") as string
         };
-        const nQty = oModel.getProperty("/quantity") as number;
 
-        const oDialog = this._oCartDialog;
-        oDialog?.setBusy(true);
-
-        const oODataModel = this.getOwnerComponent().getModel() as ODataModel;
-        oODataModel.callFunction(Constants.ODATA.FUNCTION_ADD_TO_CART, {
-            method: "POST",
-            urlParameters: { CatalogItemUuid: oProduct.CatalogItemUuid },
-            success: () => {
-                oDialog?.setBusy(false);
-                oDialog?.close();
-                this._cartService?.addItem(oProduct, nQty);
-                const sMsg = this._getText("addedToCart", [oProduct.ProductName]);
-                MessageToast.show(sMsg);
-                this._announceCartUpdate(sMsg);
+        if (!this._cartService) {return;}
+        // A busy overlay would hide the progress line, dialog only locks its controls
+        this._addToCart(
+            this._cartService, oProduct, oModel.getProperty("/quantity") as number,
+            (bBusy, sProgress) => {
+                oModel.setProperty("/busy", bBusy);
+                oModel.setProperty("/progress", sProgress);
             },
-            error: (oErr: unknown) => {
-                oDialog?.setBusy(false);
-                Log.error("addToShoppingCart error", this._errText(oErr));
-                MessageBox.error(this._extractODataError(oErr, this._getText("addToCartError")), {
-                    title: this._getText("addToCartError")
-                });
-            }
-        });
+            () => this._oCartDialog?.close()
+        );
     }
 
     public onCancelCartDialog(): void {
         this._oCartDialog?.close();
     }
 
-    // -- Wishlist --
+    // -- Wishlist -- //
 
     public onToggleWishlist(oEvent: Event<object, Button>): void {
         const oBtn = oEvent.getSource();
-        const oCtx = oBtn.getBindingContext();
-        if (!oCtx) {return;}
-        const oData = oCtx.getObject() as CatalogProduct;
+        const oData = this._ctxObject<CatalogProduct>(oEvent);
+        if (!oData) {return;}
 
         const oItem: WishlistItem = {
             uuid: oData.CatalogItemUuid,

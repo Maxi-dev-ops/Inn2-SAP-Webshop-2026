@@ -56,7 +56,8 @@
                     <HBox alignItems="Center" wrap="Wrap">
                         <StepInput
                             min="1"
-                            max="99"
+                            max="20"
+                            enabled="{= !${cartDialog>/busy} }"
                             value="{cartDialog>/quantity}"
                             width="140px"
                             class="rsQtyHighlight"/>
@@ -96,6 +97,15 @@
                     </HBox>
                 </VBox>
 
+                <!-- One backend call per unit, so a larger quantity needs visible progress -->
+                <HBox
+                    alignItems="Center"
+                    class="sapUiSmallMarginTop"
+                    visible="{= ${cartDialog>/progress} !== '' }">
+                    <BusyIndicator size="1rem" class="sapUiTinyMarginEnd"/>
+                    <Text text="{cartDialog>/progress}" class="rsCartDialogSubtotalLabel"/>
+                </HBox>
+
             </VBox>
         </content>
         <beginButton>
@@ -103,11 +113,13 @@
                 text="{i18n>addToCartFull}"
                 type="Emphasized"
                 icon="sap-icon://cart"
+                enabled="{= !${cartDialog>/busy} }"
                 press="onConfirmAddToCart"/>
         </beginButton>
         <endButton>
             <Button
                 text="{i18n>cancel}"
+                enabled="{= !${cartDialog>/busy} }"
                 press="onCancelCartDialog"/>
         </endButton>
     </Dialog>

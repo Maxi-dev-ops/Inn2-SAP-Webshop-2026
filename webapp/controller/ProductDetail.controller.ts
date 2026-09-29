@@ -1,12 +1,8 @@
 import BaseController from "./BaseController";
 import ODataModel from "sap/ui/model/odata/v2/ODataModel";
 import JSONModel from "sap/ui/model/json/JSONModel";
-import UIComponent from "sap/ui/core/UIComponent";
 import MessageToast from "sap/m/MessageToast";
-import MessageBox from "sap/m/MessageBox";
-import Log from "sap/base/Log";
 import Event from "sap/ui/base/Event";
-import Control from "sap/ui/core/Control";
 import Button from "sap/m/Button";
 import SearchField, { type SearchField$SearchEvent } from "sap/m/SearchField";
 import StepInput from "sap/m/StepInput";
@@ -25,19 +21,27 @@ export default class ProductDetailController extends BaseController {
     public readonly formatter = formatter;
 
     private _cartService: CartService | undefined;
+    // Object URLs of opened datasheets, released in onExit
+    private _aBlobUrls: string[] = [];
 
-    // -- Lifecycle --
+    // -- Lifecycle -- //
 
     public onInit(): void {
         this._cartService = new CartService(this.getOwnerComponent());
 
-        const oDetailModel = new JSONModel({ hasBundleItems: false });
+        const oDetailModel = new JSONModel({ hasBundleItems: false, addBusy: false, addProgress: "" });
         this.setModel(oDetailModel, Constants.MODELS.DETAIL);
 
         this._attachRoute(Constants.ROUTES.PRODUCT_DETAIL, this._onRouteMatched.bind(this));
     }
 
-    // -- Routing & binding --
+    public onExit(): void {
+        super.onExit();
+        this._aBlobUrls.forEach((sUrl) => { URL.revokeObjectURL(sUrl); });
+        this._aBlobUrls = [];
+    }
+
+    // -- Routing & binding -- //
 
     private _onRouteMatched(oEvent: Route$PatternMatchedEvent): void {
         (this.byId("pdpSearchField") as SearchField | undefined)?.setValue("");
@@ -75,8 +79,9 @@ export default class ProductDetailController extends BaseController {
             ProductPictureUrl?: string;
         } | undefined;
         if (!oData || !oData.CatalogItemUuid) {
+            // Also the answer to a hand-edited URL
             MessageToast.show(this._getText("productNotFound"));
-            UIComponent.getRouterFor(this).navTo(Constants.ROUTES.PRODUCT_LIST);
+            this._navTo(Constants.ROUTES.PRODUCT_LIST);
             return;
         }
 
@@ -92,49 +97,38 @@ export default class ProductDetailController extends BaseController {
             pictureUrl: oData.ProductPictureUrl ?? ""
         });
 
-        this._updateWishlistBtn(WishlistService.has(oData.CatalogItemUuid));
+        const oBtn = this._wishlistBtn();
+        if (oBtn) {
+            this._paintHeart(oBtn, WishlistService.has(oData.CatalogItemUuid));
+        }
     }
 
     private _checkBundleItems(sPath: string): void {
         const oModel = this.getOwnerComponent().getModel() as ODataModel;
-        const oDetailModel = this.getView()?.getModel(Constants.MODELS.DETAIL) as JSONModel | undefined;
+        const oDetailModel: JSONModel | undefined = this._json(Constants.MODELS.DETAIL);
         if (!oDetailModel) { return; }
         const aBundleItems = oModel.getProperty(`${sPath}/to_BundleItem`) as unknown[] | undefined;
-        const bHasBundles = Array.isArray(aBundleItems) && aBundleItems.length > 0;
-        oDetailModel.setProperty("/hasBundleItems", bHasBundles);
+        oDetailModel.setProperty("/hasBundleItems", Array.isArray(aBundleItems) && aBundleItems.length > 0);
     }
 
-    // -- Search --
+    // -- Search -- //
 
     public onSearch(oEvent: SearchField$SearchEvent): void {
         const sQuery = ((oEvent.getParameter("query") as string) ?? "").trim();
-        if (sQuery) {
-            UIComponent.getRouterFor(this).navTo(Constants.ROUTES.PRODUCT_LIST, {
-                "?query": { query: sQuery }
-            });
-        } else {
-            UIComponent.getRouterFor(this).navTo(Constants.ROUTES.PRODUCT_LIST);
-        }
+        this._navTo(Constants.ROUTES.PRODUCT_LIST, sQuery ? { "?query": { query: sQuery } } : {});
     }
 
-    // -- Wishlist --
+    // -- Wishlist -- //
 
-    private _updateWishlistBtn(bInWishlist: boolean): void {
-        const oBtn = this.byId("pdpWishlistBtn") as Button | undefined;
-        if (!oBtn) {return;}
-        oBtn.setIcon(bInWishlist ? "sap-icon://heart" : "sap-icon://heart-2");
-        if (bInWishlist) {
-            oBtn.addStyleClass("rsCardHeartBtnActive");
-        } else {
-            oBtn.removeStyleClass("rsCardHeartBtnActive");
-        }
+    private _wishlistBtn(): Button | undefined {
+        return this.byId("pdpWishlistBtn") as Button | undefined;
     }
 
     public onToggleWishlist(): void {
         const oCtx = this.getView()!.getBindingContext();
-        if (!oCtx) {return;}
+        const oBtn = this._wishlistBtn();
+        if (!oCtx || !oBtn) {return;}
         const oData = oCtx.getObject() as CatalogProduct;
-        const oBtn = this.byId("pdpWishlistBtn") as Button;
 
         const oItem: WishlistItem = {
             uuid: oData.CatalogItemUuid,
@@ -144,50 +138,31 @@ export default class ProductDetailController extends BaseController {
             currency: oData.TransactionCurrency,
             pictureUrl: oData.ProductPictureUrl
         };
-        this._toggleWishlistFromContext(oBtn, oItem, oData.ProductName, (bNow) => {
-            this._updateWishlistBtn(bNow);
-        });
+        this._toggleWishlistFromContext(oBtn, oItem, oData.ProductName);
     }
 
-    // -- Cart --
+    // -- Cart -- //
 
     public onAddToCart(): void {
         const oCtx = this.getView()!.getBindingContext();
-        if (!oCtx) {return;}
+        if (!oCtx || !this._cartService) {return;}
 
         const oData = oCtx.getObject() as CatalogProduct;
-        const oBtn = this.byId("addToCartBtn") as Button;
         const oQtyInput = this.byId("pdpQtyInput") as StepInput | undefined;
-        const nQty = oQtyInput ? oQtyInput.getValue() : 1;
-        oBtn.setBusy(true);
+        const oDetail = this._json(Constants.MODELS.DETAIL);
 
-        const oModel = this.getOwnerComponent().getModel() as ODataModel;
-        oModel.callFunction(Constants.ODATA.FUNCTION_ADD_TO_CART, {
-            method: "POST",
-            urlParameters: { CatalogItemUuid: oData.CatalogItemUuid },
-            success: () => {
-                oBtn.setBusy(false);
-                this._cartService?.addItem(oData, nQty);
-                if (oQtyInput) {oQtyInput.setValue(Constants.UI.STEP_INPUT_MIN);}
-                const sMsg = this._getText("addedToCart", [oData.ProductName]);
-                MessageToast.show(sMsg);
-                this._announceCartUpdate(sMsg);
+        // A busy overlay would hide the progress, so the controls only get locked
+        this._addToCart(
+            this._cartService, oData, oQtyInput ? oQtyInput.getValue() : 1,
+            (bBusy, sProgress) => {
+                oDetail.setProperty("/addBusy", bBusy);
+                oDetail.setProperty("/addProgress", sProgress);
             },
-            error: (oErr: unknown) => {
-                oBtn.setBusy(false);
-                Log.error("addToShoppingCart error", this._errText(oErr));
-                MessageBox.error(this._extractODataError(oErr, this._getText("addToCartError")), {
-                    title: this._getText("addToCartError")
-                });
-            }
-        });
+            () => oQtyInput?.setValue(Constants.UI.STEP_INPUT_MIN)
+        );
     }
 
-    public onBundleImageError(oEvent: Event<object, Control>): void {
-        oEvent.getSource().addStyleClass("webshopImageBroken");
-    }
-
-    // -- Datasheet download --
+    // -- Datasheet download -- //
 
     public onDownload(): void {
         const oCtx = this.getView()!.getBindingContext();
@@ -199,7 +174,7 @@ export default class ProductDetailController extends BaseController {
         const oData = oCtx.getObject() as {
             ProductName?: string;
             Material?: string;
-            NetPriceAmount?: number;
+            NetPriceAmount?: number | string;
             TransactionCurrency?: string;
             ProductSalesDescription?: string;
             ProductPictureUrl?: string;
@@ -209,8 +184,7 @@ export default class ProductDetailController extends BaseController {
             {
                 name: oData.ProductName ?? "–",
                 material: oData.Material ?? "–",
-                price: oData.NetPriceAmount,
-                currency: oData.TransactionCurrency ?? "",
+                priceText: formatter.formatPrice(CartService.toNum(oData.NetPriceAmount), oData.TransactionCurrency ?? "EUR"),
                 description: oData.ProductSalesDescription ?? "",
                 pictureUrl: oData.ProductPictureUrl ?? ""
             },
@@ -230,6 +204,11 @@ export default class ProductDetailController extends BaseController {
         if (!oWin) {
             URL.revokeObjectURL(sBlobUrl);
             MessageToast.show(this._getText("popupBlocked"));
+            return;
         }
+        // The sheet carries backend text, so it gets no handle back on this window
+        oWin.opener = null;
+        // The opened window needs the URL, so its released when this page goes away
+        this._aBlobUrls.push(sBlobUrl);
     }
 }

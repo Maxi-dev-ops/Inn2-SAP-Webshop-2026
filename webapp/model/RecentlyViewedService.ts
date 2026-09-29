@@ -1,36 +1,29 @@
 import Constants from "./Constants";
-import { StoredItem, insertFront, seedOnce } from "./itemStore";
+import { StoredItem, insertFront, loadStored, saveStored } from "./itemStore";
 
 export type RecentlyViewedItem = StoredItem;
 
 export default class RecentlyViewedService {
 
-    // Demo placeholders seeded by seedDemo()
-    private static readonly DEMO_ITEMS: RecentlyViewedItem[] = [
-        { uuid: "demo-recent-001", name: "Monitor 27\" 4K", material: "MON-4K-27", price: 649.00, currency: "EUR", pictureUrl: "" },
-        { uuid: "demo-recent-002", name: "Bürostuhl Ergonomic Plus", material: "CHAIR-ERGO-1", price: 399.00, currency: "EUR", pictureUrl: "" }
-    ];
+    private static readonly STORAGE_KEY = "recentlyViewed";
+    private static _items: RecentlyViewedItem[] = loadStored<RecentlyViewedItem>(RecentlyViewedService.STORAGE_KEY);
 
-    private static _items: RecentlyViewedItem[] = [];
-    private static _demoSeeded = false;
-
-    /** Seeds the demo items */
-    public static seedDemo(): void {
-        if (RecentlyViewedService._demoSeeded) { return; }
-        RecentlyViewedService._demoSeeded = true;
-        RecentlyViewedService._items = seedOnce(RecentlyViewedService._items, RecentlyViewedService.DEMO_ITEMS);
+    private static _persist(): void {
+        saveStored(RecentlyViewedService.STORAGE_KEY, RecentlyViewedService._items);
     }
 
-    /** Inserts at front, deduplicates by uuid, trims to max size. */
+    // Drops the list; used when a different user opens the shop in this browser
+    public static clear(): void {
+        RecentlyViewedService._items = [];
+        RecentlyViewedService._persist();
+    }
+
     public static add(oItem: RecentlyViewedItem): void {
         RecentlyViewedService._items = insertFront(RecentlyViewedService._items, oItem, Constants.STORAGE.RECENTLY_VIEWED_MAX);
+        RecentlyViewedService._persist();
     }
 
     public static getAll(): RecentlyViewedItem[] {
         return [...RecentlyViewedService._items];
-    }
-
-    public static clear(): void {
-        RecentlyViewedService._items = [];
     }
 }

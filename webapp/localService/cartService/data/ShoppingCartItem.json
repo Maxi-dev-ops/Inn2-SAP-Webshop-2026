@@ -1,0 +1,40 @@
+[
+  {
+    "ShoppingCartItemUuid": "00505683-96f7-1fe1-c000-000000000001",
+    "ShoppingCartItemId": "1",
+    "ShoppingCartUuid": "00505683-96f7-1fe1-b000-000000000001",
+    "Material": "19",
+    "ProductName": "Bundle Arbeitsplatz Basic extern",
+    "Quantity": "1",
+    "UnitCode": "ST",
+    "NetPriceAmount": "55.00",
+    "TransactionCurrency": "EUR",
+    "ProductPictureUrl": "https://stadt-bremerhaven.de/wp-content/uploads/2022/06/magenta_-720x313.jpg",
+    "SalesContract": "40000021",
+    "ExternalReference": "",
+    "ApproverStatus": "1",
+    "ApproverStatusCriticality": 2,
+    "CreationDateTime": "/Date(1675092757872+0000)/",
+    "Delete_mc": true,
+    "Update_mc": true
+  },
+  {
+    "ShoppingCartItemUuid": "00505683-96f7-1fe1-c000-000000000002",
+    "ShoppingCartItemId": "2",
+    "ShoppingCartUuid": "00505683-96f7-1fe1-b000-000000000001",
+    "Material": "61",
+    "ProductName": "Bundle Arbeitsplatz 8 - 14.2 NEU",
+    "Quantity": "1",
+    "UnitCode": "ST",
+    "NetPriceAmount": "86.00",
+    "TransactionCurrency": "EUR",
+    "ProductPictureUrl": "https://stadt-bremerhaven.de/wp-content/uploads/2022/06/magenta_-720x313.jpg",
+    "SalesContract": "40000021",
+    "ExternalReference": "",
+    "ApproverStatus": "1",
+    "ApproverStatusCriticality": 2,
+    "CreationDateTime": "/Date(1675092757872+0000)/",
+    "Delete_mc": true,
+    "Update_mc": true
+  }
+]

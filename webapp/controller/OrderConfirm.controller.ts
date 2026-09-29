@@ -1,6 +1,4 @@
 import BaseController from "./BaseController";
-import JSONModel from "sap/ui/model/json/JSONModel";
-import UIComponent from "sap/ui/core/UIComponent";
 import formatter from "../model/formatter";
 import Constants from "../model/Constants";
 
@@ -15,12 +13,11 @@ export default class OrderConfirmController extends BaseController {
     }
 
     private _onRouteMatched(): void {
-        const oModel = this.getOwnerComponent().getModel(Constants.MODELS.ORDER_CONFIRM) as JSONModel;
-        const sOrderUuid = String(oModel?.getProperty("/orderUuid") ?? "");
+        const sOrderUuid = String(this._json(Constants.MODELS.ORDER_CONFIRM)?.getProperty("/orderUuid") ?? "");
 
         // Direct URL access without a prior order, redirects to home
         if (!sOrderUuid) {
-            UIComponent.getRouterFor(this).navTo(Constants.ROUTES.HOME, {}, {}, true);
+            this._navTo(Constants.ROUTES.HOME, {}, true);
             return;
         }
 

@@ -98,12 +98,22 @@
                                         icon="sap-icon://less"
                                         type="Transparent"
                                         press="onDecreaseQty"
+                                        enabled="{= !${cartModel>/busy} }"
                                         tooltip="{i18n>qtyDecrease}"/>
-                                    <Text class="rsQtyText" text="{cartModel>quantity}"/>
+                                    <Input
+                                        value="{path: 'cartModel>quantity', mode: 'OneWay'}"
+                                        type="Number"
+                                        textAlign="Center"
+                                        width="3rem"
+                                        enabled="{= !${cartModel>/busy} }"
+                                        change="onQuantityInput"
+                                        tooltip="{i18n>qtyEnter}"
+                                        class="rsQtyText"/>
                                     <Button
                                         icon="sap-icon://add"
                                         type="Transparent"
                                         press="onIncreaseQty"
+                                        enabled="{= !${cartModel>/busy} }"
                                         tooltip="{i18n>qtyIncrease}"/>
                                 </HBox>
 
@@ -133,6 +143,7 @@
                                         icon="sap-icon://delete"
                                         type="Transparent"
                                         press="onRemoveItem"
+                                        enabled="{= !${cartModel>/busy} }"
                                         tooltip="{i18n>removeItem}"
                                         class="sapUiTinyMarginTop"/>
                                 </VBox>
@@ -199,11 +210,12 @@
                             </HBox>
 
                             <Button
-                                text="{i18n>orderNow}"
+                                text="{i18n>toCheckout}"
                                 type="Emphasized"
-                                icon="sap-icon://accept"
-                                press="onOrder"
+                                icon="sap-icon://navigation-right-arrow"
+                                press="onCheckout"
                                 width="100%"
+                                enabled="{= !${cartModel>/busy} }"
                                 class="sapUiSmallMarginTop"/>
 
                             <Button

@@ -1,7 +1,6 @@
 import BaseController from "./BaseController";
 import ODataModel from "sap/ui/model/odata/v2/ODataModel";
 import JSONModel from "sap/ui/model/json/JSONModel";
-import UIComponent from "sap/ui/core/UIComponent";
 import Log from "sap/base/Log";
 import Event from "sap/ui/base/Event";
 import Control from "sap/ui/core/Control";
@@ -10,9 +9,12 @@ import SearchField, { type SearchField$SearchEvent } from "sap/m/SearchField";
 import { type ListBase$UpdateFinishedEvent } from "sap/m/ListBase";
 import formatter from "../model/formatter";
 import CartService from "../model/CartService";
+import CatalogService from "../model/CatalogService";
 import Constants from "../model/Constants";
+import { errText } from "../model/odata";
 import { WishlistItem } from "../model/WishlistService";
-import RecentlyViewedService from "../model/RecentlyViewedService";
+import RecentlyViewedService, { RecentlyViewedItem } from "../model/RecentlyViewedService";
+import { listsReady } from "../model/userScope";
 
 interface HomeCategory {
     uuid: string;
@@ -26,12 +28,6 @@ interface HomeProduct {
     price: number;
     currency: string;
     pictureUrl: string;
-}
-
-interface RawCatalog {
-    CatalogUuid?: string;
-    Title?: string;
-    CatalogId?: string;
 }
 
 interface RawCatalogItem {
@@ -50,18 +46,18 @@ export default class HomeController extends BaseController {
     public readonly formatter = formatter;
     private _loadFeaturedSeq: number = 0;
 
-    // -- Lifecycle & routing --
+    // -- Lifecycle & routing -- //
 
     public onInit(): void {
-        const aRecent = RecentlyViewedService.getAll();
+        // _loadRecentlyViewed() fills it once listsReady() is ready
         const oHomeModel = new JSONModel({
             categories: [],
             featured: [],
             featuredLoading: true,
             featuredVisible: false,
-            recentlyViewed: aRecent,
-            recentlyViewedCount: aRecent.length,
-            hasRecentlyViewed: aRecent.length > 0
+            recentlyViewed: [],
+            recentlyViewedCount: 0,
+            hasRecentlyViewed: false
         });
         this.setModel(oHomeModel, "home");
         this._loadCategories();
@@ -72,51 +68,41 @@ export default class HomeController extends BaseController {
 
     private _onRouteMatched(): void {
         (this.byId("homeSearchField") as SearchField | undefined)?.setValue("");
-        const aRecent = RecentlyViewedService.getAll();
+        this._loadRecentlyViewed();
+    }
+
+    // Waits for listsReady(): the list may still belong to the previous user and is about to be dropped 
+    private _loadRecentlyViewed(): void {
+        void listsReady().then(() => {
+            const aRecent = RecentlyViewedService.getAll();
+            this._setRecentlyViewed(aRecent);
+            void CatalogService.withPrices(this.getOwnerComponent(), aRecent)
+                .then((aPriced) => { this._setRecentlyViewed(aPriced); });
+        });
+    }
+
+    private _setRecentlyViewed(aRecent: RecentlyViewedItem[]): void {
         const oHome = this._getHomeModel();
         oHome.setProperty("/recentlyViewed", aRecent);
         oHome.setProperty("/recentlyViewedCount", aRecent.length);
         oHome.setProperty("/hasRecentlyViewed", aRecent.length > 0);
+        oHome.refresh(true);
     }
 
     private _getHomeModel(): JSONModel {
-        return this.getModel("home") as JSONModel;
+        return this._json("home");
     }
 
-    // -- Data loading --
+    // -- Data loading -- //
 
     private _loadCategories(): void {
-        const oCatalogCache = this.getOwnerComponent().getModel(Constants.MODELS.CATALOG) as JSONModel | undefined;
-        if (oCatalogCache?.getProperty("/loaded") === true) {
-            const aRaw = oCatalogCache.getProperty("/results") as RawCatalog[];
-            const aCached: HomeCategory[] = aRaw.map((c) => ({
+        CatalogService.load(this.getOwnerComponent()).then((aResults) => {
+            const aCats: HomeCategory[] = aResults.map((c) => ({
                 uuid: c.CatalogUuid ?? "",
                 title: c.Title || this._getText("catalogFallback", [c.CatalogId ?? ""])
             }));
-            this._getHomeModel().setProperty("/categories", aCached);
-            return;
-        }
-        const oModel = this.getOwnerComponent().getModel() as ODataModel;
-        if (!oModel) {return;}
-        oModel.read(Constants.ODATA.ENTITY_CATALOG, {
-            urlParameters: {
-                $orderby: "CatalogId asc",
-                $select: Constants.ODATA.SELECT_CATALOG
-            },
-            success: (oData: { results?: RawCatalog[] }) => {
-                const aResults = oData.results ?? [];
-                const aCats: HomeCategory[] = aResults.map((c) => ({
-                    uuid: c.CatalogUuid ?? "",
-                    title: c.Title || this._getText("catalogFallback", [c.CatalogId ?? ""])
-                }));
-                this._getHomeModel().setProperty("/categories", aCats);
-                oCatalogCache?.setProperty("/results", aResults);
-                oCatalogCache?.setProperty("/loaded", true);
-            },
-            error: (oErr: unknown) => {
-                Log.warning("Home categories load failed.", this._errText(oErr));
-            }
-        });
+            this._getHomeModel().setProperty("/categories", aCats);
+        }).catch(() => undefined); // CatalogService already logged it
     }
 
     private _loadFeatured(): void {
@@ -148,7 +134,7 @@ export default class HomeController extends BaseController {
             },
             error: (oErr: unknown) => {
                 if (nSeq !== this._loadFeaturedSeq) { return; }
-                Log.warning("Home featured products load failed.", this._errText(oErr));
+                Log.warning("Home featured products load failed.", errText(oErr));
                 const oHome = this._getHomeModel();
                 oHome.setProperty("/featuredLoading", false);
                 oHome.setProperty("/featuredVisible", true);
@@ -156,40 +142,29 @@ export default class HomeController extends BaseController {
         });
     }
 
-    // -- Event handlers --
+    // -- Event handlers -- //
 
     public onProductPress(oEvent: Event<object, Control>): void {
-        const oCtx = oEvent.getSource().getBindingContext("home");
-        if (!oCtx) {return;}
-        UIComponent.getRouterFor(this).navTo(Constants.ROUTES.PRODUCT_DETAIL, {
-            catalogItemUuid: oCtx.getProperty("uuid") as string
-        });
+        const oProduct = this._ctxObject<HomeProduct>(oEvent, "home");
+        if (!oProduct) {return;}
+        this._navTo(Constants.ROUTES.PRODUCT_DETAIL, { catalogItemUuid: oProduct.uuid });
     }
 
     public onCategoryPress(oEvent: Event<object, Control>): void {
-        const oCtx = oEvent.getSource().getBindingContext("home");
-        const sUuid = oCtx ? (oCtx.getProperty("uuid") as string) : "";
-        UIComponent.getRouterFor(this).navTo(Constants.ROUTES.PRODUCT_LIST, {
-            "?query": sUuid ? { catalog: sUuid } : {}
-        });
+        const sUuid = this._ctxObject<HomeCategory>(oEvent, "home")?.uuid ?? "";
+        this._navTo(Constants.ROUTES.PRODUCT_LIST, { "?query": sUuid ? { catalog: sUuid } : {} });
     }
 
     public onExplore(): void {
-        UIComponent.getRouterFor(this).navTo(Constants.ROUTES.PRODUCT_LIST);
+        this._navTo(Constants.ROUTES.PRODUCT_LIST);
     }
 
     public onSearch(oEvent: SearchField$SearchEvent): void {
         const sQuery = ((oEvent.getParameter("query") as string) ?? "").trim();
-        if (sQuery) {
-            UIComponent.getRouterFor(this).navTo(Constants.ROUTES.PRODUCT_LIST, {
-                "?query": { query: sQuery }
-            });
-        } else {
-            UIComponent.getRouterFor(this).navTo(Constants.ROUTES.PRODUCT_LIST);
-        }
+        this._navTo(Constants.ROUTES.PRODUCT_LIST, sQuery ? { "?query": { query: sQuery } } : {});
     }
 
-    // -- Wishlist --
+    // -- Wishlist -- //
 
     public onListUpdateFinished(oEvent: ListBase$UpdateFinishedEvent): void {
         this._updateHeartIcons(oEvent.getSource(), "home", "uuid");
@@ -197,9 +172,8 @@ export default class HomeController extends BaseController {
 
     public onToggleWishlist(oEvent: Event<object, Button>): void {
         const oBtn = oEvent.getSource();
-        const oCtx = oBtn.getBindingContext("home");
-        if (!oCtx) {return;}
-        const oProduct = oCtx.getObject() as HomeProduct;
+        const oProduct = this._ctxObject<HomeProduct>(oEvent, "home");
+        if (!oProduct) {return;}
 
         const oItem: WishlistItem = {
             uuid: oProduct.uuid,

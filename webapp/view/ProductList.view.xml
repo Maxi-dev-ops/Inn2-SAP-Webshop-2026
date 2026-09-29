@@ -54,8 +54,6 @@
                             press="onCategoryChipPress"
                             class="rsCategoryPill"/>
                     </HBox>
-
-                    <!-- Divider -->
                     <HBox class="sapUiMediumMarginTopBottom rsFilterDivider"/>
 
                     <!-- Price filter -->
@@ -81,8 +79,6 @@
                         id="cbOnlyPriced"
                         text="{i18n>onlyPriced}"
                         select="onTogglePriced"/>
-
-                    <!-- Divider -->
                     <HBox class="sapUiMediumMarginTopBottom rsFilterDivider"/>
 
                     <!-- Reset filters -->
@@ -122,13 +118,9 @@
                         id="productGrid"
                         items="{
                             path: '/CatalogItem',
-                            parameters: {
-                                operationMode: 'Server',
-                                select: 'CatalogItemUuid,ProductName,Material,NetPriceAmount,TransactionCurrency,ProductPictureUrl,CatalogUuid,addToShoppingCart_ac'
-                            },
-                            events: {
-                                dataReceived: '.onProductDataReceived'
-                            }
+                            suspended: true,
+                            parameters: { operationMode: 'Server' },
+                            events: { dataReceived: '.onProductDataReceived' }
                         }"
                         mode="None"
                         busyIndicatorDelay="0"

@@ -1,0 +1,242 @@
+<mvc:View
+    controllerName="com.sapwebshop2026.sapwebshop.controller.Checkout"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    displayBlock="true">
+
+    <Page id="checkoutPage" showHeader="true" backgroundDesign="Solid">
+
+        <!-- Shell bar -->
+        <customHeader>
+            <Bar class="rsShellBar">
+                <contentLeft>
+                    <core:Fragment fragmentName="com.sapwebshop2026.sapwebshop.view.ShellBarLeftNav" type="XML"/>
+                </contentLeft>
+                <contentMiddle>
+                    <Title text="{i18n>checkoutTitle}" level="H4" class="rsShellTitle"/>
+                </contentMiddle>
+                <contentRight>
+                    <core:Fragment fragmentName="com.sapwebshop2026.sapwebshop.view.ShellBarRight" type="XML"/>
+                </contentRight>
+            </Bar>
+        </customHeader>
+
+        <content>
+            <HBox
+                class="sapUiMediumMarginBeginEnd sapUiMediumMarginTop"
+                wrap="Wrap"
+                alignItems="Start">
+
+                <!-- Form column -->
+                <VBox class="rsCartItemsColumn sapUiMediumMarginEnd">
+
+                    <Title text="{i18n>checkoutHeading}" level="H4"/>
+                    <Text text="{i18n>checkoutSubheading}" class="rsCheckoutIntro sapUiTinyMarginTop sapUiSmallMarginBottom"/>
+
+                    <!-- Reference + remark -->
+                    <Panel class="rsCheckoutPanel" backgroundDesign="Transparent">
+                        <headerToolbar>
+                            <Toolbar>
+                                <core:Icon src="sap-icon://document-text" class="sapUiTinyMarginEnd rsCheckoutSectionIcon"/>
+                                <Title text="{i18n>checkoutOrderDataTitle}" level="H5"/>
+                            </Toolbar>
+                        </headerToolbar>
+                        <content>
+                            <VBox class="rsCheckoutPanelInner">
+
+                                <Label text="{i18n>checkoutExternalReference}" labelFor="checkoutExternalReference"/>
+                                <Input
+                                    id="checkoutExternalReference"
+                                    value="{checkoutModel>/fields/ExternalReference}"
+                                    maxLength="35"
+                                    placeholder="{i18n>checkoutExternalReferencePlaceholder}"
+                                    valueState="{checkoutModel>/states/ExternalReference}"
+                                    valueStateText="{checkoutModel>/stateTexts/ExternalReference}"
+                                    change="onFieldChange"
+                                    enabled="{= !${checkoutModel>/busy} }"/>
+                                <Text text="{i18n>checkoutExternalReferenceHint}" class="rsCheckoutHint sapUiTinyMarginTop"/>
+
+                                <Label text="{i18n>checkoutRemark}" labelFor="checkoutRemark" class="sapUiSmallMarginTop"/>
+                                <TextArea
+                                    id="checkoutRemark"
+                                    value="{checkoutModel>/fields/Remark}"
+                                    maxLength="256"
+                                    rows="3"
+                                    growing="false"
+                                    width="100%"
+                                    placeholder="{i18n>checkoutRemarkPlaceholder}"
+                                    enabled="{= !${checkoutModel>/busy} }"/>
+                                <Text
+                                    text="{
+                                        path: 'checkoutModel>/fields/Remark',
+                                        formatter: '.formatRemarkCounter'
+                                    }"
+                                    class="rsCheckoutHint sapUiTinyMarginTop"/>
+
+                            </VBox>
+                        </content>
+                    </Panel>
+
+                    <!-- Deviating delivery address -->
+                    <Panel class="rsCheckoutPanel sapUiSmallMarginTop" backgroundDesign="Transparent">
+                        <headerToolbar>
+                            <Toolbar>
+                                <core:Icon src="sap-icon://shipping-status" class="sapUiTinyMarginEnd rsCheckoutSectionIcon"/>
+                                <Title text="{i18n>checkoutDeliveryTitle}" level="H5"/>
+                            </Toolbar>
+                        </headerToolbar>
+                        <content>
+                            <VBox class="rsCheckoutPanelInner">
+
+                                <CheckBox
+                                    text="{i18n>checkoutDeviatingAddress}"
+                                    selected="{checkoutModel>/deviatingAddress}"
+                                    select="onToggleDeviatingAddress"
+                                    enabled="{= !${checkoutModel>/busy} }"/>
+                                <Text text="{i18n>checkoutDeliveryHint}" class="rsCheckoutHint"/>
+
+                                <VBox visible="{checkoutModel>/deviatingAddress}" class="sapUiSmallMarginTop">
+
+                                    <Label text="{i18n>checkoutStreet}" labelFor="checkoutStreet" required="true"/>
+                                    <Input
+                                        id="checkoutStreet"
+                                        value="{checkoutModel>/fields/DeliveryStreet}"
+                                        maxLength="60"
+                                        valueState="{checkoutModel>/states/DeliveryStreet}"
+                                        valueStateText="{checkoutModel>/stateTexts/DeliveryStreet}"
+                                        change="onFieldChange"
+                                        enabled="{= !${checkoutModel>/busy} }"/>
+
+                                    <HBox class="rsCheckoutCityRow sapUiSmallMarginTop" wrap="Wrap">
+                                        <VBox class="rsCheckoutZipField">
+                                            <Label text="{i18n>checkoutPostalCode}" labelFor="checkoutPostalCode" required="true"/>
+                                            <Input
+                                                id="checkoutPostalCode"
+                                                value="{checkoutModel>/fields/DeliveryPostalCode}"
+                                                maxLength="10"
+                                                valueState="{checkoutModel>/states/DeliveryPostalCode}"
+                                                valueStateText="{checkoutModel>/stateTexts/DeliveryPostalCode}"
+                                                change="onFieldChange"
+                                                enabled="{= !${checkoutModel>/busy} }"/>
+                                        </VBox>
+                                        <VBox class="rsCheckoutCityField">
+                                            <Label text="{i18n>checkoutCity}" labelFor="checkoutCity" required="true"/>
+                                            <Input
+                                                id="checkoutCity"
+                                                value="{checkoutModel>/fields/DeliveryCity}"
+                                                maxLength="40"
+                                                valueState="{checkoutModel>/states/DeliveryCity}"
+                                                valueStateText="{checkoutModel>/stateTexts/DeliveryCity}"
+                                                change="onFieldChange"
+                                                enabled="{= !${checkoutModel>/busy} }"/>
+                                        </VBox>
+                                    </HBox>
+
+                                    <Label text="{i18n>checkoutCountry}" labelFor="checkoutCountry" required="true" class="sapUiSmallMarginTop"/>
+                                    <Input
+                                        id="checkoutCountry"
+                                        value="{checkoutModel>/fields/DeliveryCountry}"
+                                        maxLength="3"
+                                        width="8rem"
+                                        placeholder="{i18n>checkoutCountryPlaceholder}"
+                                        valueState="{checkoutModel>/states/DeliveryCountry}"
+                                        valueStateText="{checkoutModel>/stateTexts/DeliveryCountry}"
+                                        change="onFieldChange"
+                                        enabled="{= !${checkoutModel>/busy} }"/>
+                                    <Text text="{i18n>checkoutCountryHint}" class="rsCheckoutHint sapUiTinyMarginTop"/>
+
+                                </VBox>
+                            </VBox>
+                        </content>
+                    </Panel>
+
+                </VBox>
+
+                <!-- Summary + final order button -->
+                <Panel class="rsCartSummaryPanel" backgroundDesign="Transparent">
+                    <headerToolbar>
+                        <Toolbar>
+                            <Title text="{i18n>summary}" level="H5"/>
+                        </Toolbar>
+                    </headerToolbar>
+                    <content>
+                        <VBox class="sapUiSmallMarginBeginEnd sapUiSmallMarginBottom">
+
+                            <HBox justifyContent="SpaceBetween" class="sapUiTinyMarginTop">
+                                <Text text="{i18n>itemsTotal}"/>
+                                <Text text="{cartModel>/count}"/>
+                            </HBox>
+                            <HBox justifyContent="SpaceBetween" class="sapUiTinyMarginTop">
+                                <Text text="{i18n>subtotalNet}"/>
+                                <Text text="{
+                                    path: 'cartModel>/',
+                                    formatter: '.formatter.formatCartTotal'
+                                }"/>
+                            </HBox>
+                            <HBox
+                                justifyContent="SpaceBetween"
+                                class="sapUiTinyMarginTop"
+                                visible="{
+                                    path: 'cartModel>/',
+                                    formatter: '.formatter.hasUnpricedItems'
+                                }">
+                                <Text text="{i18n>priceOnRequest}"/>
+                                <Text text="{
+                                    path: 'cartModel>/',
+                                    formatter: '.formatter.formatUnpricedCount'
+                                }"/>
+                            </HBox>
+                            <HBox justifyContent="SpaceBetween" class="sapUiTinyMarginTop rsGreen">
+                                <Text text="{i18n>shipping}" class="rsGreen"/>
+                                <Text text="{i18n>free}" class="rsGreen"/>
+                            </HBox>
+
+                            <HBox class="rsFilterDivider sapUiSmallMarginTopBottom"/>
+
+                            <HBox justifyContent="SpaceBetween" class="sapUiTinyMarginTop">
+                                <Title text="{i18n>totalNet}" level="H5"/>
+                                <Title text="{
+                                    path: 'cartModel>/',
+                                    formatter: '.formatter.formatCartTotal'
+                                }" level="H5" class="rsPriceHighlight"/>
+                            </HBox>
+
+                            <!-- No payment step in this shop: the order goes into the approval flow -->
+                            <Text text="{i18n>checkoutApprovalNote}" class="rsCheckoutApprovalNote sapUiSmallMarginTop"/>
+
+                            <Button
+                                text="{i18n>checkoutPlaceOrder}"
+                                type="Emphasized"
+                                icon="sap-icon://accept"
+                                press="onOrder"
+                                width="100%"
+                                enabled="{= !${checkoutModel>/busy} }"
+                                class="sapUiSmallMarginTop"/>
+
+                            <Button
+                                text="{i18n>checkoutBackToCart}"
+                                type="Transparent"
+                                icon="sap-icon://cart"
+                                press="onBackToCart"
+                                width="100%"
+                                enabled="{= !${checkoutModel>/busy} }"
+                                class="sapUiTinyMarginTop"/>
+
+                            <HBox
+                                visible="{checkoutModel>/busy}"
+                                alignItems="Center"
+                                justifyContent="Center"
+                                class="sapUiSmallMarginTop">
+                                <BusyIndicator size="1rem" class="sapUiTinyMarginEnd"/>
+                                <Text text="{i18n>checkoutSubmitting}"/>
+                            </HBox>
+
+                        </VBox>
+                    </content>
+                </Panel>
+
+            </HBox>
+        </content>
+    </Page>
+</mvc:View>

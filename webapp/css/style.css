@@ -42,6 +42,20 @@
     background: #ffffff !important;
 }
 
+/* -- SHARED: sticky side panel (cart summary, order history overview) -- */
+.rsCartSummaryPanel.sapMPanel,
+.rsOrderSidePanel.sapMPanel {
+    border: 1px solid var(--rs-color-border-alt) !important;
+    border-radius: var(--rs-radius-card) !important;
+    background: #ffffff !important;
+    align-self: flex-start; position: sticky; top: 60px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+}
+.rsCartSummaryPanel .sapMText,
+.rsOrderSidePanel .sapMText { font-size: 0.95rem !important; }
+.rsCartSummaryPanel .sapMTitle,
+.rsOrderSidePanel .sapMTitle { font-size: 1.05rem !important; }
+
 /* -- SHARED: sapMList as CSS-grid container -- */
 :is(.rsProductGrid, .rsBundleGrid, .rsCartDialogBundleList):is(.sapMList) {
     background: transparent !important;
@@ -390,6 +404,9 @@
 .rsPriceHighlight { color: var(--rs-color-primary) !important; }
 .rsDeliveryInfo { padding-top: 10px; border-top: 1px solid #f0f0f0; }
 .rsPremiumTitle.sapMTitle { color: var(--rs-color-text) !important; font-size: 1.5rem !important; font-weight: 800 !important; }
+/* Reads like a link, but is a button so the arrow can be a real icon */
+.rsAllProductsLink .sapMBtnInner { background: transparent !important; border: none !important; box-shadow: none !important; }
+.rsAllProductsLink .sapMBtnContent, .rsAllProductsLink .sapUiIcon { color: var(--rs-color-primary) !important; }
 .rsPdpBuyBox { max-width: 460px !important; }
 .rsPdpQtyLabel.sapMLabel { font-weight: 600 !important; margin-right: 14px !important; }
 .rsPdpCartBtn { width: 100% !important; }
@@ -411,24 +428,18 @@
 
 .rsQtyBox { border: 1px solid var(--rs-color-border); border-radius: var(--rs-radius-sm); overflow: hidden; width: max-content !important; flex: 0 0 auto !important; }
 .rsQtyBox .sapMBtn .sapMBtnInner { border-radius: 0 !important; }
-.rsQtyText.sapMText {
-    min-width: 44px; text-align: center;
-    font-weight: 700 !important; font-size: 1rem !important;
-    border-left: 1px solid var(--rs-color-border);
-    border-right: 1px solid var(--rs-color-border);
-    padding: 6px 10px; box-sizing: border-box; line-height: 1.4;
+/* The quantity field sits between the two buttons and drops its own frame for the shared one */
+.rsQtyText.sapMInputBase {
+    min-width: 44px;
+    border-left: 1px solid var(--rs-color-border) !important;
+    border-right: 1px solid var(--rs-color-border) !important;
+}
+.rsQtyText .sapMInputBaseInner {
+    text-align: center; font-weight: 700 !important; font-size: 1rem !important;
+    border: none !important; background: transparent !important; padding: 6px 4px !important;
 }
 
-.rsCartSummaryPanel.sapMPanel {
-    flex: 0 0 380px; min-width: 320px;
-    border: 1px solid var(--rs-color-border-alt) !important;
-    border-radius: var(--rs-radius-card) !important;
-    background: #ffffff !important;
-    align-self: flex-start; position: sticky; top: 60px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
-}
-.rsCartSummaryPanel .sapMText { font-size: 0.95rem !important; }
-.rsCartSummaryPanel .sapMTitle { font-size: 1.05rem !important; }
+.rsCartSummaryPanel.sapMPanel { flex: 0 0 380px; min-width: 320px; }
 .rsCartSummaryPanel .sapMHBox { gap: 12px; }
 .rsCartTrustBadges { padding-top: 12px; border-top: 1px solid #f0f0f0; }
 
@@ -436,7 +447,7 @@
 .rsGreen.sapMText { color: var(--rs-color-success) !important; font-weight: 600 !important; }
 .rsGreen { color: var(--rs-color-success) !important; }
 
-/* -- WISHLIST (reuses .rsProductGrid) -- */
+/* Cart loading and empty state; the wishlist grid itself reuses .rsProductGrid */
 .rsEmptyState { padding: 60px 20px; }
 
 /* -- INFO BOXES -- */
@@ -446,19 +457,21 @@
 /* -- UTILITIES -- */
 .webshopImageBroken img { opacity: 0 !important; }
 
-/* -- SCROLL FIX -- */
+/* -- SCROLL -- */
+/* Only the <section> of the page in view scrolls. Letting the document grow as well adds a second
+   bar on the window: it flashes on every page change and stays once a tall page has been open. */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.3); }
-html { scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.15) transparent; }
+html, body.sapUiBody, .sapMPage > section { scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.15) transparent; }
 html,
-body.sapUiBody { height: auto !important; min-height: 100vh; overflow-y: auto !important; overflow-x: hidden !important; }
+body.sapUiBody,
 .sapMApp,
 .sapUiComponentContent,
-body > div { height: auto !important; min-height: 100vh; overflow: visible !important; }
-.sapMPage { position: relative !important; height: auto !important; min-height: 100vh; overflow: visible !important; }
-.sapMPageEnableScrolling { padding-bottom: 100px !important; }
+body > div { height: 100% !important; overflow: hidden !important; }
+/* Air below the last row, inside the scrolling element */
+.sapMPage > section.sapMPageEnableScrolling { padding-bottom: 100px !important; }
 
 /* -- PRODUCT GRID as sapMList -- */
 .rsProductGrid.sapMList .sapMListItems { grid-template-columns: repeat(auto-fill, 260px) !important; gap: 20px !important; justify-content: center !important; }
@@ -497,7 +510,7 @@ body > div { height: auto !important; min-height: 100vh; overflow: visible !impo
 .rsOrderConfirmPage { max-width: 640px !important; margin: 0 auto !important; padding: 64px 24px !important; text-align: center !important; }
 .rsOrderConfirmIcon { color: #16a34a !important; }
 .rsOrderConfirmTitle.sapMTitle { color: var(--rs-color-shell) !important; }
-.rsOrderConfirmTimestamp.sapMText { color: var(--rs-color-text-muted) !important; }
+.rsOrderConfirmTimestamp.sapMText, .rsOrderConfirmNote.sapMText { color: var(--rs-color-text-muted) !important; }
 .rsOrderConfirmRef.sapMText { font-family: monospace !important; color: var(--rs-color-text-medium) !important; }
 .rsOrderConfirmSummary { gap: 24px !important; }
 .rsOrderConfirmStat {
@@ -545,8 +558,6 @@ body > div { height: auto !important; min-height: 100vh; overflow: visible !impo
 .rsProfileHeader { gap: 20px; }
 .rsProfileAvatar.sapFAvatar { background-color: var(--rs-color-primary) !important; flex-shrink: 0; }
 .rsProfileName.sapMTitle { font-size: 1.5rem !important; font-weight: 700 !important; color: var(--rs-color-text) !important; }
-.rsProfileDept.sapMText { color: var(--rs-color-text-muted) !important; font-size: 0.9rem !important; }
-.rsProfileCompany.sapMText { color: var(--rs-color-text-medium) !important; font-weight: 600 !important; }
 .rsProfileInfoRow { padding: 12px 0; border-bottom: 1px solid var(--rs-color-separator); }
 .rsProfileInfoRowLast { border-bottom: none !important; }
 .rsProfileInfoIcon.sapUiIcon { font-size: 1.1rem !important; width: 2rem !important; flex-shrink: 0; }
@@ -561,12 +572,13 @@ body > div { height: auto !important; min-height: 100vh; overflow: visible !impo
 .rsProfileLinksPanel .sapMLIBActive .rsProfileLinkItem { background: var(--rs-color-bg-light); }
 
 /* -- ORDER HISTORY -- */
-.rsOrderCardInner { padding: 20px; }
+/* Denser than the cart rows: an order card is a summary, not a place to act on single items */
+.rsOrderCardInner { padding: 12px 16px; }
 .rsOrderUuid.sapMTitle { font-size: 1rem !important; font-weight: 700 !important; color: var(--rs-color-text) !important; }
 .rsOrderDate.sapMText { color: var(--rs-color-text-muted) !important; font-size: 0.85rem !important; }
 .rsOrderDateIcon.sapUiIcon,
 .rsOrderSummaryIcon.sapUiIcon { color: var(--rs-color-text-light) !important; font-size: 0.85rem !important; }
-.rsOrderSummaryRow { padding-top: 14px; border-top: 1px solid var(--rs-color-separator); }
+.rsOrderSummaryRow { padding-top: 8px; border-top: 1px solid var(--rs-color-separator); }
 .rsOrderTotal.sapMText { font-weight: 700 !important; color: var(--rs-color-shell) !important; font-size: 1rem !important; }
 .rsOrderToggleBtn.sapMBtn .sapMBtnInner { color: var(--rs-color-primary) !important; font-size: 0.85rem !important; padding-left: 0 !important; }
 .rsOrderItemList { border-top: 1px solid var(--rs-color-separator); padding-top: 12px; margin-top: 4px; }
@@ -576,3 +588,66 @@ body > div { height: auto !important; min-height: 100vh; overflow: visible !impo
 .rsOrderItemName.sapMText { font-weight: 500 !important; color: var(--rs-color-text-medium) !important; }
 .rsOrderItemId.sapMText { color: var(--rs-color-text-light) !important; font-size: 0.78rem !important; }
 .rsOrderItemPrice.sapMText { font-weight: 700 !important; color: var(--rs-color-shell) !important; }
+.rsOrderReorderBtn.sapMBtn .sapMBtnInner { color: var(--rs-color-primary) !important; font-size: 0.85rem !important; }
+.rsOrderViewBtn.sapMBtn .sapMBtnInner { color: var(--rs-color-text-muted) !important; }
+.rsOrderViewBtn.sapMBtn:hover .sapMBtnInner { color: var(--rs-color-primary) !important; }
+
+/* Right-hand column of the order history; the frame comes from the shared side-panel rule */
+.rsOrderSidePanel.sapMPanel { flex: 0 0 320px; min-width: 280px; }
+
+.rsOrderViewSwitch { width: 100%; }
+.rsOrderViewSwitch .sapMSegBBtn { flex: 1 1 0%; }
+/* Group headings (week or month) as a separating band. Two rules to keep in mind here:
+   address them by class, never by id - UI5 prefixes the DOM id with the view id, so "#orderList"
+   matches nothing; and keep the selector this deep - sap.m sets a fixed 26px height through
+   .sapMListUl > .sapMLIB.sapMGHLI, which a flatter rule loses against even with !important. */
+.rsOrderList .sapMListUl > .sapMLIB.sapMGHLI {
+    height: auto !important;
+    line-height: normal !important;
+    margin: 18px 0 !important;
+    padding: 11px 16px !important;
+    background: var(--rs-color-bg-light) !important;
+    border: 1px solid var(--rs-color-border) !important;
+    border-radius: var(--rs-radius-sm) !important;
+    align-items: center !important;
+    overflow: visible !important;
+}
+.rsOrderList .sapMListUl > .sapMLIB.sapMGHLI:first-child { margin-top: 0 !important; }
+/* The heading text sits in its own flex container, not directly in the list item */
+.rsOrderList .sapMGHLI > .sapMLIBContent {
+    align-items: center !important;
+    overflow: visible !important;
+}
+.rsOrderList .sapMGHLITitle {
+    font-size: 1rem !important;
+    font-style: italic !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    color: var(--rs-color-text-medium) !important;
+    line-height: 1.5 !important;
+    /* sap.m sets overflow:hidden + text-overflow:ellipsis + nowrap here. Italic glyphs reach past
+       their advance width, so the last character gets cut off ("April 202" instead of "April 2026"). */
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: normal !important;
+    padding-right: 0.25em !important;
+    max-width: 100% !important;
+}
+
+/* -- CHECKOUT -- */
+.rsCheckoutIntro.sapMText { color: var(--rs-color-text-muted) !important; }
+.rsCheckoutPanel.sapMPanel {
+    border: 1px solid var(--rs-color-border-alt) !important;
+    border-radius: var(--rs-radius-card) !important;
+    background: #ffffff !important;
+    box-shadow: var(--rs-shadow-card) !important;
+}
+.rsCheckoutPanelInner { padding: 4px 16px 16px 16px; }
+.rsCheckoutSectionIcon.sapUiIcon { color: var(--rs-color-primary) !important; font-size: 1rem !important; }
+.rsCheckoutHint.sapMText { color: var(--rs-color-text-light) !important; font-size: 0.78rem !important; }
+.rsCheckoutApprovalNote.sapMText { color: var(--rs-color-text-muted) !important; font-size: 0.82rem !important; }
+/* Postal code stays narrow, the city takes the rest of the row */
+.rsCheckoutCityRow { gap: 12px; width: 100%; }
+.rsCheckoutZipField { flex: 0 0 8rem; }
+.rsCheckoutCityField { flex: 1 1 0%; min-width: 10rem; }

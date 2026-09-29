@@ -1,5 +1,6 @@
 import BaseController from "./BaseController";
 import JSONModel from "sap/ui/model/json/JSONModel";
+import UserService from "../model/UserService";
 import Constants from "../model/Constants";
 
 /**
@@ -9,34 +10,20 @@ export default class ProfileController extends BaseController {
 
     public onInit(): void {
         this._attachRoute(Constants.ROUTES.PROFILE, this._onRouteMatched.bind(this));
-        this.setModel(new JSONModel(this._buildProfile()), "profileModel");
+        // Filled from start_up on every entry; empty until the first answer arrives
+        this.setModel(new JSONModel({ name: "", initials: "", email: "", userId: "" }), "profileModel");
     }
 
+    // Reloads on every entry
     private _onRouteMatched(): void {
-        // profile data once a backend service is available
-    }
-
-    /** Demo data only, requires OData entity set for real data */
-    private _buildProfile(): Record<string, string> {
-        if (this._isDemoMode()) {
-            return {
-                name: "Demo User",
-                initials: "DU",
-                company: "Demo GmbH",
-                email: "user@example.com",
-                department: "Procurement",
-                location: "–",
-                userId: "DEMO_USER"
-            };
-        }
-        return {
-            name: "–",
-            initials: "",
-            company: "–",
-            email: "–",
-            department: "–",
-            location: "–",
-            userId: "–"
-        };
+        void UserService.load().then((oUser) => {
+            if (!oUser) {return;}
+            const oProfile = this._json("profileModel");
+            oProfile.setProperty("/name", oUser.fullName);
+            oProfile.setProperty("/initials", oUser.initials);
+            oProfile.setProperty("/userId", oUser.id);
+            if (oUser.email) {oProfile.setProperty("/email", oUser.email);}
+            oProfile.refresh(true);
+        });
     }
 }

@@ -1,0 +1,20 @@
+[
+  {
+    "ShoppingCartUuid": "00505683-96f7-1fe1-b000-000000000001",
+    "ShoppingCartId": "0000000042",
+    "NetAmount": "141.00",
+    "CurrencyCode": "EUR",
+    "ApproverStatus": "1",
+    "orderShoppingCart_ac": true,
+    "ExternalReference": "",
+    "Remark": "",
+    "DeliveryStreet": "",
+    "DeliveryCity": "",
+    "DeliveryPostalCode": "",
+    "DeliveryCountry": "",
+    "CreationDateTime": "/Date(1675092757872+0000)/",
+    "Delete_mc": true,
+    "Update_mc": true,
+    "ApproverStatusCriticality": 2
+  }
+]

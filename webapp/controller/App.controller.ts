@@ -1,10 +1,9 @@
 import BaseController from "./BaseController";
-import ODataModel from "sap/ui/model/odata/v2/ODataModel";
 import JSONModel from "sap/ui/model/json/JSONModel";
-import Log from "sap/base/Log";
 import CartService from "../model/CartService";
+import CatalogService from "../model/CatalogService";
 import WishlistService from "../model/WishlistService";
-import RecentlyViewedService from "../model/RecentlyViewedService";
+import { listsReady } from "../model/userScope";
 import Constants from "../model/Constants";
 
 /**
@@ -22,8 +21,11 @@ export default class App extends BaseController {
             totalCurrency: "EUR",
             cartUuid: "",
             loading: true,
+            busy: false,
             showEmpty: false,
-            showItems: false
+            showItems: false,
+            // Writable header fields of the open cart
+            headerFields: CartService.trimHeaderFields(null)
         });
         oComponent.setModel(oCartModel, Constants.MODELS.CART);
 
@@ -35,45 +37,23 @@ export default class App extends BaseController {
             orderUuid: "",
             submittedAt: "",
             itemCount: 0,
+            unpricedCount: 0,
             totalAmount: 0,
-            totalCurrency: "EUR"
+            totalCurrency: "EUR",
+            externalReference: ""
         });
         oComponent.setModel(oOrderConfirmModel, Constants.MODELS.ORDER_CONFIRM);
 
-        // Preload the catalog once so Home and PLP avoid duplicate /Catalog requests
-        const oCatalogModel = new JSONModel({ results: [], loaded: false });
-        oComponent.setModel(oCatalogModel, Constants.MODELS.CATALOG);
-        const oODataModel = oComponent.getModel() as ODataModel | null;
-        if (oODataModel) {
-            oODataModel.read(Constants.ODATA.ENTITY_CATALOG, {
-                urlParameters: {
-                    $orderby: "CatalogId asc",
-                    $select: Constants.ODATA.SELECT_CATALOG
-                },
-                success: (oData: { results?: Array<{ CatalogUuid: string; Title: string; CatalogId: string }> }) => {
-                    oCatalogModel.setProperty("/results", oData.results ?? []);
-                    oCatalogModel.setProperty("/loaded", true);
-                },
-                error: () => {
-                    // Home and PLP retry /Catalog independently (loaded stays false)
-                    Log.warning("App catalog preload failed - Home/PLP will load /Catalog independently.");
-                }
-            });
-        }
+        // Preload the catalog once
+        oComponent.setModel(new JSONModel({ results: [], loaded: false }), Constants.MODELS.CATALOG);
+        CatalogService.load(oComponent).catch(() => undefined); // already logged
 
-        new CartService(oComponent).preload();
+        // Fills the shell badge and the cart model from the backend on app start
+        void new CartService(oComponent).sync();
 
-        if (this._isDemoMode()) {
-            this._seedDemoData();
-        }
-    }
-
-    /** Only in demo mode; Seeds demo data (wishlist + recently viewed) and refreshes the shell badge */
-    private _seedDemoData(): void {
-        WishlistService.seedDemo();
-        RecentlyViewedService.seedDemo();
-        const oWishlistModel = this.getOwnerComponent().getModel(Constants.MODELS.WISHLIST) as JSONModel;
-        oWishlistModel.setProperty("/count", WishlistService.getAll().length);
-        oWishlistModel.refresh(true);
+        // Starts the check whether the stored lists still belong to this user
+        void listsReady().then((bDropped) => {
+            if (bDropped) {this._refreshWishlistCount();}
+        });
     }
 }

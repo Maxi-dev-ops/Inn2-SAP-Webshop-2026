@@ -9,11 +9,15 @@ import Control from "sap/ui/core/Control";
 import Button from "sap/m/Button";
 import ListBase from "sap/m/ListBase";
 import JSONModel from "sap/ui/model/json/JSONModel";
+import MessageBox from "sap/m/MessageBox";
 import MessageToast from "sap/m/MessageToast";
+import Log from "sap/base/Log";
 import ResourceBundle from "sap/base/i18n/ResourceBundle";
 import ResourceModel from "sap/ui/model/resource/ResourceModel";
 import { type Route$PatternMatchedEvent } from "sap/ui/core/routing/Route";
 import WishlistService, { WishlistItem } from "../model/WishlistService";
+import CartService, { CatalogProduct } from "../model/CartService";
+import { errText, extractODataError } from "../model/odata";
 import Constants from "../model/Constants";
 
 /**
@@ -35,14 +39,28 @@ export default class BaseController extends Controller {
         return this.getView()!.getModel(sName);
     }
 
-    // -- Routing --
+    // A named JSON model, typed. Reaches the view's own models as well as the ones the component holds - UI5 propagates those down to every view, so the lookup is the same either way.
+    protected _json(sName: string): JSONModel {
+        return this.getModel(sName) as JSONModel;
+    }
 
-    /**
-     * Attaches a pattern-matched handler to a route to detach it again via the shared onExit()
-     */
+    // The object a control's binding context points at 
+    protected _ctxObject<T>(oEvent: Event<object, Control>, sModelName?: string): T | undefined {
+        const oCtx = oEvent.getSource().getBindingContext(sModelName);
+        return oCtx ? (oCtx.getObject() as T) : undefined;
+    }
+
+    // -- Routing -- //
+
+
+    // Attaches a pattern-matched handler to a route to detach it again via onExit()
     protected _attachRoute(sRoute: string, fnHandler: (oEvent: Route$PatternMatchedEvent) => void): void {
         UIComponent.getRouterFor(this).getRoute(sRoute)!.attachPatternMatched(fnHandler);
         this._aRouteHandlers.push({ sRoute, fn: fnHandler });
+    }
+
+    protected _navTo(sRoute: string, oParams?: object, bReplace = false): void {
+        UIComponent.getRouterFor(this).navTo(sRoute, oParams ?? {}, undefined, bReplace);
     }
 
     public onExit(): void {
@@ -51,103 +69,117 @@ export default class BaseController extends Controller {
         this._aRouteHandlers = [];
     }
 
-    // -- Shared helpers (used across controllers) --
+    // -- Shared helpers (used across controllers) -- //
 
     protected _getText(sKey: string, aArgs?: (string | number)[]): string {
         const oBundle = (this.getOwnerComponent().getModel(Constants.MODELS.I18N) as ResourceModel).getResourceBundle() as ResourceBundle;
         return oBundle.getText(sKey, aArgs) ?? sKey;
     }
 
-    protected _isDemoMode(): boolean {
-        const oConfig = this.getOwnerComponent().getModel(Constants.MODELS.CONFIG) as JSONModel | undefined;
-        return oConfig?.getProperty("/demoMode") === true;
-    }
-
-    /** Raw error text of an OData V2 error */
-    protected _errText(oErr: unknown): string {
-        return (oErr as { responseText?: string })?.responseText ?? "";
-    }
-
-    /** Extracts a readable error message from an SAP OData V2 error */
-    protected _extractODataError(oErr: unknown, sFallback: string): string {
-        const sResp = this._errText(oErr);
-        if (!sResp) {return sFallback;}
-        try {
-            const oResp = JSON.parse(sResp) as { error?: { message?: { value?: string } } };
-            return oResp?.error?.message?.value ?? sFallback;
-        } catch {
-            const oMatch = sResp.match(/<message[^>]*>([^<]+)<\/message>/i);
-            return oMatch?.[1] ?? sFallback;
-        }
+    // Reports a failed backend call
+    protected _reportError(oErr: unknown, sFallbackKey: string, sLogMessage: string): void {
+        Log.error(sLogMessage, errText(oErr));
+        const sFallback = this._getText(sFallbackKey);
+        MessageBox.error(extractODataError(oErr, sFallback), { title: sFallback });
     }
 
     public onImageError(oEvent: Event<object, Control>): void {
         oEvent.getSource().addStyleClass("webshopImageBroken");
     }
 
-    protected _announceCartUpdate(sText: string): void {
-        InvisibleMessage.getInstance().announce(sText, InvisibleMessageMode.Polite);
+    // -- Cart -- //
+
+    // The one way an article reaches the cart
+    protected _addToCart(
+        oCartService: CartService,
+        oProduct: CatalogProduct,
+        nQuantity: number,
+        fnBusy: (bBusy: boolean, sProgress: string) => void,
+        fnDone?: () => void
+    ): void {
+        const nUnits = CartService.units(nQuantity);
+        const progress = (nDone: number): string => this._getText("addProgress", [nDone, nUnits]);
+
+        fnBusy(true, progress(0));
+        oCartService.addToCart(oProduct, nUnits, (nDone) => { fnBusy(true, progress(nDone)); }).then(() => {
+            fnBusy(false, "");
+            fnDone?.();
+            const sMsg = this._getText("addedToCart", [oProduct.ProductName]);
+            MessageToast.show(sMsg);
+            InvisibleMessage.getInstance().announce(sMsg, InvisibleMessageMode.Polite);
+        }, (oErr: unknown) => {
+            fnBusy(false, "");
+            this._reportError(oErr, "addToCartError", "addToShoppingCart error");
+        });
     }
 
-    /** Syncs the heart icons of a product list with the current wishlist state. */
+    // -- Wishlist -- //
+
+    // Keeps the shell badge in step with the stored wishlist
+    protected _refreshWishlistCount(): void {
+        const oWishlistModel = this._json(Constants.MODELS.WISHLIST);
+        oWishlistModel.setProperty("/count", WishlistService.getAll().length);
+        oWishlistModel.refresh(true);
+    }
+
+    // Syncs the heart icons of a product list with the current wishlist state
     protected _updateHeartIcons(oList: ListBase, sModelName: string | undefined, sUuidProp: string): void {
         for (const oItem of oList.getItems()) {
             const oCtx = oItem.getBindingContext(sModelName);
             if (!oCtx) { continue; }
             const sUuid = (oCtx.getProperty(sUuidProp) as string) ?? "";
-            const bInWishlist = WishlistService.has(sUuid);
             const oHeartBtn = oItem.findAggregatedObjects(true).find(
                 (c): c is Button => c.isA("sap.m.Button") && (c as Button).hasStyleClass("rsCardHeartBtn")
             );
             if (oHeartBtn) {
-                oHeartBtn.setIcon(bInWishlist ? "sap-icon://heart" : "sap-icon://heart-2");
-                oHeartBtn.toggleStyleClass("rsCardHeartBtnActive", bInWishlist);
+                this._paintHeart(oHeartBtn, WishlistService.has(sUuid));
             }
         }
     }
 
-    protected _toggleWishlistFromContext(
-        oBtn: Button, oItem: WishlistItem, sProductName: string,
-        fnPostToggle?: (bNowInWishlist: boolean) => void
-    ): void {
-        const bNowInWishlist = WishlistService.toggle(oItem);
-        oBtn.setIcon(bNowInWishlist ? "sap-icon://heart" : "sap-icon://heart-2");
-        oBtn.toggleStyleClass("rsCardHeartBtnActive", bNowInWishlist);
-        const oWishlistModel = this.getOwnerComponent().getModel(Constants.MODELS.WISHLIST) as JSONModel;
-        oWishlistModel.setProperty("/count", WishlistService.getAll().length);
-        oWishlistModel.refresh(true);
-        MessageToast.show(this._getText(bNowInWishlist ? "addedToWishlist" : "removedFromWishlist", [sProductName]));
-        fnPostToggle?.(bNowInWishlist);
+    // The two states of a heart button, in one place so list and detail page cannot drift.
+    protected _paintHeart(oBtn: Button, bInWishlist: boolean): void {
+        oBtn.setIcon(bInWishlist ? "sap-icon://heart" : "sap-icon://heart-2");
+        oBtn.toggleStyleClass("rsCardHeartBtnActive", bInWishlist);
     }
 
-    // -- Navigation --
+    protected _toggleWishlistFromContext(
+        oBtn: Button, oItem: WishlistItem, sProductName: string
+    ): void {
+        const bNowInWishlist = WishlistService.toggle(oItem);
+        this._paintHeart(oBtn, bNowInWishlist);
+        this._refreshWishlistCount();
+        MessageToast.show(this._getText(bNowInWishlist ? "addedToWishlist" : "removedFromWishlist", [sProductName]));
+    }
+
+    // -- Navigation -- //
 
     public onNavBack(): void {
         const sPreviousHash = History.getInstance().getPreviousHash();
         if (sPreviousHash !== undefined) {
             window.history.go(-1);
         } else {
-            UIComponent.getRouterFor(this).navTo(Constants.ROUTES.HOME, {}, undefined, true);
+            this._navTo(Constants.ROUTES.HOME, {}, true);
         }
     }
 
     public onNavHome(): void {
-        UIComponent.getRouterFor(this).navTo(Constants.ROUTES.HOME);
+        this._navTo(Constants.ROUTES.HOME);
     }
 
     public onNavToCart(): void {
-        UIComponent.getRouterFor(this).navTo(Constants.ROUTES.CART);
+        this._navTo(Constants.ROUTES.CART);
     }
 
     public onNavToWishlist(): void {
-        UIComponent.getRouterFor(this).navTo(Constants.ROUTES.WISHLIST);
+        this._navTo(Constants.ROUTES.WISHLIST);
     }
 
     public onNavToOrderHistory(): void {
-        UIComponent.getRouterFor(this).navTo(Constants.ROUTES.ORDER_HISTORY);
+        this._navTo(Constants.ROUTES.ORDER_HISTORY);
     }
 
     public onNavToProfile(): void {
-        UIComponent.getRouterFor(this).navTo(Constants.ROUTES.PROFILE);
+        this._navTo(Constants.ROUTES.PROFILE);
     }
 }

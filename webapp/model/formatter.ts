@@ -1,13 +1,13 @@
 import ResourceBundle from "sap/base/i18n/ResourceBundle";
 import NumberFormat from "sap/ui/core/format/NumberFormat";
-import WishlistService from "./WishlistService";
+import CartService, { CartState } from "./CartService";
 
 export default class Formatter {
 
     private static oI18n: ResourceBundle | undefined;
     private static oCurrencyFormat: NumberFormat | undefined;
 
-    /** Injected once so formatters reuse the app's i18n bundle */
+    // Injected once so formatters reuse the i18n bundle
     public static setBundle(oBundle: ResourceBundle): void {
         Formatter.oI18n = oBundle;
     }
@@ -47,36 +47,26 @@ export default class Formatter {
         return `${nQty} × ${Formatter.formatPrice(amount, currency)}`;
     }
 
-    public static formatCartTotal(oCart: { items?: Array<{ price: number; currency: string; quantity: number }>; totalAmount?: number; totalCurrency?: string } | null | undefined): string {
-        if (oCart?.totalAmount && oCart.totalAmount > 0) {
-            return Formatter.formatPrice(oCart.totalAmount, oCart.totalCurrency ?? "EUR");
-        }
-        if (!oCart?.items?.length) {return Formatter.formatPrice(0, "EUR");}
-        const aPriced = oCart.items.filter((i) => i.price > 0);
-        if (!aPriced.length) {return Formatter.getText("priceOnRequest");}
-        const sCurrency = aPriced[0]?.currency ?? "EUR";
-        const nTotal = aPriced.reduce((sum, item) => sum + (item.price ?? 0) * (item.quantity ?? 1), 0);
-        return Formatter.formatPrice(nTotal, sCurrency);
+    public static formatCartTotal(oCart: CartState | null | undefined): string {
+        const oTotals = CartService.calcTotals(oCart);
+        return Formatter.formatPrice(oTotals.amount, oTotals.currency);
     }
 
-    public static formatPricedCount(oCart: { items?: Array<{ price: number; quantity: number }> } | null | undefined): string {
-        if (!oCart?.items?.length) {return "0";}
-        const n = oCart.items.filter((i) => i.price > 0).reduce((s, i) => s + (i.quantity ?? 1), 0);
-        return String(n);
+    public static formatPricedCount(oCart: CartState | null | undefined): string {
+        return String(CartService.calcTotals(oCart).pricedCount);
     }
 
-    public static formatUnpricedCount(oCart: { items?: Array<{ price: number; quantity: number }> } | null | undefined): string {
-        if (!oCart?.items?.length) {return Formatter.getText("unpricedCount", [0]);}
-        const n = oCart.items.filter((i) => !i.price || i.price === 0).reduce((s, i) => s + (i.quantity ?? 1), 0);
-        return Formatter.getText("unpricedCount", [n]);
+    public static formatUnpricedCount(oCart: CartState | null | undefined): string {
+        return Formatter.getText("unpricedCount", [CartService.calcTotals(oCart).unpricedCount]);
     }
 
-    public static hasUnpricedItems(oCart: { items?: Array<{ price: number }> } | null | undefined): boolean {
-        if (!oCart?.items?.length) {return false;}
-        return oCart.items.some((i) => !i.price || i.price === 0);
+    public static hasUnpricedItems(oCart: CartState | null | undefined): boolean {
+        return CartService.calcTotals(oCart).unpricedCount > 0;
     }
 
-    public static formatHeartIcon(sUuid: string | null | undefined): string {
-        return WishlistService.has(sUuid ?? "") ? "sap-icon://heart" : "sap-icon://heart-2";
+    // Note on the order confirmation explaining why the item count exceeds the priced amount
+    public static formatOrderUnpriced(nCount: number | string | null | undefined): string {
+        const n = typeof nCount === "string" ? parseInt(nCount, 10) : (nCount ?? 0);
+        return Formatter.getText("orderConfirmUnpriced", [isNaN(n) ? 0 : n]);
     }
 }

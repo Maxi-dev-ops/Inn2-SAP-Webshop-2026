@@ -23,129 +23,235 @@
         </customHeader>
 
         <content>
-            <VBox class="sapUiMediumMarginBeginEnd sapUiMediumMarginTop">
 
-                <!-- Empty state -->
-                <VBox
-                    visible="{orderHistoryModel>/showEmpty}"
-                    class="rsOrderHistoryEmpty"
-                    alignItems="Center">
-                    <IllustratedMessage
-                        illustrationType="sapIllus-NoEntries"
-                        illustrationSize="Auto"
-                        title="{i18n>orderHistoryEmpty}"
-                        description="{i18n>orderHistoryEmptyHint}"/>
+            <!-- No orders at all: full width, no switch to offer -->
+            <VBox
+                visible="{= !${orderHistoryModel>/loading} &amp;&amp; !${orderHistoryModel>/hasOrders} }"
+                class="rsOrderHistoryEmpty"
+                alignItems="Center">
+                <IllustratedMessage
+                    illustrationType="sapIllus-NoEntries"
+                    illustrationSize="Auto"
+                    title="{i18n>orderHistoryEmpty}"
+                    description="{i18n>orderHistoryEmptyHint}"/>
+            </VBox>
+
+            <!-- Same split as the cart: list on the left, narrow column on the right -->
+            <HBox
+                visible="{orderHistoryModel>/hasOrders}"
+                class="sapUiMediumMarginBeginEnd sapUiMediumMarginTop"
+                wrap="Wrap"
+                alignItems="Start">
+
+                <VBox class="rsCartItemsColumn sapUiMediumMarginEnd">
+
+                    <!-- Always visible, so it is clear which of the two lists is showing -->
+                    <SegmentedButton
+                        id="orderViewSwitch"
+                        selectedKey="{orderHistoryModel>/view}"
+                        selectionChange="onSelectView"
+                        class="rsOrderViewSwitch sapUiSmallMarginBottom">
+                        <items>
+                            <SegmentedButtonItem
+                                key="recent"
+                                icon="sap-icon://history"
+                                text="{= ${i18n>orderViewRecent} + ' (' + ${orderHistoryModel>/recentCount} + ')' }"/>
+                            <SegmentedButtonItem
+                                key="older"
+                                icon="sap-icon://past"
+                                text="{= ${i18n>orderViewOlder} + ' (' + ${orderHistoryModel>/olderCount} + ')' }"/>
+                        </items>
+                    </SegmentedButton>
+
+                    <!-- The other bucket has entries, this one does not -->
+                    <Text
+                        visible="{orderHistoryModel>/showEmpty}"
+                        text="{i18n>orderViewEmpty}"
+                        class="rsCheckoutHint sapUiSmallMarginBottom"/>
+
+                    <!-- Order list; filter and grouping are set on the binding in the controller -->
+                    <List
+                        id="orderList"
+                        items="{orderHistoryModel>/orders}"
+                        visible="{orderHistoryModel>/showList}"
+                        showSeparators="None"
+                        mode="None"
+                        class="rsOrderList">
+                        <CustomListItem
+                            type="Inactive"
+                            class="rsOrderCard">
+                            <VBox class="rsOrderCardInner">
+
+                                <HBox justifyContent="SpaceBetween" alignItems="Center">
+                                    <VBox>
+                                        <Title text="{= ${i18n>orderNumberPrefix} + ' ' + ${orderHistoryModel>orderId}}" level="H5" class="rsOrderUuid"/>
+                                        <HBox alignItems="Center" class="sapUiTinyMarginTop">
+                                            <core:Icon src="sap-icon://calendar" class="sapUiTinyMarginEnd rsOrderDateIcon"/>
+                                            <Text text="{orderHistoryModel>date}" class="rsOrderDate"/>
+                                        </HBox>
+                                    </VBox>
+                                    <ObjectStatus
+                                        text="{
+                                            parts: [
+                                                { path: 'orderHistoryModel>status' },
+                                                { path: 'orderHistoryModel>statusText' }
+                                            ],
+                                            formatter: '.formatOrderStatus'
+                                        }"
+                                        state="{
+                                            path: 'orderHistoryModel>status',
+                                            formatter: '.formatOrderStatusState'
+                                        }"
+                                        inverted="true"/>
+                                </HBox>
+
+                                <!-- Summary: item count + total -->
+                                <HBox justifyContent="SpaceBetween" alignItems="Center" class="rsOrderSummaryRow sapUiSmallMarginTop">
+                                    <HBox alignItems="Center">
+                                        <core:Icon src="sap-icon://cart" class="sapUiTinyMarginEnd rsOrderSummaryIcon"/>
+                                        <Text text="{
+                                            parts: [
+                                                { path: 'orderHistoryModel>itemCount' },
+                                                { path: 'orderHistoryModel>itemsLoaded' }
+                                            ],
+                                            formatter: '.formatOrderItemCount'
+                                        }"/>
+                                    </HBox>
+                                    <Text
+                                        text="{
+                                            parts: [
+                                                { path: 'orderHistoryModel>totalAmount' },
+                                                { path: 'orderHistoryModel>currency' }
+                                            ],
+                                            formatter: '.formatter.formatPrice'
+                                        }"
+                                        class="rsOrderTotal"/>
+                                </HBox>
+
+                                <!-- Details toggle + reorder -->
+                                <HBox alignItems="Center" justifyContent="SpaceBetween" class="sapUiTinyMarginTop">
+                                    <Button
+                                        text="{
+                                            path: 'orderHistoryModel>expanded',
+                                            formatter: '.formatToggleText'
+                                        }"
+                                        icon="{
+                                            path: 'orderHistoryModel>expanded',
+                                            formatter: '.formatToggleIcon'
+                                        }"
+                                        type="Transparent"
+                                        press="onToggleOrderDetails"
+                                        class="rsOrderToggleBtn"/>
+                                    <Button
+                                        text="{i18n>orderReorder}"
+                                        icon="sap-icon://cart-approval"
+                                        type="Transparent"
+                                        press="onReorder"
+                                        enabled="{= !${orderHistoryModel>/reordering} }"
+                                        tooltip="{i18n>orderReorderTooltip}"
+                                        class="rsOrderReorderBtn"/>
+                                </HBox>
+
+                                <!-- Collapsible item list -->
+                                <VBox visible="{orderHistoryModel>expanded}" class="rsOrderItemList">
+                                    <!-- Nested inside the order list: the template is cloned per order,
+                                         so it must say whether the framework may destroy it -->
+                                    <List
+                                        items="{
+                                            path: 'orderHistoryModel>items',
+                                            templateShareable: false
+                                        }"
+                                        showSeparators="None"
+                                        mode="None"
+                                        class="sapUiNoContentPadding">
+                                        <CustomListItem type="Inactive">
+                                            <HBox alignItems="Center" justifyContent="SpaceBetween" class="rsOrderItem">
+                                                <VBox class="rsOrderItemInfo">
+                                                    <Text text="{orderHistoryModel>name}" class="rsOrderItemName"/>
+                                                    <Text
+                                                        text="{= ${i18n>articleNo} + ' ' + ${orderHistoryModel>material}}"
+                                                        class="rsOrderItemId sapUiTinyMarginTop"/>
+                                                </VBox>
+                                                <HBox alignItems="Center">
+                                                    <VBox alignItems="End">
+                                                        <Text
+                                                            text="{
+                                                                parts: [
+                                                                    { path: 'orderHistoryModel>price' },
+                                                                    { path: 'orderHistoryModel>currency' },
+                                                                    { path: 'orderHistoryModel>quantity' }
+                                                                ],
+                                                                formatter: '.formatter.formatLinePrice'
+                                                            }"
+                                                            class="rsOrderItemPrice"/>
+                                                        <Text
+                                                            visible="{= ${orderHistoryModel>quantity} > 1}"
+                                                            text="{
+                                                                parts: [
+                                                                    { path: 'orderHistoryModel>price' },
+                                                                    { path: 'orderHistoryModel>currency' },
+                                                                    { path: 'orderHistoryModel>quantity' }
+                                                                ],
+                                                                formatter: '.formatter.formatUnitLine'
+                                                            }"
+                                                            class="rsCartUnitLine"/>
+                                                    </VBox>
+                                                    <!-- Only reachable with the details open; resolves
+                                                         the material to a catalog item on click -->
+                                                    <Button
+                                                        icon="sap-icon://show"
+                                                        type="Transparent"
+                                                        press="onViewProduct"
+                                                        tooltip="{i18n>orderViewProduct}"
+                                                        class="rsOrderViewBtn sapUiTinyMarginBegin"/>
+                                                </HBox>
+                                            </HBox>
+                                        </CustomListItem>
+                                    </List>
+                                </VBox>
+
+                            </VBox>
+                        </CustomListItem>
+                    </List>
+
                 </VBox>
 
-                <!-- Order list -->
-                <List
-                    id="orderList"
-                    items="{orderHistoryModel>/orders}"
-                    visible="{orderHistoryModel>/showList}"
-                    showSeparators="None"
-                    mode="None">
-                    <CustomListItem type="Inactive" class="rsOrderCard">
-                        <VBox class="rsOrderCardInner">
+                <!-- Narrow column, same role as the cart summary -->
+                <Panel class="rsOrderSidePanel" backgroundDesign="Transparent">
+                    <headerToolbar>
+                        <Toolbar>
+                            <Title text="{i18n>orderHistorySideTitle}" level="H5"/>
+                        </Toolbar>
+                    </headerToolbar>
+                    <content>
+                        <VBox class="sapUiSmallMarginBeginEnd sapUiSmallMarginBottom">
 
-                            <HBox justifyContent="SpaceBetween" alignItems="Center">
-                                <VBox>
-                                    <Title text="{orderHistoryModel>uuid}" level="H5" class="rsOrderUuid"/>
-                                    <HBox alignItems="Center" class="sapUiTinyMarginTop">
-                                        <core:Icon src="sap-icon://calendar" class="sapUiTinyMarginEnd rsOrderDateIcon"/>
-                                        <Text text="{orderHistoryModel>date}" class="rsOrderDate"/>
-                                    </HBox>
-                                </VBox>
-                                <ObjectStatus
-                                    text="{
-                                        path: 'orderHistoryModel>status',
-                                        formatter: '.formatOrderStatus'
-                                    }"
-                                    state="{
-                                        path: 'orderHistoryModel>status',
-                                        formatter: '.formatOrderStatusState'
-                                    }"
-                                    inverted="true"/>
+                            <HBox justifyContent="SpaceBetween" class="sapUiTinyMarginTop">
+                                <Text text="{i18n>orderHistoryShownCount}"/>
+                                <Text text="{orderHistoryModel>/recentCount}"/>
+                            </HBox>
+                            <HBox justifyContent="SpaceBetween" class="sapUiTinyMarginTop">
+                                <Text text="{i18n>orderHistoryOlderCount}"/>
+                                <Text text="{orderHistoryModel>/olderCount}"/>
                             </HBox>
 
-                            <!-- Summary: item count + total -->
-                            <HBox justifyContent="SpaceBetween" alignItems="Center" class="rsOrderSummaryRow sapUiSmallMarginTop">
+                            <HBox class="rsFilterDivider sapUiSmallMarginTopBottom"/>
+
+                            <Text text="{i18n>orderHistoryOlderHint}" class="rsCheckoutHint"/>
+
+                            <!-- Reorder runs one backend call per unit, so it gets a progress line -->
+                            <VBox visible="{orderHistoryModel>/reordering}" class="sapUiSmallMarginTop">
                                 <HBox alignItems="Center">
-                                    <core:Icon src="sap-icon://cart" class="sapUiTinyMarginEnd rsOrderSummaryIcon"/>
-                                    <Text text="{= ${orderHistoryModel>itemCount} + ' ' + ${i18n>orderItems}}"/>
+                                    <BusyIndicator size="1rem" class="sapUiTinyMarginEnd"/>
+                                    <Text text="{orderHistoryModel>/reorderText}"/>
                                 </HBox>
-                                <Text
-                                    text="{
-                                        parts: [
-                                            { path: 'orderHistoryModel>totalAmount' },
-                                            { path: 'orderHistoryModel>currency' }
-                                        ],
-                                        formatter: '.formatter.formatPrice'
-                                    }"
-                                    class="rsOrderTotal"/>
-                            </HBox>
-
-                            <!-- Details toggle -->
-                            <Button
-                                text="{
-                                    path: 'orderHistoryModel>expanded',
-                                    formatter: '.formatToggleText'
-                                }"
-                                icon="{
-                                    path: 'orderHistoryModel>expanded',
-                                    formatter: '.formatToggleIcon'
-                                }"
-                                type="Transparent"
-                                press="onToggleOrderDetails"
-                                class="rsOrderToggleBtn sapUiTinyMarginTop"/>
-
-                            <!-- Collapsible item list -->
-                            <VBox visible="{orderHistoryModel>expanded}" class="rsOrderItemList">
-                                <List
-                                    items="{orderHistoryModel>items}"
-                                    showSeparators="None"
-                                    mode="None"
-                                    class="sapUiNoContentPadding">
-                                    <CustomListItem type="Inactive">
-                                        <HBox alignItems="Center" justifyContent="SpaceBetween" class="rsOrderItem">
-                                            <VBox class="rsOrderItemInfo">
-                                                <Text text="{orderHistoryModel>name}" class="rsOrderItemName"/>
-                                                <Text
-                                                    text="{= ${i18n>articleNo} + ' ' + ${orderHistoryModel>material}}"
-                                                    class="rsOrderItemId sapUiTinyMarginTop"/>
-                                            </VBox>
-                                            <VBox alignItems="End">
-                                                <Text
-                                                    text="{
-                                                        parts: [
-                                                            { path: 'orderHistoryModel>price' },
-                                                            { path: 'orderHistoryModel>currency' },
-                                                            { path: 'orderHistoryModel>quantity' }
-                                                        ],
-                                                        formatter: '.formatter.formatLinePrice'
-                                                    }"
-                                                    class="rsOrderItemPrice"/>
-                                                <Text
-                                                    visible="{= ${orderHistoryModel>quantity} > 1}"
-                                                    text="{
-                                                        parts: [
-                                                            { path: 'orderHistoryModel>price' },
-                                                            { path: 'orderHistoryModel>currency' },
-                                                            { path: 'orderHistoryModel>quantity' }
-                                                        ],
-                                                        formatter: '.formatter.formatUnitLine'
-                                                    }"
-                                                    class="rsCartUnitLine"/>
-                                            </VBox>
-                                        </HBox>
-                                    </CustomListItem>
-                                </List>
                             </VBox>
 
                         </VBox>
-                    </CustomListItem>
-                </List>
+                    </content>
+                </Panel>
 
-            </VBox>
+            </HBox>
         </content>
     </Page>
 </mvc:View>

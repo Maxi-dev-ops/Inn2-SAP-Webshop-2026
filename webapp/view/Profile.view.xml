@@ -35,8 +35,6 @@
                                 class="rsProfileAvatar sapUiMediumMarginEnd"/>
                             <VBox>
                                 <Title text="{profileModel>/name}" level="H2" class="rsProfileName"/>
-                                <Text text="{profileModel>/department}" class="rsProfileDept sapUiTinyMarginTop"/>
-                                <Text text="{profileModel>/company}" class="rsProfileCompany sapUiTinyMarginTop"/>
                             </VBox>
                         </HBox>
                     </content>
@@ -51,18 +49,15 @@
                     </headerToolbar>
                     <content>
                         <VBox class="sapUiSmallMarginBeginEnd sapUiSmallMarginBottom">
-                            <HBox alignItems="Center" class="rsProfileInfoRow">
+                            <!-- start_up delivers an address only for users who have one -->
+                            <HBox
+                                alignItems="Center"
+                                class="rsProfileInfoRow"
+                                visible="{= ${profileModel>/email} !== '' }">
                                 <core:Icon src="sap-icon://email" class="rsProfileInfoIcon sapUiMediumMarginEnd"/>
                                 <VBox>
                                     <Label text="{i18n>profileEmail}"/>
                                     <Text text="{profileModel>/email}"/>
-                                </VBox>
-                            </HBox>
-                            <HBox alignItems="Center" class="rsProfileInfoRow">
-                                <core:Icon src="sap-icon://addresses" class="rsProfileInfoIcon sapUiMediumMarginEnd"/>
-                                <VBox>
-                                    <Label text="{i18n>profileLocation}"/>
-                                    <Text text="{profileModel>/location}"/>
                                 </VBox>
                             </HBox>
                             <HBox alignItems="Center" class="rsProfileInfoRow rsProfileInfoRowLast">

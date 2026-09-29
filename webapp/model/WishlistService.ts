@@ -1,33 +1,31 @@
 import Constants from "./Constants";
-import { StoredItem, hasUuid, insertFront, removeByUuid, seedOnce } from "./itemStore";
+import { StoredItem, hasUuid, insertFront, loadStored, removeByUuid, saveStored } from "./itemStore";
 
 export type WishlistItem = StoredItem;
 
 export default class WishlistService {
 
-    // Demo placeholders seeded by seedDemo()
-    private static readonly DEMO_ITEMS: WishlistItem[] = [
-        { uuid: "demo-wish-001", name: "Laptop Business Pro", material: "T-MOBILE-0001", price: 1299.00, currency: "EUR", pictureUrl: "" },
-        { uuid: "demo-wish-002", name: "Docking Station Ultra", material: "T-DOCK-001", price: 149.90, currency: "EUR", pictureUrl: "" }
-    ];
+    private static readonly STORAGE_KEY = "wishlist";
+    private static _items: WishlistItem[] = loadStored<WishlistItem>(WishlistService.STORAGE_KEY);
 
-    private static _items: WishlistItem[] = [];
-    private static _demoSeeded = false;
-
-    /** Seeds the demo items */
-    public static seedDemo(): void {
-        if (WishlistService._demoSeeded) { return; }
-        WishlistService._demoSeeded = true;
-        WishlistService._items = seedOnce(WishlistService._items, WishlistService.DEMO_ITEMS);
+    private static _persist(): void {
+        saveStored(WishlistService.STORAGE_KEY, WishlistService._items);
     }
 
-    /** Adds/Deletes an item */
+    // Drops the list; used when a different user opens the shop in this browser
+    public static clear(): void {
+        WishlistService._items = [];
+        WishlistService._persist();
+    }
+
     public static toggle(oItem: WishlistItem): boolean {
         if (hasUuid(WishlistService._items, oItem.uuid)) {
             WishlistService._items = removeByUuid(WishlistService._items, oItem.uuid);
+            WishlistService._persist();
             return false;
         }
         WishlistService._items = insertFront(WishlistService._items, oItem, Constants.STORAGE.WISHLIST_MAX);
+        WishlistService._persist();
         return true;
     }
 
@@ -37,9 +35,5 @@ export default class WishlistService {
 
     public static has(sUuid: string): boolean {
         return hasUuid(WishlistService._items, sUuid);
-    }
-
-    public static clear(): void {
-        WishlistService._items = [];
     }
 }

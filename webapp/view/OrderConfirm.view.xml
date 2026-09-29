@@ -51,6 +51,15 @@
                     <Text text="{orderConfirmModel>/orderUuid}" class="rsOrderConfirmRef"/>
                 </HBox>
 
+                <!-- Only when the checkout page collected one -->
+                <HBox
+                    alignItems="Center"
+                    class="sapUiTinyMarginTop"
+                    visible="{= !!${orderConfirmModel>/externalReference}}">
+                    <Text text="{= ${i18n>checkoutExternalReference} + ': '}" class="sapUiTinyMarginEnd"/>
+                    <Text text="{orderConfirmModel>/externalReference}" class="rsOrderConfirmRef"/>
+                </HBox>
+
                 <!-- Summary stats -->
                 <HBox class="rsOrderConfirmSummary sapUiMediumMarginTop" justifyContent="Center">
                     <VBox class="rsOrderConfirmStat" alignItems="Center">
@@ -68,6 +77,15 @@
                         <Text text="{i18n>orderConfirmTotal}"/>
                     </VBox>
                 </HBox>
+
+                <!-- Explains why the item count is higher than the priced amount -->
+                <Text
+                    text="{
+                        path: 'orderConfirmModel>/unpricedCount',
+                        formatter: '.formatter.formatOrderUnpriced'
+                    }"
+                    visible="{= ${orderConfirmModel>/unpricedCount} > 0}"
+                    class="sapUiSmallMarginTop rsOrderConfirmNote"/>
 
                 <Button
                     text="{i18n>orderConfirmContinue}"

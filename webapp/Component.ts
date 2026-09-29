@@ -4,6 +4,7 @@ import ResourceModel from "sap/ui/model/resource/ResourceModel";
 import ResourceBundle from "sap/base/i18n/ResourceBundle";
 import { createDeviceModel } from "./model/models";
 import Formatter from "./model/formatter";
+import Constants from "./model/Constants";
 import ErrorHandler from "./controller/ErrorHandler";
 
 /**
@@ -20,7 +21,7 @@ export default class Component extends BaseComponent {
 	public init() : void {
 		super.init();
 
-		// Central handler for fatal OData errors (service/metadata unreachable)
+		// Central handler for fatal OData errors
 		this._oErrorHandler = new ErrorHandler(this);
 
 		// Reuse the already-loaded i18n bundle in the formatter
@@ -34,14 +35,10 @@ export default class Component extends BaseComponent {
 		this.getRouter().initialize();
 		this.setModel(createDeviceModel(), "device");
 
-        // Demo mode shows placeholder data
-        const demoMode = new URLSearchParams(window.location.search).get("demo") === "true";
-        const oConfigModel = new JSONModel({
-            demoMode: demoMode,
-            customerName: demoMode ? "Demo GmbH" : "",
-            customerLogo: sap.ui.require.toUrl("com/sapwebshop2026/sapwebshop/images/customer-logo.png")
-        });
-        this.setModel(oConfigModel, "config");
+		// Customer branding of the start page
+		this.setModel(new JSONModel({
+			customerLogo: sap.ui.require.toUrl("com/sapwebshop2026/sapwebshop/images/customer-logo.png")
+		}), Constants.MODELS.CONFIG);
 	}
 
 	public exit(): void {
