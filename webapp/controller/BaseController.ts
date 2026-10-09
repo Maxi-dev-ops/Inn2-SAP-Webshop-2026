@@ -27,6 +27,8 @@ export default class BaseController extends Controller {
 
     private _aRouteHandlers: Array<{ sRoute: string; fn: (oEvent: Route$PatternMatchedEvent) => void }> = [];
 
+    // -- Typed accessors -- //
+
     public getOwnerComponent(): UIComponent {
         return super.getOwnerComponent() as UIComponent;
     }
@@ -39,12 +41,12 @@ export default class BaseController extends Controller {
         return this.getView()!.getModel(sName);
     }
 
-    // A named JSON model, typed. Reaches the view's own models as well as the ones the component holds - UI5 propagates those down to every view, so the lookup is the same either way.
+    // A named JSON model, typed; finds view models and the component models UI5 passes down alike
     protected _json(sName: string): JSONModel {
         return this.getModel(sName) as JSONModel;
     }
 
-    // The object a control's binding context points at 
+    // The object a control's binding context points at
     protected _ctxObject<T>(oEvent: Event<object, Control>, sModelName?: string): T | undefined {
         const oCtx = oEvent.getSource().getBindingContext(sModelName);
         return oCtx ? (oCtx.getObject() as T) : undefined;
@@ -69,7 +71,7 @@ export default class BaseController extends Controller {
         this._aRouteHandlers = [];
     }
 
-    // -- Shared helpers (used across controllers) -- //
+    // -- Shared helpers -- //
 
     protected _getText(sKey: string, aArgs?: (string | number)[]): string {
         const oBundle = (this.getOwnerComponent().getModel(Constants.MODELS.I18N) as ResourceModel).getResourceBundle() as ResourceBundle;
@@ -137,7 +139,7 @@ export default class BaseController extends Controller {
         }
     }
 
-    // The two states of a heart button, in one place so list and detail page cannot drift.
+    // The two states of a heart button, in one place so list and detail page cannot drift
     protected _paintHeart(oBtn: Button, bInWishlist: boolean): void {
         oBtn.setIcon(bInWishlist ? "sap-icon://heart" : "sap-icon://heart-2");
         oBtn.toggleStyleClass("rsCardHeartBtnActive", bInWishlist);

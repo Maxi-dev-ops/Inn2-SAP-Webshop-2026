@@ -217,7 +217,7 @@
 .rsHeroCustomerLogo img { max-width: 100% !important; max-height: 138px !important; object-fit: contain !important; }
 
 /* -- CATEGORY PILLS -- */
-/* Horizon transparent Button restyled as a pill (radius + colors only). */
+/* Horizon transparent Button restyled as a pill (radius + colors only) */
 .rsCategoryRow { display: flex !important; flex-wrap: wrap !important; gap: 6px !important; }
 .rsCategoryRow > * { flex: 0 0 auto !important; }
 
@@ -248,7 +248,7 @@
 }
 
 /* -- PRODUCT CARDS -- */
-/* Grid lives on .sapMListItems (see PRODUCT GRID as sapMList); this only sets the outer margin. */
+/* Grid lives on .sapMListItems (see PRODUCT GRID as sapMList); this only sets the outer margin */
 .rsProductGrid { margin-bottom: 16px !important; }
 .rsProductGrid > * { margin: 0 !important; min-width: 0 !important; }
 
@@ -424,6 +424,7 @@
 .rsCartItemInfo,
 .rsCartItemPrice { min-width: 0; }
 .rsCartUnitLine.sapMText { font-size: 0.78rem !important; color: var(--rs-color-text-light) !important; margin-bottom: 2px; }
+.rsCartItemContract.sapMText { font-size: 0.78rem !important; color: var(--rs-color-text-light) !important; }
 .rsCartItemImage { border-radius: var(--rs-radius-sm); object-fit: contain; background: var(--rs-gradient-detail); flex-shrink: 0; border: 1px solid var(--rs-color-border-alt); }
 
 .rsQtyBox { border: 1px solid var(--rs-color-border); border-radius: var(--rs-radius-sm); overflow: hidden; width: max-content !important; flex: 0 0 auto !important; }
@@ -458,8 +459,7 @@
 .webshopImageBroken img { opacity: 0 !important; }
 
 /* -- SCROLL -- */
-/* Only the <section> of the page in view scrolls. Letting the document grow as well adds a second
-   bar on the window: it flashes on every page change and stays once a tall page has been open. */
+/* Only the page's own <section> scrolls; a growing document would add a second scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
@@ -597,10 +597,7 @@ body > div { height: 100% !important; overflow: hidden !important; }
 
 .rsOrderViewSwitch { width: 100%; }
 .rsOrderViewSwitch .sapMSegBBtn { flex: 1 1 0%; }
-/* Group headings (week or month) as a separating band. Two rules to keep in mind here:
-   address them by class, never by id - UI5 prefixes the DOM id with the view id, so "#orderList"
-   matches nothing; and keep the selector this deep - sap.m sets a fixed 26px height through
-   .sapMListUl > .sapMLIB.sapMGHLI, which a flatter rule loses against even with !important. */
+/* Group headings (week or month) as a band; selector this deep to beat sap.m's fixed 26px height */
 .rsOrderList .sapMListUl > .sapMLIB.sapMGHLI {
     height: auto !important;
     line-height: normal !important;
@@ -626,8 +623,7 @@ body > div { height: 100% !important; overflow: hidden !important; }
     letter-spacing: normal !important;
     color: var(--rs-color-text-medium) !important;
     line-height: 1.5 !important;
-    /* sap.m sets overflow:hidden + text-overflow:ellipsis + nowrap here. Italic glyphs reach past
-       their advance width, so the last character gets cut off ("April 202" instead of "April 2026"). */
+    /* sap.m's ellipsis would cut off the last italic glyph ("April 202") */
     overflow: visible !important;
     text-overflow: clip !important;
     white-space: normal !important;

@@ -32,6 +32,8 @@ export default class OrderHistoryController extends BaseController {
     // Which of the two lists the binding currently carries
     private _appliedView: string | undefined;
 
+    // -- Lifecycle & loading -- //
+
     private _model(): JSONModel {
         return this._json(OrderHistoryController.MODEL);
     }
@@ -59,7 +61,7 @@ export default class OrderHistoryController extends BaseController {
         OrderService.load(this.getOwnerComponent()).then((aOrders) => {
             this._setOrders(aOrders);
         }, () => {
-            // Already logged in service; show the empty state instead of stale list
+            // Already logged by OrderService; show the empty state, not a stale list
             this._setOrders([]);
         });
     }
@@ -87,6 +89,8 @@ export default class OrderHistoryController extends BaseController {
         oModel.setProperty("/showList", !bLoading && nVisible > 0);
     }
 
+    // -- Recent / older view -- //
+
     // Switches between the two lists (recent, older)
     private _applyView(): void {
         const oBinding = (this.byId("orderList") as List | undefined)?.getBinding("items") as ListBinding | undefined;
@@ -94,7 +98,7 @@ export default class OrderHistoryController extends BaseController {
 
         const bOlder = this._isOlderView();
         const sView = bOlder ? OrderHistoryController.VIEW_OLDER : OrderHistoryController.VIEW_RECENT;
-        // Filtering fires a re-render
+        // Filtering re-renders and onAfterRendering lands here again, so only on a real change
         if (this._appliedView === sView) {return;}
         this._appliedView = sView;
 
@@ -131,7 +135,7 @@ export default class OrderHistoryController extends BaseController {
         return this._getText("orderWeeksAgo", [nWeeks]);
     }
 
-    // The segmented control at the top to show older or recent
+    // Recent / older switch at the top
     public onSelectView(oEvent: SegmentedButton$SelectionChangeEvent): void {
         const oModel = this._model();
         const sKey = oEvent.getParameter("item")?.getKey() ?? OrderHistoryController.VIEW_RECENT;
@@ -148,6 +152,8 @@ export default class OrderHistoryController extends BaseController {
         oModel.refresh(true);
         this._applyView();
     }
+
+    // -- Order details -- //
 
     // Positions are fetched on the first expand
     public onToggleOrderDetails(oEvent: Event<object, Control>): void {
@@ -216,7 +222,7 @@ export default class OrderHistoryController extends BaseController {
             });
     }
 
-    // Uses the already loaded positions, otherwise fetches appends them
+    // Uses the positions already loaded, otherwise fetches them into the order
     private _orderItems(oOrder: Order, sPath: string): Promise<OrderItem[]> {
         if (oOrder.itemsLoaded) {return Promise.resolve(oOrder.items);}
 
@@ -230,7 +236,7 @@ export default class OrderHistoryController extends BaseController {
         });
     }
 
-    // A material the catalog no longer resolves is skipped and are named before the cart opens
+    // Names the articles that could not be added before the cart opens
     private _afterReorder(oResult: ReorderResult): void {
         if (!oResult.added) {
             MessageBox.error(this._getText("orderReorderNoneAdded", [oResult.failed.join(", ")]));
@@ -249,7 +255,7 @@ export default class OrderHistoryController extends BaseController {
         fnGoToCart();
     }
 
-    // Order positions carry only a material, so the product page has to be looked up. If material is no longer available user gets info
+    // Order positions only carry a material, so the product is looked up; says so when it is gone
     public onViewProduct(oEvent: Event<object, Control>): void {
         const oItem = this._ctxObject<OrderItem>(oEvent, OrderHistoryController.MODEL);
         if (!oItem || !this._cartService) {return;}
@@ -263,7 +269,7 @@ export default class OrderHistoryController extends BaseController {
 
     // -- Formatters -- //
 
-    // Falls back to the raw code when the service delivers status wording
+    // Falls back to the raw code when the service delivers no status text
     public formatOrderStatus(sStatus: string, sStatusText: string): string {
         return sStatusText || sStatus || "";
     }

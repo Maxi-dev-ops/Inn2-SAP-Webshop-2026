@@ -55,8 +55,12 @@ server:
             metadataPath: ./webapp/localService/cartService/metadata.xml
             mockdataPath: ./webapp/localService/cartService/data
             generateMockData: true
-            # No resolveExternalServiceReferences: it aborts with "object is not iterable"
-        # No annotations block: both *_VAN.xml were deleted along with the unused annotation sources
+            # Keep resolveExternalServiceReferences off: it aborts the mockserver ("object is not iterable")
+        annotations:
+          - localPath: ./webapp/localService/mainService/ZINN2_UI_MY_SHOP_CATA_O2_VAN.xml
+            urlPath: /sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZINN2_UI_MY_SHOP_CATA_O2_VAN',Version='0001')/$value/
+          - localPath: ./webapp/localService/cartService/ZINN2_UI_MY_SHOP_CART_O2_VAN.xml
+            urlPath: /sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZINN2_UI_MY_SHOP_CART_O2_VAN',Version='0001')/$value/
 builder:
   customTasks:
     - name: ui5-tooling-transpile-task

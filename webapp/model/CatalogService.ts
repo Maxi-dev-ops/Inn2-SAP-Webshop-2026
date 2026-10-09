@@ -27,7 +27,7 @@ interface RawPrice {
     TransactionCurrency?: string;
 }
 
-// Single owner of the /Catalog request
+// Catalog reads: the catalog list (loaded once) and prices for stored items
 export default class CatalogService {
     private static _pLoad: Promise<CatalogEntry[]> | undefined;
 
@@ -53,7 +53,7 @@ export default class CatalogService {
             oCache?.setProperty("/loaded", true);
             return aResults;
         }, (oErr: unknown) => {
-            // Do not cache the failure. Next page entry may retry
+            // The failure is not cached, the next page entry retries
             CatalogService._pLoad = undefined;
             Log.warning("Catalog load failed.", errText(oErr));
             throw oErr;

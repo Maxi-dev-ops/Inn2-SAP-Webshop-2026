@@ -1,5 +1,6 @@
 import Storage from "sap/ui/util/Storage";
 
+// An item kept in browser storage (wishlist, recently viewed)
 export interface StoredItem {
     uuid: string;
     name: string;
@@ -9,7 +10,9 @@ export interface StoredItem {
     pictureUrl: string;
 }
 
-// Inserts an item at the front, removes entry with the same uuid
+// -- List helpers -- //
+
+// Puts an item in front, drops an older entry with the same uuid and caps the list
 export function insertFront<T extends StoredItem>(aItems: T[], oItem: T, nMaxSize: number): T[] {
     const aNext = aItems.filter((i) => i.uuid !== oItem.uuid);
     aNext.unshift(oItem);
@@ -26,10 +29,10 @@ export function hasUuid<T extends StoredItem>(aItems: T[], sUuid: string): boole
 
 // -- Persistence -- //
 
-// Uses the UI5 storage wrapper (sap/ui/util/Storage) instead of raw localStorage
+// UI5 local storage wrapper, keys prefixed with "inn2.webshop"
 class Store {
     public static readonly instance = new Storage(Storage.Type.local, "inn2.webshop");
-    // Owner Key for the stored lists
+    // Key under which the owner of the stored lists is kept
     public static readonly USER_KEY = "lastUserId";
 }
 
@@ -42,7 +45,7 @@ function isPersistedItem(v: unknown): v is PersistedItem {
         && typeof o.name === "string" && typeof o.material === "string";
 }
 
-// Reads a persisted list
+// Reads a persisted list; prices are not stored and come back as 0
 export function loadStored<T extends StoredItem>(sKey: string): T[] {
     try {
         if (!Store.instance.isSupported()) {return [];}
@@ -63,7 +66,7 @@ export function saveStored<T extends StoredItem>(sKey: string, aItems: T[]): voi
             uuid, name, material, pictureUrl
         })));
     } catch {
-        // Nothing to do
+        // Storage unavailable: the list just is not persisted
     }
 }
 
@@ -84,11 +87,11 @@ export function rememberUser(sUserId: string): void {
     try {
         if (Store.instance.isSupported()) {Store.instance.put(Store.USER_KEY, sUserId);}
     } catch {
-        // Nothing to do
+        // Storage unavailable: nothing to remember
     }
 }
 
-// True when the lists in this browser were left behind by someone else. If it is a empty id nothing is thrown away.
+// True when the stored lists belong to someone else; without both ids nothing is dropped
 export function isForeignUser(sUserId: string, sStored: string): boolean {
     return !!sUserId && !!sStored && sUserId !== sStored;
 }

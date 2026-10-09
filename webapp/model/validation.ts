@@ -1,7 +1,6 @@
-/**
- * One place for "is this input usable and what exactly gets sent", so a field only has to say
- * what it holds - not how to check it
- */
+// Input rules: a field only says what it holds, the checks and the shape sent live here
+
+// -- Field rules -- //
 
 // What a text field accepts and how its value is brought into the backend's shape
 export interface FieldRule {
@@ -21,6 +20,8 @@ class Shared {
     public static regionNames: Intl.DisplayNames | null | undefined;
 }
 
+// -- Normalize & check -- //
+
 // Anything the model may hand over as a text value, coerced to a string
 export function asText(v: unknown): string {
     if (typeof v === "string") {return v;}
@@ -28,16 +29,13 @@ export function asText(v: unknown): string {
     return "";
 }
 
-// Brings a value into the shape the backend accepts. Upper-casing comes before the cut, because
-// it can grow the string: the German sharp s becomes two characters, so cutting first lets ten
-// of them turn into twenty and the MERGE answers 400 (reproduced 2026-09-01).
+// Brings a value into the backend's shape; upper-case before cutting, as it can make the string longer
 export function normalizeText(v: unknown, oRule: FieldRule): string {
     const sValue = asText(v).trim();
     return (oRule.upperCase ? sValue.toUpperCase() : sValue).slice(0, oRule.maxLength);
 }
 
-// i18n key of the first thing wrong with an already normalized value, or undefined when it may go
-// out. An empty value is only an error where the field is required.
+// i18n key of the first problem of a normalized value, or undefined; empty only fails when required
 export function checkText(sValue: string, oRule: FieldRule, bRequired: boolean): string | undefined {
     if (!sValue) {return bRequired ? Shared.MSG_REQUIRED : undefined;}
     if (oRule.check && !oRule.check(sValue)) {return oRule.messageKey ?? Shared.MSG_REQUIRED;}
@@ -56,15 +54,12 @@ export function hasAlphanumeric(sValue: string): boolean {
     return /[\p{L}\p{N}]/u.test(sValue);
 }
 
-// Letters, digits, spaces and hyphens, plus at least one digit - that last part keeps
-// "SSSSSSSSSS" out
+// Letters, digits, spaces and hyphens, with at least one digit
 export function isPostalCode(sValue: string): boolean {
     return /^(?=.*\d)[A-Z0-9][A-Z0-9 -]{1,9}$/.test(sValue);
 }
 
-// A country code the runtime can name. DeliveryCountry has no value list and the backend takes
-// anything that fits the field (verified 2026-09-01: "XX" and "ZZZ" answer 204), so the check has
-// to come from here. Intl already carries ISO 3166-1; asking it beats a table of 250 codes that ages.
+// A two-letter country code Intl can name; the backend itself accepts anything that fits
 export function isKnownCountry(sValue: string): boolean {
     // ZZ is the placeholder CLDR answers with for "unknown region" - it has a name but no country
     if (!/^[A-Z]{2}$/.test(sValue) || sValue === "ZZ") {return false;}
@@ -84,14 +79,14 @@ export function isKnownCountry(sValue: string): boolean {
     }
 }
 
-// A well-formed Edm.Guid. Keys read back from browser storage are user-editable, so they are
-// checked before they reach a request - even one built through sap.ui.model.Filter.
+// -- Other input -- //
+
+// A well-formed Edm.Guid; keys from browser storage are user-editable, so they are checked first
 export function isGuid(sValue: string): boolean {
     return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sValue);
 }
 
-// A number the user typed, or null when it is none or lies outside the range. Callers decide what
-// an empty field means - for a filter it is "no bound", for a quantity it is a mistake.
+// A typed number within the range, or null; callers decide what an empty field means
 export function parseNumberInRange(v: unknown, nMin: number, nMax: number, bInteger = false): number | null {
     const sValue = asText(v).trim().replace(",", ".");
     // Number("") is 0, not NaN - without this an emptied quantity field would read as "zero units"

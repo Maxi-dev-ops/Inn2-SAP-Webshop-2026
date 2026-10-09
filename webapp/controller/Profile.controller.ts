@@ -8,13 +8,15 @@ import Constants from "../model/Constants";
  */
 export default class ProfileController extends BaseController {
 
+    // -- Lifecycle & routing -- //
+
     public onInit(): void {
         this._attachRoute(Constants.ROUTES.PROFILE, this._onRouteMatched.bind(this));
-        // Filled from start_up on every entry; empty until the first answer arrives
+        // Filled from start_up; empty until the first answer arrives
         this.setModel(new JSONModel({ name: "", initials: "", email: "", userId: "" }), "profileModel");
     }
 
-    // Reloads on every entry
+    // UserService caches the answer, so later entries cost no request
     private _onRouteMatched(): void {
         void UserService.load().then((oUser) => {
             if (!oUser) {return;}

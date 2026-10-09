@@ -49,7 +49,7 @@ export default class HomeController extends BaseController {
     // -- Lifecycle & routing -- //
 
     public onInit(): void {
-        // _loadRecentlyViewed() fills it once listsReady() is ready
+        // recentlyViewed stays empty until listsReady() has decided
         const oHomeModel = new JSONModel({
             categories: [],
             featured: [],
@@ -71,7 +71,7 @@ export default class HomeController extends BaseController {
         this._loadRecentlyViewed();
     }
 
-    // Waits for listsReady(): the list may still belong to the previous user and is about to be dropped 
+    // Waits for listsReady(): the list may still belong to the previous user
     private _loadRecentlyViewed(): void {
         void listsReady().then(() => {
             const aRecent = RecentlyViewedService.getAll();

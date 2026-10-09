@@ -154,8 +154,7 @@
 
                                 <!-- Collapsible item list -->
                                 <VBox visible="{orderHistoryModel>expanded}" class="rsOrderItemList">
-                                    <!-- Nested inside the order list: the template is cloned per order,
-                                         so it must say whether the framework may destroy it -->
+                                    <!-- Nested template, cloned per order: templateShareable must be set explicitly -->
                                     <List
                                         items="{
                                             path: 'orderHistoryModel>items',
@@ -196,8 +195,7 @@
                                                             }"
                                                             class="rsCartUnitLine"/>
                                                     </VBox>
-                                                    <!-- Only reachable with the details open; resolves
-                                                         the material to a catalog item on click -->
+                                                    <!-- Resolves the material to a catalog item on click -->
                                                     <Button
                                                         icon="sap-icon://show"
                                                         type="Transparent"

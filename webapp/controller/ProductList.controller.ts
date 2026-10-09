@@ -47,7 +47,7 @@ export default class ProductListController extends BaseController {
     private _searchTimer: ReturnType<typeof setTimeout> | undefined;
     // XML item template, captured so the product list can be rebound from scratch
     private _oProductTemplate: Control | undefined;
-    // Filter state the binding currently carries. Several controls ask the same list
+    // Filter key the binding currently carries, so an unchanged filter set does not rebind
     private _sAppliedFilter: string | undefined;
 
     // -- Lifecycle -- //
@@ -62,7 +62,7 @@ export default class ProductListController extends BaseController {
         });
         this.setModel(oCartDialogModel, "cartDialog");
 
-        // Show All filter before catalog request returns
+        // The "All" chip shows before the catalogs arrive
         const oViewModel = new JSONModel({ categoryChips: [{ uuid: "", title: this._getText("filterAll") }] });
         this.setModel(oViewModel, "plpView");
 
@@ -106,7 +106,7 @@ export default class ProductListController extends BaseController {
         this._rebindProducts();
     }
 
-    // binds the product grid from scratch with the current filters + sort order
+    // Binds the product grid from scratch with the current filters and sort order
     private _rebindProducts(): void {
         const oList = this.byId("productGrid") as List;
         if (!this._oProductTemplate) {
@@ -117,7 +117,7 @@ export default class ProductListController extends BaseController {
             }
         }
         if (!this._oProductTemplate) {
-            // resume what the XML declared
+            // No template: resume the binding the XML declared
             Log.error("Product list template missing - falling back to the declarative binding");
             (oList.getBinding("items") as ListBinding | undefined)?.resume();
             return;
@@ -326,9 +326,7 @@ export default class ProductListController extends BaseController {
         (this.byId("cbOnlyPriced") as CheckBox)?.setSelected(false);
         (this.byId("sortSelect") as Select)?.setSelectedKey("ProductName-asc");
 
-        // Clears the hash too, otherwise the next entry would filter by a catalog the user just
-        // reset away. When the hash was already bare the route does not fire, so _syncProducts()
-        // does the rebind; when it does fire, it is already done and the call below is a no-op.
+        // Clears the hash too; on an already bare hash the route does not fire, so rebind here
         this._navTo(Constants.ROUTES.PRODUCT_LIST, {}, true);
         this._syncProducts();
     }

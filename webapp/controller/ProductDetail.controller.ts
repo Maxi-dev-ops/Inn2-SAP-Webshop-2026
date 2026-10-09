@@ -45,6 +45,8 @@ export default class ProductDetailController extends BaseController {
 
     private _onRouteMatched(oEvent: Route$PatternMatchedEvent): void {
         (this.byId("pdpSearchField") as SearchField | undefined)?.setValue("");
+        // The view is reused for every product, so the quantity of the last one must not carry over
+        (this.byId("pdpQtyInput") as StepInput | undefined)?.setValue(Constants.UI.STEP_INPUT_MIN);
 
         const sUuid = (oEvent.getParameter("arguments") as { catalogItemUuid: string }).catalogItemUuid;
         const sPath = `/CatalogItem(guid'${sUuid}')`;

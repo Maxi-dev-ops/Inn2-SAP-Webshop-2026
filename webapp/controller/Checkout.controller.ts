@@ -9,16 +9,14 @@ import CartService, { CartHeaderFields, CartState, HeaderField } from "../model/
 import Constants from "../model/Constants";
 
 /**
- * Last step before the order: this page collects a customer reference, a remark and a deviating
- * delivery address. They are written before orderShoppingCart runs
+ * Last step before the order: customer reference, remark and a deviating delivery address
  *
  * @namespace com.sapwebshop2026.sapwebshop.controller
  */
 export default class CheckoutController extends BaseController {
     public readonly formatter = formatter;
 
-    // Pages the typed values survive. Moving between cart, checkout, wishlist and profile is part
-    // of placing the order; going to a product or the home page is leaving the order behind.
+    // Pages the typed values survive; any other page means the order was left behind
     private static readonly KEEP_ROUTES: readonly string[] = [
         Constants.ROUTES.CART, Constants.ROUTES.CHECKOUT,
         Constants.ROUTES.WISHLIST, Constants.ROUTES.PROFILE
@@ -35,9 +33,7 @@ export default class CheckoutController extends BaseController {
         this.setModel(new JSONModel(CheckoutController.emptyState()), Constants.MODELS.CHECKOUT);
         this._attachRoute(Constants.ROUTES.CHECKOUT, this._onRouteMatched.bind(this));
 
-        // Every route is watched, not just the one visited before the checkout: on a way like
-        // checkout -> home -> cart -> checkout the previous route alone would say "keep", so the
-        // form has to be dropped the moment a page outside the group is reached.
+        // Every route is watched, not just the previous one: a detour via home must drop the form too
         this._fnLeaveWatch = (oEvent: Router$RouteMatchedEvent): void => {
             if (!CheckoutController.KEEP_ROUTES.includes(oEvent.getParameter("name") ?? "")) {
                 this._resetForm();
@@ -81,7 +77,7 @@ export default class CheckoutController extends BaseController {
         };
     }
 
-    // Entering with an empty cart would offer an order that cannot go out, so the page bounces back to the cart
+    // Bounces back to the cart when there is nothing to order
     private _onRouteMatched(): void {
         const oCartModel = this._json(Constants.MODELS.CART);
         const pReady = this._hasOrderableCart(oCartModel)
@@ -97,8 +93,7 @@ export default class CheckoutController extends BaseController {
 
             const oModel = this._json(Constants.MODELS.CHECKOUT);
             const sCartUuid = String(oCartModel.getProperty("/cartUuid") ?? "");
-            // Rebuilt for a new cart and after _resetForm() emptied the cart UUID. Stepping back
-            // to the cart and returning keeps what was typed; that is a normal thing to do.
+            // Rebuilt only for a new cart or after _resetForm(); a step back to the cart keeps the input
             if (oModel.getProperty("/cartUuid") === sCartUuid) {return;}
 
             const oFields = CartService.trimHeaderFields(
@@ -219,7 +214,8 @@ export default class CheckoutController extends BaseController {
         oCartModel.setProperty("/cartUuid", "");
         oCartModel.setProperty("/headerFields", CartService.trimHeaderFields(null));
 
-        this._navTo(Constants.ROUTES.ORDER_CONFIRM);
+        // Replaces the checkout entry, so browser back from the confirmation goes straight to the cart
+        this._navTo(Constants.ROUTES.ORDER_CONFIRM, {}, true);
     }
 
     public onBackToCart(): void {

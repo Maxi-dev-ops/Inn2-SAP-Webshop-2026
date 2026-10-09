@@ -38,7 +38,7 @@ export default class Constants {
         SELECT_CATALOG: "CatalogUuid,Title,CatalogId",
         SELECT_CATALOG_ITEM_CARD: "CatalogItemUuid,ProductName,Material,NetPriceAmount,TransactionCurrency,ProductPictureUrl,CatalogUuid,addToShoppingCart_ac",
         SELECT_CART_HEADER: "ShoppingCartUuid,NetAmount,CurrencyCode,ApproverStatus,orderShoppingCart_ac,ExternalReference,Remark,DeliveryStreet,DeliveryCity,DeliveryPostalCode,DeliveryCountry",
-        SELECT_CART_ITEM: "ShoppingCartItemUuid,ShoppingCartUuid,ProductName,Material,NetPriceAmount,TransactionCurrency,ProductPictureUrl,Quantity",
+        SELECT_CART_ITEM: "ShoppingCartItemUuid,ShoppingCartUuid,ProductName,Material,NetPriceAmount,TransactionCurrency,ProductPictureUrl,Quantity,SalesContract",
         SELECT_ORDER: "ShoppingCartUuid,ShoppingCartId,NetAmount,CurrencyCode,ApproverStatus,CreationDateTime,orderShoppingCart_ac,to_ApproverStatus/DomainValue_Text"
     } as const;
 
@@ -47,7 +47,7 @@ export default class Constants {
         ORDERED: "5"
     } as const;
 
-    // List limits
+    // Max entries of the lists kept in browser storage
     public static readonly STORAGE = {
         RECENTLY_VIEWED_MAX: 6,
         WISHLIST_MAX: 50

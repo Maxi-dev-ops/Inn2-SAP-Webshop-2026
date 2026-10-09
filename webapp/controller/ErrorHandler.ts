@@ -32,7 +32,7 @@ export default class ErrorHandler {
         if (this._bMessageOpen) { return; }
         this._bMessageOpen = true;
 
-        // 401 and 403 are not a broken connection: the user simply has no authorization for the service 
+        // 401 and 403 mean missing authorization for the service, not a broken connection
         const sStatus = String(oEvent.getParameter("statusCode") ?? "");
         const bDenied = sStatus === "401" || sStatus === "403";
 

@@ -24,7 +24,7 @@ export function escHtml(s: string): string {
         .replace(/'/g, "&#39;");
 }
 
-// Builds a printable HTML datasheet for a product. The result is opened in a new window
+// Printable HTML datasheet of a product, opened in its own window
 export function buildDatasheetHtml(oData: DatasheetData, oLabels: DatasheetLabels): string {
     const sName = escHtml(oData.name);
     const sMat = escHtml(oData.material);

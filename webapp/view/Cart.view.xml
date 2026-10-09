@@ -91,6 +91,11 @@
                                 <VBox class="rsCartItemInfo">
                                     <Title text="{cartModel>name}" level="H5" wrapping="true"/>
                                     <Text text="{= ${i18n>articleNo} + ' ' + ${cartModel>material}}" class="sapUiTinyMarginTop"/>
+                                    <!-- Says where the price comes from; the catalog price can differ or be missing -->
+                                    <Text
+                                        text="{= ${i18n>salesContract} + ' ' + ${cartModel>salesContract}}"
+                                        visible="{= !!${cartModel>salesContract}}"
+                                        class="rsCartItemContract"/>
                                 </VBox>
 
                                 <HBox class="rsQtyBox" alignItems="Center" justifyContent="Center">

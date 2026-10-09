@@ -11,6 +11,8 @@ import Constants from "../model/Constants";
  */
 export default class App extends BaseController {
 
+    // -- Lifecycle -- //
+
     public onInit(): void {
         const oComponent = this.getOwnerComponent();
 

@@ -47,7 +47,6 @@ export default class CartController extends BaseController {
         const oItem = this._row(oEvent);
         if (!oItem || !this._cartService) {return;}
 
-        // addToShoppingCart call
         this._cartService.addUnit(oItem).catch((oErr: unknown) => {
             this._reportError(oErr, "addToCartError", "Cart addUnit failed");
         });
@@ -61,7 +60,7 @@ export default class CartController extends BaseController {
 
         const nWanted = parseNumberInRange(oInput.getValue(), 0, Constants.UI.STEP_INPUT_MAX, true);
         if (nWanted === null) {
-            // Put current value back
+            // Unusable input: show the current quantity again
             oInput.setValue(String(oItem.quantity));
             MessageToast.show(this._getText("qtyRangeInvalid", [Constants.UI.STEP_INPUT_MAX]));
             return;

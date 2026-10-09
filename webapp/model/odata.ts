@@ -1,9 +1,9 @@
 import ODataModel from "sap/ui/model/odata/v2/ODataModel";
 import Filter from "sap/ui/model/Filter";
 
-/**
- * The OData V2 model reports every call through callbacks, so the wrapping lives here once
- */
+// Promise wrappers for the callback-based OData V2 model
+
+// -- Errors -- //
 
 // Raw response body of an OData V2 error
 export function errText(oErr: unknown): string {
@@ -21,6 +21,8 @@ export function extractODataError(oErr: unknown, sFallback: string): string {
         return sResp.match(/<message[^>]*>([^<]+)<\/message>/i)?.[1] ?? sFallback;
     }
 }
+
+// -- Requests -- //
 
 // GET of a single entity or of an expanded structure
 export function readOnce<T>(

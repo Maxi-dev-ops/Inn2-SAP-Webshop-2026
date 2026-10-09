@@ -42,14 +42,16 @@ interface RawOrder {
     to_ApproverStatus?: { DomainValue_Text?: string };
 }
 
-//Reads submitted carts as the order history
+// Reads submitted carts as the order history
 export default class OrderService {
-    // anything beyond that is not fetched at all
+    // Newest carts read at most
     private static readonly MAX_ORDERS = 100;
     // Orders younger than this show right away
     private static readonly RECENT_MONTHS = 1;
-    // Orders older than this are deleted
+    // Orders older than this are not shown
     private static readonly MAX_AGE_MONTHS = 12;
+
+    // -- Backend reads -- //
 
     public static load(oComponent: UIComponent): Promise<Order[]> {
         const oModel = oComponent.getModel(Constants.MODELS.CART_SERVICE) as ODataModel | null;
@@ -84,6 +86,8 @@ export default class OrderService {
             currency: i.currency
         })));
     }
+
+    // -- Mapping -- //
 
     public static mapOrders(aRaw: RawOrder[], dNow = new Date()): Order[] {
         const aSubmitted = aRaw.filter((r) => r.orderShoppingCart_ac === false && !!r.ShoppingCartUuid);
@@ -129,13 +133,15 @@ export default class OrderService {
             .map((x) => x.order);
     }
 
+    // -- Date helpers -- //
+
     // Whole weeks between an order and now
     public static weeksAgo(nTime: number, dNow = new Date()): number {
         const nWeekMs = 7 * 24 * 60 * 60 * 1000;
         return Math.max(0, Math.floor((dNow.getTime() - nTime) / nWeekMs));
     }
 
-    // Groups the older list
+    // Month bucket the older orders are grouped by
     public static monthKey(nTime: number): number {
         const oDate = new Date(nTime);
         return new Date(oDate.getFullYear(), oDate.getMonth(), 1).getTime();
