@@ -15,6 +15,8 @@ server:
             - /resources
             - /test-resources
           url: https://ui5.sap.com
+          # Fixed patch: the CDN no longer has 1.102 (minUI5Version), the target runtime is tested with start-t4e
+          version: "1.136.23"
         backend:
           - path: /sap
             url: http://tld-vm-t4e.telekom.site:50000

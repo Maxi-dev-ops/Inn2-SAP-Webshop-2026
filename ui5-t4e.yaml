@@ -1,0 +1,61 @@
+# yaml-language-server: $schema=https://sap.github.io/ui5-tooling/schema/ui5.yaml.json
+
+specVersion: "4.0"
+metadata:
+  name: com.sapwebshop2026.sapwebshop
+type: application
+server:
+  # Own port: T4E sends its UI5 files with a 7-day cache, sharing 8080 with the CDN variants mixes versions
+  settings:
+    httpPort: 8090
+  customMiddleware:
+    - name: fiori-tools-proxy
+      afterMiddleware: compression
+      configuration:
+        ignoreCertErrors: false
+        backend:
+          - path: /resources
+            pathReplace: /sap/public/bc/ui5_ui5/resources
+            url: http://tld-vm-t4e.telekom.site:50000
+            client: '100'
+            destination: T4ECLNT100
+          - path: /test-resources
+            pathReplace: /sap/public/bc/ui5_ui5/test-resources
+            url: http://tld-vm-t4e.telekom.site:50000
+            client: '100'
+            destination: T4ECLNT100
+          - path: /sap
+            url: http://tld-vm-t4e.telekom.site:50000
+            client: '100'
+            destination: T4ECLNT100
+    - name: fiori-tools-appreload
+      afterMiddleware: compression
+      configuration:
+        port: 35729
+        path: webapp
+        delay: 300
+    - name: fiori-tools-preview
+      afterMiddleware: fiori-tools-appreload
+      configuration:
+        flp:
+          theme: sap_horizon
+    - name: ui5-tooling-transpile-middleware
+      afterMiddleware: compression
+      configuration:
+        debug: false
+        transformModulesToUI5:
+          overridesToOverride: true
+        excludePatterns:
+          - /Component-preload.js
+builder:
+  customTasks:
+    - name: ui5-tooling-transpile-task
+      afterTask: replaceVersion
+      configuration:
+        debug: false
+        transformModulesToUI5:
+          overridesToOverride: true
+  resources:
+    excludes:
+      - /test/**
+      - /localService/**
