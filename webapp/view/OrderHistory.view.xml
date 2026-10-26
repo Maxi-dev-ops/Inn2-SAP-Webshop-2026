@@ -45,6 +45,14 @@
 
                 <VBox class="rsCartItemsColumn sapUiMediumMarginEnd">
 
+                    <SearchField
+                        id="orderSearch"
+                        value="{orderHistoryModel>/query}"
+                        placeholder="{i18n>orderSearchPlaceholder}"
+                        liveChange="onSearchOrders"
+                        search="onSearchOrders"
+                        class="sapUiSmallMarginBottom"/>
+
                     <!-- Always visible, so it is clear which of the two lists is showing -->
                     <SegmentedButton
                         id="orderViewSwitch"
@@ -66,7 +74,7 @@
                     <!-- The other bucket has entries, this one does not -->
                     <Text
                         visible="{orderHistoryModel>/showEmpty}"
-                        text="{i18n>orderViewEmpty}"
+                        text="{= ${orderHistoryModel>/query} ? ${i18n>orderSearchNoMatch} : ${i18n>orderViewEmpty} }"
                         class="rsCheckoutHint sapUiSmallMarginBottom"/>
 
                     <!-- Order list; filter and grouping are set on the binding in the controller -->
@@ -89,6 +97,13 @@
                                             <core:Icon src="sap-icon://calendar" class="sapUiTinyMarginEnd rsOrderDateIcon"/>
                                             <Text text="{orderHistoryModel>date}" class="rsOrderDate"/>
                                         </HBox>
+                                        <HBox
+                                            visible="{= !!${orderHistoryModel>reference} }"
+                                            alignItems="Center"
+                                            class="sapUiTinyMarginTop">
+                                            <core:Icon src="sap-icon://tag" class="sapUiTinyMarginEnd rsOrderDateIcon"/>
+                                            <Text text="{orderHistoryModel>reference}" tooltip="{i18n>checkoutExternalReference}" class="rsOrderDate"/>
+                                        </HBox>
                                     </VBox>
                                     <ObjectStatus
                                         text="{
@@ -99,7 +114,10 @@
                                             formatter: '.formatOrderStatus'
                                         }"
                                         state="{
-                                            path: 'orderHistoryModel>status',
+                                            parts: [
+                                                { path: 'orderHistoryModel>status' },
+                                                { path: 'orderHistoryModel>statusCriticality' }
+                                            ],
                                             formatter: '.formatOrderStatusState'
                                         }"
                                         inverted="true"/>
@@ -154,6 +172,15 @@
 
                                 <!-- Collapsible item list -->
                                 <VBox visible="{orderHistoryModel>expanded}" class="rsOrderItemList">
+                                    <VBox visible="{= !!${orderHistoryModel>remark} || !!${orderHistoryModel>deliveryAddress} }" class="rsOrderExtra">
+                                        <Text
+                                            visible="{= !!${orderHistoryModel>remark} }"
+                                            text="{= ${i18n>checkoutRemark} + ': ' + ${orderHistoryModel>remark} }"/>
+                                        <Text
+                                            visible="{= !!${orderHistoryModel>deliveryAddress} }"
+                                            text="{= ${i18n>checkoutDeliveryTitle} + ': ' + ${orderHistoryModel>deliveryAddress} }"
+                                            class="sapUiTinyMarginTop"/>
+                                    </VBox>
                                     <!-- Nested template, cloned per order: templateShareable must be set explicitly -->
                                     <List
                                         items="{

@@ -23,6 +23,14 @@ export interface Order {
     // '1' is open, '5' is ordered
     status: string;
     statusText: string;
+    // Backend's colour for the status: 1 negative, 2 critical, 3 positive, 0 or missing neutral
+    statusCriticality: number;
+    // Customer reference, remark and deviating delivery address as entered at checkout
+    reference: string;
+    remark: string;
+    deliveryAddress: string;
+    // False while a search hides this order
+    match: boolean;
     itemCount: number;
     totalAmount: number;
     currency: string;
@@ -37,8 +45,15 @@ interface RawOrder {
     NetAmount?: string;
     CurrencyCode?: string;
     ApproverStatus?: string;
+    ApproverStatusCriticality?: number | string;
     CreationDateTime?: Date | string;
     orderShoppingCart_ac?: boolean;
+    ExternalReference?: string;
+    Remark?: string;
+    DeliveryStreet?: string;
+    DeliveryPostalCode?: string;
+    DeliveryCity?: string;
+    DeliveryCountry?: string;
     to_ApproverStatus?: { DomainValue_Text?: string };
 }
 
@@ -104,6 +119,11 @@ export default class OrderService {
                 date: OrderService.formatDate(r.CreationDateTime),
                 status: r.ApproverStatus ?? "",
                 statusText: (r.to_ApproverStatus?.DomainValue_Text ?? "").trim(),
+                statusCriticality: CartService.toNum(r.ApproverStatusCriticality),
+                reference: (r.ExternalReference ?? "").trim(),
+                remark: (r.Remark ?? "").trim(),
+                deliveryAddress: OrderService.formatAddress(r),
+                match: true,
                 itemCount: 0,
                 totalAmount: CartService.toNum(r.NetAmount),
                 currency: r.CurrencyCode ?? "EUR",
@@ -131,6 +151,31 @@ export default class OrderService {
             })
             .filter((x) => x.time >= nOldest)
             .map((x) => x.order);
+    }
+
+    // One line out of the delivery fields; empty when no deviating address was given
+    public static formatAddress(r: RawOrder): string {
+        const sTown = [r.DeliveryPostalCode, r.DeliveryCity].map((s) => (s ?? "").trim()).filter(Boolean).join(" ");
+        return [r.DeliveryStreet, sTown, r.DeliveryCountry].map((s) => (s ?? "").trim()).filter(Boolean).join(", ");
+    }
+
+    // -- Status & search -- //
+
+    // ValueState of the status badge; the backend's criticality wins, the status code is the fallback
+    public static statusState(sStatus: string, nCriticality: number | null | undefined): string {
+        switch (nCriticality) {
+            case 1: return "Error";
+            case 2: return "Warning";
+            case 3: return "Success";
+            default: return sStatus === Constants.ORDER_STATUS.ORDERED ? "Success" : "Information";
+        }
+    }
+
+    // Case-insensitive match on customer reference or order number; an empty query matches all
+    public static matchesQuery(oOrder: Pick<Order, "reference" | "orderId">, sQuery: string): boolean {
+        const sNeedle = sQuery.trim().toLowerCase();
+        if (!sNeedle) {return true;}
+        return oOrder.reference.toLowerCase().includes(sNeedle) || oOrder.orderId.toLowerCase().includes(sNeedle);
     }
 
     // -- Date helpers -- //

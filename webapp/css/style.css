@@ -583,6 +583,9 @@ body > div { height: 100% !important; overflow: hidden !important; }
 .rsOrderToggleBtn.sapMBtn .sapMBtnInner { color: var(--rs-color-primary) !important; font-size: 0.85rem !important; padding-left: 0 !important; }
 .rsOrderItemList { border-top: 1px solid var(--rs-color-separator); padding-top: 12px; margin-top: 4px; }
 .rsOrderItem { padding: 8px 0; border-bottom: 1px solid #f8f9fa; }
+/* Remark and delivery address above the positions */
+.rsOrderExtra { padding-bottom: 8px; border-bottom: 1px solid #f8f9fa; }
+.rsOrderExtra .sapMText { color: var(--rs-color-text-medium) !important; font-size: 0.85rem !important; }
 .rsOrderItemList .sapMLIB:last-child .rsOrderItem { border-bottom: none; }
 .rsOrderItemInfo { min-width: 0; flex: 1 1 auto; margin-right: 12px; }
 .rsOrderItemName.sapMText { font-weight: 500 !important; color: var(--rs-color-text-medium) !important; }

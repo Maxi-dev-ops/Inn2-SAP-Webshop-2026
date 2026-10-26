@@ -39,7 +39,8 @@ export default class Constants {
         SELECT_CATALOG_ITEM_CARD: "CatalogItemUuid,ProductName,Material,NetPriceAmount,TransactionCurrency,ProductPictureUrl,CatalogUuid,addToShoppingCart_ac",
         SELECT_CART_HEADER: "ShoppingCartUuid,NetAmount,CurrencyCode,ApproverStatus,orderShoppingCart_ac,ExternalReference,Remark,DeliveryStreet,DeliveryCity,DeliveryPostalCode,DeliveryCountry",
         SELECT_CART_ITEM: "ShoppingCartItemUuid,ShoppingCartUuid,ProductName,Material,NetPriceAmount,TransactionCurrency,ProductPictureUrl,Quantity,SalesContract",
-        SELECT_ORDER: "ShoppingCartUuid,ShoppingCartId,NetAmount,CurrencyCode,ApproverStatus,CreationDateTime,orderShoppingCart_ac,to_ApproverStatus/DomainValue_Text"
+        SELECT_ORDER: "ShoppingCartUuid,ShoppingCartId,NetAmount,CurrencyCode,ApproverStatus,ApproverStatusCriticality,CreationDateTime,orderShoppingCart_ac,"
+            + "ExternalReference,Remark,DeliveryStreet,DeliveryPostalCode,DeliveryCity,DeliveryCountry,to_ApproverStatus/DomainValue_Text"
     } as const;
 
     // Cart approval status

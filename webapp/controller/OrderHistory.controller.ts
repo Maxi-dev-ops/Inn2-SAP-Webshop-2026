@@ -6,6 +6,7 @@ import Log from "sap/base/Log";
 import Event from "sap/ui/base/Event";
 import Control from "sap/ui/core/Control";
 import List from "sap/m/List";
+import SearchField from "sap/m/SearchField";
 import { type SegmentedButton$SelectionChangeEvent } from "sap/m/SegmentedButton";
 import ListBinding from "sap/ui/model/ListBinding";
 import Context from "sap/ui/model/Context";
@@ -46,6 +47,8 @@ export default class OrderHistoryController extends BaseController {
             // "recent" or "older"
             view: OrderHistoryController.VIEW_RECENT,
             recentCount: 0, olderCount: 0,
+            // Search over customer reference & order number
+            query: "",
             reordering: false, reorderText: ""
         }), OrderHistoryController.MODEL);
     }
@@ -68,6 +71,7 @@ export default class OrderHistoryController extends BaseController {
 
     private _setOrders(aOrders: Order[]): void {
         const oModel = this._model();
+        this._markMatches(aOrders);
         oModel.setProperty("/orders", aOrders);
         oModel.setProperty("/loading", false);
         this._setVisibility(oModel);
@@ -80,7 +84,7 @@ export default class OrderHistoryController extends BaseController {
         const aOrders = (oModel.getProperty("/orders") as Order[] | undefined) ?? [];
         const nOlder = aOrders.filter((o) => o.older).length;
         const bOlderView = oModel.getProperty("/view") === OrderHistoryController.VIEW_OLDER;
-        const nVisible = bOlderView ? nOlder : aOrders.length - nOlder;
+        const nVisible = aOrders.filter((o) => o.match && o.older === bOlderView).length;
 
         oModel.setProperty("/recentCount", aOrders.length - nOlder);
         oModel.setProperty("/olderCount", nOlder);
@@ -102,7 +106,11 @@ export default class OrderHistoryController extends BaseController {
         if (this._appliedView === sView) {return;}
         this._appliedView = sView;
 
-        oBinding.filter([new Filter("older", FilterOperator.EQ, bOlder)]);
+        // match is kept up to date by the search, so this filter never has to change for it
+        oBinding.filter([new Filter({
+            filters: [new Filter("older", FilterOperator.EQ, bOlder), new Filter("match", FilterOperator.EQ, true)],
+            and: true
+        })]);
         oBinding.sort([new Sorter("time", true, (oContext: Context) => this._groupHeader(oContext, bOlder))]);
     }
 
@@ -151,6 +159,22 @@ export default class OrderHistoryController extends BaseController {
         this._setVisibility(oModel);
         oModel.refresh(true);
         this._applyView();
+    }
+
+    // -- Search -- //
+
+    // Bound to liveChange and search, so typing and the clear button both land here
+    public onSearchOrders(oEvent: Event<object, SearchField>): void {
+        const oModel = this._model();
+        oModel.setProperty("/query", oEvent.getSource().getValue());
+        this._markMatches((oModel.getProperty("/orders") as Order[] | undefined) ?? []);
+        this._setVisibility(oModel);
+        oModel.refresh(true);
+    }
+
+    private _markMatches(aOrders: Order[]): void {
+        const sQuery = String(this._model().getProperty("/query") ?? "");
+        aOrders.forEach((o) => { o.match = OrderService.matchesQuery(o, sQuery); });
     }
 
     // -- Order details -- //
@@ -274,8 +298,8 @@ export default class OrderHistoryController extends BaseController {
         return sStatusText || sStatus || "";
     }
 
-    public formatOrderStatusState(sStatus: string): string {
-        return sStatus === Constants.ORDER_STATUS.ORDERED ? "Success" : "Information";
+    public formatOrderStatusState(sStatus: string, nCriticality: number): string {
+        return OrderService.statusState(sStatus, nCriticality);
     }
 
     public formatToggleText(bExpanded: boolean): string {
