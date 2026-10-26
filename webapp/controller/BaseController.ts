@@ -2,8 +2,6 @@ import Controller from "sap/ui/core/mvc/Controller";
 import UIComponent from "sap/ui/core/UIComponent";
 import Model from "sap/ui/model/Model";
 import History from "sap/ui/core/routing/History";
-import InvisibleMessage from "sap/ui/core/InvisibleMessage";
-import { InvisibleMessageMode } from "sap/ui/core/library";
 import Event from "sap/ui/base/Event";
 import Control from "sap/ui/core/Control";
 import Button from "sap/m/Button";
@@ -106,9 +104,8 @@ export default class BaseController extends Controller {
         oCartService.addToCart(oProduct, nUnits, (nDone) => { fnBusy(true, progress(nDone)); }).then(() => {
             fnBusy(false, "");
             fnDone?.();
-            const sMsg = this._getText("addedToCart", [oProduct.ProductName]);
-            MessageToast.show(sMsg);
-            InvisibleMessage.getInstance().announce(sMsg, InvisibleMessageMode.Polite);
+            // MessageToast renders with role="alert", screen readers announce it on their own
+            MessageToast.show(this._getText("addedToCart", [oProduct.ProductName]));
         }, (oErr: unknown) => {
             fnBusy(false, "");
             this._reportError(oErr, "addToCartError", "addToShoppingCart error");

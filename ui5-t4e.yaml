@@ -19,11 +19,7 @@ server:
             url: http://tld-vm-t4e.telekom.site:50000
             client: '100'
             destination: T4ECLNT100
-          - path: /test-resources
-            pathReplace: /sap/public/bc/ui5_ui5/test-resources
-            url: http://tld-vm-t4e.telekom.site:50000
-            client: '100'
-            destination: T4ECLNT100
+          # No /test-resources here: T4E ships none, the FLP sandbox bootstrap comes from the devDependency @sapui5/sap.ushell
           - path: /sap
             url: http://tld-vm-t4e.telekom.site:50000
             client: '100'
@@ -39,6 +35,10 @@ server:
       configuration:
         flp:
           theme: sap_horizon
+          # Same intent as the inbound in manifest.json, so test/flp.html#ZWebshop-display opens the app like the T4E launchpad
+          intent:
+            object: ZWebshop
+            action: display
     - name: ui5-tooling-transpile-middleware
       afterMiddleware: compression
       configuration:

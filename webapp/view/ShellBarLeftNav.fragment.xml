@@ -6,6 +6,7 @@
         type="Transparent"
         tooltip="{i18n>back}"
         press="onNavBack"
+        visible="{= !${config>/inLaunchpad} }"
         class="rsShellBtn"/>
     <Button
         icon="sap-icon://home"

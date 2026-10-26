@@ -1,6 +1,8 @@
 import BaseController from "./BaseController";
 import JSONModel from "sap/ui/model/json/JSONModel";
 import MessageToast from "sap/m/MessageToast";
+import InvisibleMessage from "sap/ui/core/InvisibleMessage";
+import { InvisibleMessageMode } from "sap/ui/core/library";
 import Event from "sap/ui/base/Event";
 import Input from "sap/m/Input";
 import formatter from "../model/formatter";
@@ -47,7 +49,7 @@ export default class CartController extends BaseController {
         const oItem = this._rowFromEvent(oEvent);
         if (!oItem || !this._cartService) {return;}
 
-        this._cartService.addUnit(oItem).catch((oErr: unknown) => {
+        this._cartService.addUnit(oItem).then(() => { this._announceQuantity(oItem); }, (oErr: unknown) => {
             this._reportError(oErr, "addToCartError", "Cart addUnit failed");
         });
     }
@@ -66,7 +68,7 @@ export default class CartController extends BaseController {
             return;
         }
 
-        this._cartService.setQuantity(oItem, nWanted).catch((oErr: unknown) => {
+        this._cartService.setQuantity(oItem, nWanted).then(() => { this._announceQuantity(oItem); }, (oErr: unknown) => {
             this._reportError(oErr, "addToCartError", "Cart setQuantity failed");
         });
     }
@@ -74,7 +76,7 @@ export default class CartController extends BaseController {
     public onDecreaseQty(oEvent: Event): void {
         const oItem = this._rowFromEvent(oEvent);
         if (!oItem) {return;}
-        this._removeUnits(oItem, 1);
+        this._removeUnits(oItem, 1, () => { this._announceQuantity(oItem); });
     }
 
     public onRemoveItem(oEvent: Event): void {
@@ -85,10 +87,20 @@ export default class CartController extends BaseController {
     }
 
     // Without nUnits the whole row goes; syncFromBackend() restores the row if the backend refuses
-    private _removeUnits(oItem: CartItem, nUnits?: number): void {
-        this._cartService?.removeUnits(oItem, nUnits).catch((oErr: unknown) => {
+    private _removeUnits(oItem: CartItem, nUnits?: number, fnDone?: () => void): void {
+        this._cartService?.removeUnits(oItem, nUnits).then(fnDone, (oErr: unknown) => {
             this._reportError(oErr, "removeItemError", "Cart item DELETE failed");
         });
+    }
+
+    // Quantity changes show no toast, so screen readers hear the new quantity from here
+    private _announceQuantity(oItem: CartItem): void {
+        const sKey = CartService.productMatchKey(oItem);
+        const oRow = this._cartService?.getItems().find((i) => CartService.productMatchKey(i) === sKey);
+        const sText = oRow
+            ? this._getText("cartQtyChanged", [oItem.name, oRow.quantity])
+            : this._getText("itemRemoved", [oItem.name]);
+        InvisibleMessage.getInstance().announce(sText, InvisibleMessageMode.Polite);
     }
 
     // -- Checkout -- //

@@ -52,6 +52,21 @@
           "localUri": "localService/cartService/ZINN2_UI_MY_SHOP_CART_O2_VAN.xml"
         }
       }
+    },
+    "crossNavigation": {
+      "inbounds": {
+        "ZWebshop-display": {
+          "semanticObject": "ZWebshop",
+          "action": "display",
+          "title": "{{appTitle}}",
+          "subTitle": "{{appDescription}}",
+          "icon": "sap-icon://cart",
+          "signature": {
+            "parameters": {},
+            "additionalParameters": "allowed"
+          }
+        }
+      }
     }
   },
   "sap.ui": {
