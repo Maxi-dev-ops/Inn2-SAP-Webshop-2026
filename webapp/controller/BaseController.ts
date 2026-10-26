@@ -42,7 +42,7 @@ export default class BaseController extends Controller {
     }
 
     // A named JSON model, typed; finds view models and the component models UI5 passes down alike
-    protected _json(sName: string): JSONModel {
+    protected _jsonModel(sName: string): JSONModel {
         return this.getModel(sName) as JSONModel;
     }
 
@@ -99,7 +99,7 @@ export default class BaseController extends Controller {
         fnBusy: (bBusy: boolean, sProgress: string) => void,
         fnDone?: () => void
     ): void {
-        const nUnits = CartService.units(nQuantity);
+        const nUnits = CartService.clampUnits(nQuantity);
         const progress = (nDone: number): string => this._getText("addProgress", [nDone, nUnits]);
 
         fnBusy(true, progress(0));
@@ -119,7 +119,7 @@ export default class BaseController extends Controller {
 
     // Keeps the shell badge in step with the stored wishlist
     protected _refreshWishlistCount(): void {
-        const oWishlistModel = this._json(Constants.MODELS.WISHLIST);
+        const oWishlistModel = this._jsonModel(Constants.MODELS.WISHLIST);
         oWishlistModel.setProperty("/count", WishlistService.getAll().length);
         oWishlistModel.refresh(true);
     }

@@ -40,7 +40,7 @@ export default class WishlistController extends BaseController {
     }
 
     private _setItems(aItems: WishlistItem[]): void {
-        const oModel = this._json("wishlistView");
+        const oModel = this._jsonModel("wishlistView");
         oModel.setProperty("/items", aItems);
         oModel.setProperty("/count", aItems.length);
         oModel.setProperty("/showEmpty", aItems.length === 0);
@@ -48,14 +48,14 @@ export default class WishlistController extends BaseController {
         oModel.refresh(true);
     }
 
-    private _row(oEvent: Event): WishlistItem | undefined {
+    private _rowFromEvent(oEvent: Event): WishlistItem | undefined {
         return this._ctxObject<WishlistItem>(oEvent, "wishlistView");
     }
 
     // -- Event handlers -- //
 
     public onProductPress(oEvent: Event): void {
-        const oItem = this._row(oEvent);
+        const oItem = this._rowFromEvent(oEvent);
         if (!oItem) {return;}
         this._navTo(Constants.ROUTES.PRODUCT_DETAIL, { catalogItemUuid: oItem.uuid });
     }
@@ -65,7 +65,7 @@ export default class WishlistController extends BaseController {
     }
 
     public onRemoveFromWishlist(oEvent: Event): void {
-        const oItem = this._row(oEvent);
+        const oItem = this._rowFromEvent(oEvent);
         if (!oItem) {return;}
 
         WishlistService.toggle(oItem);
@@ -75,7 +75,7 @@ export default class WishlistController extends BaseController {
     }
 
     public onAddToCartFromWishlist(oEvent: Event<object, Button>): void {
-        const oItem = this._row(oEvent);
+        const oItem = this._rowFromEvent(oEvent);
         if (!oItem || !this._cartService) {return;}
 
         const oBtn = oEvent.getSource();

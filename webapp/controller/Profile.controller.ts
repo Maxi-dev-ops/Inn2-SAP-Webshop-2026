@@ -20,7 +20,7 @@ export default class ProfileController extends BaseController {
     private _onRouteMatched(): void {
         void UserService.load().then((oUser) => {
             if (!oUser) {return;}
-            const oProfile = this._json("profileModel");
+            const oProfile = this._jsonModel("profileModel");
             oProfile.setProperty("/name", oUser.fullName);
             oProfile.setProperty("/initials", oUser.initials);
             oProfile.setProperty("/userId", oUser.id);

@@ -107,7 +107,7 @@ export default class ProductDetailController extends BaseController {
 
     private _checkBundleItems(sPath: string): void {
         const oModel = this.getOwnerComponent().getModel() as ODataModel;
-        const oDetailModel: JSONModel | undefined = this._json(Constants.MODELS.DETAIL);
+        const oDetailModel: JSONModel | undefined = this._jsonModel(Constants.MODELS.DETAIL);
         if (!oDetailModel) { return; }
         const aBundleItems = oModel.getProperty(`${sPath}/to_BundleItem`) as unknown[] | undefined;
         oDetailModel.setProperty("/hasBundleItems", Array.isArray(aBundleItems) && aBundleItems.length > 0);
@@ -136,7 +136,7 @@ export default class ProductDetailController extends BaseController {
             uuid: oData.CatalogItemUuid,
             name: oData.ProductName,
             material: oData.Material,
-            price: CartService.toNum(oData.NetPriceAmount),
+            price: CartService.toNumber(oData.NetPriceAmount),
             currency: oData.TransactionCurrency,
             pictureUrl: oData.ProductPictureUrl
         };
@@ -151,7 +151,7 @@ export default class ProductDetailController extends BaseController {
 
         const oData = oCtx.getObject() as CatalogProduct;
         const oQtyInput = this.byId("pdpQtyInput") as StepInput | undefined;
-        const oDetail = this._json(Constants.MODELS.DETAIL);
+        const oDetail = this._jsonModel(Constants.MODELS.DETAIL);
 
         // A busy overlay would hide the progress, so the controls only get locked
         this._addToCart(
@@ -186,7 +186,7 @@ export default class ProductDetailController extends BaseController {
             {
                 name: oData.ProductName ?? "–",
                 material: oData.Material ?? "–",
-                priceText: formatter.formatPrice(CartService.toNum(oData.NetPriceAmount), oData.TransactionCurrency ?? "EUR"),
+                priceText: formatter.formatPrice(CartService.toNumber(oData.NetPriceAmount), oData.TransactionCurrency ?? "EUR"),
                 description: oData.ProductSalesDescription ?? "",
                 pictureUrl: oData.ProductPictureUrl ?? ""
             },

@@ -53,7 +53,7 @@ export default class CheckoutController extends BaseController {
 
     // Empties the form; the next visit prefills it from the cart header again
     private _resetForm(): void {
-        const oModel = this._json(Constants.MODELS.CHECKOUT);
+        const oModel = this._jsonModel(Constants.MODELS.CHECKOUT);
         oModel.setData(CheckoutController.emptyState());
         oModel.refresh(true);
     }
@@ -79,10 +79,10 @@ export default class CheckoutController extends BaseController {
 
     // Bounces back to the cart when there is nothing to order
     private _onRouteMatched(): void {
-        const oCartModel = this._json(Constants.MODELS.CART);
+        const oCartModel = this._jsonModel(Constants.MODELS.CART);
         const pReady = this._hasOrderableCart(oCartModel)
             ? Promise.resolve()
-            : (this._cartService?.sync() ?? Promise.resolve());
+            : (this._cartService?.syncFromBackend() ?? Promise.resolve());
 
         void pReady.then(() => {
             if (!this._hasOrderableCart(oCartModel)) {
@@ -91,7 +91,7 @@ export default class CheckoutController extends BaseController {
                 return;
             }
 
-            const oModel = this._json(Constants.MODELS.CHECKOUT);
+            const oModel = this._jsonModel(Constants.MODELS.CHECKOUT);
             const sCartUuid = String(oCartModel.getProperty("/cartUuid") ?? "");
             // Rebuilt only for a new cart or after _resetForm(); a step back to the cart keeps the input
             if (oModel.getProperty("/cartUuid") === sCartUuid) {return;}
@@ -132,16 +132,16 @@ export default class CheckoutController extends BaseController {
     }
 
     private _clearFieldStates(): void {
-        const oModel = this._json(Constants.MODELS.CHECKOUT);
+        const oModel = this._jsonModel(Constants.MODELS.CHECKOUT);
         for (const sKey of CartService.headerFieldNames()) {
             oModel.setProperty(`/states/${sKey}`, "None");
             oModel.setProperty(`/stateTexts/${sKey}`, "");
         }
     }
 
-    // Validates the input in the checkout page
-    private _validate(): boolean {
-        const oModel = this._json(Constants.MODELS.CHECKOUT);
+    // Marks every field that blocks the order; true when none does
+    private _validateForm(): boolean {
+        const oModel = this._jsonModel(Constants.MODELS.CHECKOUT);
         this._clearFieldStates();
 
         const oErrors = CartService.validateHeader(
@@ -162,16 +162,16 @@ export default class CheckoutController extends BaseController {
     // -- Order -- //
 
     public onOrder(): void {
-        if (!this._validate()) {return;}
+        if (!this._validateForm()) {return;}
 
-        const oCartModel = this._json(Constants.MODELS.CART);
+        const oCartModel = this._jsonModel(Constants.MODELS.CART);
         const sCartUuid = String(oCartModel.getProperty("/cartUuid") ?? "");
         if (!this._cartService || !sCartUuid) {
             MessageToast.show(this._getText("orderNoCart"));
             return;
         }
 
-        const oModel = this._json(Constants.MODELS.CHECKOUT);
+        const oModel = this._jsonModel(Constants.MODELS.CHECKOUT);
         const oFields = oModel.getProperty("/fields") as CartHeaderFields;
         // An unchecked box must not leave an old address on the cart from an earlier visit
         const oPayload = oModel.getProperty("/deviatingAddress") === true
@@ -182,7 +182,7 @@ export default class CheckoutController extends BaseController {
 
         // The header has to be on the cart before it is ordered
         this._cartService.saveHeader(sCartUuid, oPayload)
-            .then(() => this._cartService!.order(sCartUuid))
+            .then(() => this._cartService!.placeOrder(sCartUuid))
             .then(() => {
                 oModel.setProperty("/busy", false);
                 this._onOrdered(oCartModel, sCartUuid, oPayload);
@@ -198,7 +198,7 @@ export default class CheckoutController extends BaseController {
         MessageToast.show(this._getText("orderSubmitted"));
 
         const oTotals = CartService.calcTotals(oCartModel.getData() as CartState);
-        const oOrderConfirm = this._json(Constants.MODELS.ORDER_CONFIRM);
+        const oOrderConfirm = this._jsonModel(Constants.MODELS.ORDER_CONFIRM);
         oOrderConfirm.setData({
             orderUuid: sCartUuid,
             submittedAt: DateFormat.getDateTimeInstance({ style: "medium" }).format(new Date()),

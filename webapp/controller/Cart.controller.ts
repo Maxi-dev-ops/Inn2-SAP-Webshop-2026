@@ -26,17 +26,17 @@ export default class CartController extends BaseController {
     // -- Loading (cart items + header) -- //
 
     private _onRouteMatched(): void {
-        const oModel = this._json(Constants.MODELS.CART);
+        const oModel = this._jsonModel(Constants.MODELS.CART);
         const bHasItems = ((oModel.getProperty("/items") as CartItem[] | undefined) ?? []).length > 0;
 
         // Keep the current list visible while the backend answers
         oModel.setProperty("/loading", !bHasItems);
         CartService.updateVisibility(oModel);
 
-        void this._cartService?.sync();
+        void this._cartService?.syncFromBackend();
     }
 
-    private _row(oEvent: Event): CartItem | undefined {
+    private _rowFromEvent(oEvent: Event): CartItem | undefined {
         return this._ctxObject<CartItem>(oEvent, Constants.MODELS.CART);
     }
 
@@ -44,7 +44,7 @@ export default class CartController extends BaseController {
 
     // One more unit means one more backend position
     public onIncreaseQty(oEvent: Event): void {
-        const oItem = this._row(oEvent);
+        const oItem = this._rowFromEvent(oEvent);
         if (!oItem || !this._cartService) {return;}
 
         this._cartService.addUnit(oItem).catch((oErr: unknown) => {
@@ -55,7 +55,7 @@ export default class CartController extends BaseController {
     // Second way to change the amount
     public onQuantityInput(oEvent: Event<object, Input>): void {
         const oInput = oEvent.getSource();
-        const oItem = this._row(oEvent);
+        const oItem = this._rowFromEvent(oEvent);
         if (!oItem || !this._cartService) {return;}
 
         const nWanted = parseNumberInRange(oInput.getValue(), 0, Constants.UI.STEP_INPUT_MAX, true);
@@ -72,19 +72,19 @@ export default class CartController extends BaseController {
     }
 
     public onDecreaseQty(oEvent: Event): void {
-        const oItem = this._row(oEvent);
+        const oItem = this._rowFromEvent(oEvent);
         if (!oItem) {return;}
         this._removeUnits(oItem, 1);
     }
 
     public onRemoveItem(oEvent: Event): void {
-        const oItem = this._row(oEvent);
+        const oItem = this._rowFromEvent(oEvent);
         if (!oItem) {return;}
         this._removeUnits(oItem);
         MessageToast.show(this._getText("itemRemoved", [oItem.name]));
     }
 
-    // Without nUnits the whole row goes; sync() in the CartService restores the row if the backend refuses
+    // Without nUnits the whole row goes; syncFromBackend() restores the row if the backend refuses
     private _removeUnits(oItem: CartItem, nUnits?: number): void {
         this._cartService?.removeUnits(oItem, nUnits).catch((oErr: unknown) => {
             this._reportError(oErr, "removeItemError", "Cart item DELETE failed");
@@ -95,7 +95,7 @@ export default class CartController extends BaseController {
 
     // The checkout page collects header fields first and places the order
     public onCheckout(): void {
-        const oCartModel: JSONModel = this._json(Constants.MODELS.CART);
+        const oCartModel: JSONModel = this._jsonModel(Constants.MODELS.CART);
         if (!String(oCartModel.getProperty("/cartUuid") ?? "")) {
             MessageToast.show(this._getText("orderNoCart"));
             return;

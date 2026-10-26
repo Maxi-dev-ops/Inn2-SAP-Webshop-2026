@@ -183,13 +183,13 @@ export default class CartService {
     }
 
     // Safe float conversion (OData V2 delivers Edm.Decimal as string)
-    public static toNum(v: unknown): number {
+    public static toNumber(v: unknown): number {
         const n = parseFloat(asText(v));
         return isNaN(n) ? 0 : n;
     }
 
     // Positions are keyed by ShoppingCartItemUuid, optimistic rows by CatalogItemUuid; only Material matches both
-    public static matchKey(oItem: { material?: string; uuid?: string }): string {
+    public static productMatchKey(oItem: { material?: string; uuid?: string }): string {
         const sMaterial = (oItem.material ?? "").trim().toUpperCase().replace(/^0+/, "");
         return sMaterial || (oItem.uuid ?? "");
     }
@@ -204,10 +204,10 @@ export default class CartService {
                 pending: false,
                 name: asText(r.ProductName),
                 material: asText(r.Material),
-                price: CartService.toNum(r.NetPriceAmount),
+                price: CartService.toNumber(r.NetPriceAmount),
                 currency: asText(r.TransactionCurrency) || "EUR",
                 pictureUrl: asText(r.ProductPictureUrl),
-                quantity: Math.max(1, Math.round(CartService.toNum(r.Quantity))),
+                quantity: Math.max(1, Math.round(CartService.toNumber(r.Quantity))),
                 salesContract: asText(r.SalesContract)
             };
         });
@@ -217,7 +217,7 @@ export default class CartService {
     public static groupItems(aPositions: CartItem[]): CartItem[] {
         const mRows = new Map<string, CartItem>();
         for (const oPos of aPositions) {
-            const sKey = CartService.matchKey(oPos);
+            const sKey = CartService.productMatchKey(oPos);
             const oRow = mRows.get(sKey);
             if (!oRow) {
                 mRows.set(sKey, { ...oPos, cartItemUuids: [...oPos.cartItemUuids] });
@@ -240,11 +240,11 @@ export default class CartService {
     public static mergeItems(aBackend: CartItem[], aLocal: CartItem[]): CartItem[] {
         const mLocal = new Map<string, CartItem>();
         for (const oLocal of aLocal) {
-            mLocal.set(CartService.matchKey(oLocal), oLocal);
+            mLocal.set(CartService.productMatchKey(oLocal), oLocal);
         }
 
         const aMerged = aBackend.map((oBackend) => {
-            const sKey = CartService.matchKey(oBackend);
+            const sKey = CartService.productMatchKey(oBackend);
             const oLocal = mLocal.get(sKey);
             mLocal.delete(sKey);
             if (!oLocal) {return oBackend;}
@@ -275,10 +275,10 @@ export default class CartService {
     public static calcTotals(oCart: CartState | null | undefined): CartTotals {
         const aItems = oCart?.items ?? [];
         const units = (aList: CartItem[]): number => aList.reduce((s, i) => s + Math.max(1, i.quantity ?? 1), 0);
-        const aPriced = aItems.filter((i) => CartService.toNum(i.price) > 0);
-        const aUnpriced = aItems.filter((i) => CartService.toNum(i.price) <= 0);
+        const aPriced = aItems.filter((i) => CartService.toNumber(i.price) > 0);
+        const aUnpriced = aItems.filter((i) => CartService.toNumber(i.price) <= 0);
 
-        const nBackendAmount = CartService.toNum(oCart?.totalAmount);
+        const nBackendAmount = CartService.toNumber(oCart?.totalAmount);
         const bFromBackend = nBackendAmount > 0;
 
         return {
@@ -288,7 +288,7 @@ export default class CartService {
             unpricedCount: units(aUnpriced),
             amount: bFromBackend
                 ? nBackendAmount
-                : aPriced.reduce((s, i) => s + CartService.toNum(i.price) * Math.max(1, i.quantity ?? 1), 0),
+                : aPriced.reduce((s, i) => s + CartService.toNumber(i.price) * Math.max(1, i.quantity ?? 1), 0),
             currency: (bFromBackend ? oCart?.totalCurrency : aPriced[0]?.currency) || "EUR",
             fromBackend: bFromBackend
         };
@@ -336,7 +336,7 @@ export default class CartService {
         return oCleared;
     }
 
-    // Writes the header fields onto the open cart; must run before order(), an ordered cart answers 422
+    // Writes the header fields onto the open cart; must run before placeOrder(), an ordered cart answers 422
     public saveHeader(sCartUuid: string, oFields: Partial<CartHeaderFields>): Promise<void> {
         const oCartODataModel = this._getCartODataModel();
         if (!oCartODataModel || !sCartUuid) {
@@ -359,7 +359,7 @@ export default class CartService {
     }
 
     // Places the open cart; saveHeader() has to run first
-    public order(sCartUuid: string): Promise<void> {
+    public placeOrder(sCartUuid: string): Promise<void> {
         const oCartODataModel = this._getCartODataModel();
         if (!oCartODataModel || !sCartUuid) {
             return Promise.reject(new Error("order: no cart service model or cart UUID"));
@@ -376,7 +376,7 @@ export default class CartService {
     }
 
     // Units per add; one backend call each, so the number stays bounded
-    public static units(nQuantity: number): number {
+    public static clampUnits(nQuantity: number): number {
         return Math.min(Constants.UI.STEP_INPUT_MAX, Math.max(1, Math.round(nQuantity)));
     }
 
@@ -402,13 +402,13 @@ export default class CartService {
 
     // Adds units of a product and syncs; rejects with the first backend error
     public addToCart(oProduct: CatalogProduct, nQuantity = 1, fnProgress?: (nDone: number, nTotal: number) => void): Promise<void> {
-        const nUnits = CartService.units(nQuantity);
+        const nUnits = CartService.clampUnits(nQuantity);
         this._setBusy(true);
 
         // Busy until the sync is through, so a second click cannot act on stale positions
         return this._addUnits(oProduct, nUnits, fnProgress).then(
-            () => this.sync().then(() => { this._setBusy(false); }),
-            (oErr: unknown) => this.sync().then(() => {
+            () => this.syncFromBackend().then(() => { this._setBusy(false); }),
+            (oErr: unknown) => this.syncFromBackend().then(() => {
                 this._setBusy(false);
                 throw oErr;
             })
@@ -457,18 +457,18 @@ export default class CartService {
         this._setBusy(true);
         return Promise.allSettled(
             aTargets.map((sUuid) => removeOnce(oCartODataModel, `${Constants.ODATA.ENTITY_CART_ITEM}(guid'${sUuid}')`))
-        ).then((aResults) => this.sync().then(() => {
+        ).then((aResults) => this.syncFromBackend().then(() => {
             this._setBusy(false);
             const oFailed = aResults.find((r) => r.status === "rejected");
             if (oFailed) {throw oFailed.reason;}
         }));
     }
 
-    // Shows the new units until sync() replaces them; rows are replaced, never mutated in place
+    // Shows the new units until syncFromBackend() replaces them; rows are replaced, never mutated in place
     private _addOptimistic(oProduct: CatalogProduct, nUnits: number): void {
         const aItems = [...this.getItems()];
-        const sKey = CartService.matchKey({ material: oProduct.Material, uuid: oProduct.CatalogItemUuid });
-        const nExisting = aItems.findIndex((i) => CartService.matchKey(i) === sKey);
+        const sKey = CartService.productMatchKey({ material: oProduct.Material, uuid: oProduct.CatalogItemUuid });
+        const nExisting = aItems.findIndex((i) => CartService.productMatchKey(i) === sKey);
 
         if (nExisting >= 0) {
             const oExisting = aItems[nExisting];
@@ -486,7 +486,7 @@ export default class CartService {
                 pending: true,
                 name: oProduct.ProductName,
                 material: oProduct.Material,
-                price: CartService.toNum(oProduct.NetPriceAmount),
+                price: CartService.toNumber(oProduct.NetPriceAmount),
                 currency: oProduct.TransactionCurrency || "EUR",
                 pictureUrl: oProduct.ProductPictureUrl,
                 quantity: nUnits
@@ -536,14 +536,14 @@ export default class CartService {
 
     // Puts an order back into the cart line by line, so one refused article does not stop the rest
     public reorder(aItems: ReorderItem[], fnProgress?: (nDone: number, nTotal: number) => void): Promise<ReorderResult> {
-        const nTotal = aItems.reduce((s, i) => s + CartService.units(i.quantity), 0);
+        const nTotal = aItems.reduce((s, i) => s + CartService.clampUnits(i.quantity), 0);
 
         // nDone is passed along so every step reports progress against the count really reached
         const step = (nIndex: number, oResult: ReorderResult, nDone: number): Promise<ReorderResult> => {
             const oItem = aItems[nIndex];
             if (!oItem) {return Promise.resolve(oResult);}
 
-            const nUnits = CartService.units(oItem.quantity);
+            const nUnits = CartService.clampUnits(oItem.quantity);
             return this.resolveCatalogUuid(oItem)
                 // _addUnits, not addToCart: one sync for the whole reorder instead of one per line
                 .then((sCatalogUuid) => this._addUnits({
@@ -552,7 +552,7 @@ export default class CartService {
                     Material: oItem.material,
                     NetPriceAmount: oItem.price,
                     TransactionCurrency: oItem.currency,
-                    // Not on the order position; sync() and enrichFromCatalog() fill it in
+                    // Not on the order position; syncFromBackend() and enrichFromCatalog() fill it in
                     ProductPictureUrl: ""
                 }, nUnits, (n) => fnProgress?.(nDone + n, nTotal)))
                 .then(() => {
@@ -569,7 +569,7 @@ export default class CartService {
 
         this._setBusy(true);
         return step(0, { added: 0, failed: [] }, 0)
-            .then((oResult) => this.sync().then(() => oResult))
+            .then((oResult) => this.syncFromBackend().then(() => oResult))
             .then(
                 (oResult) => { this._setBusy(false); return oResult; },
                 (oErr: unknown) => { this._setBusy(false); throw oErr; }
@@ -579,7 +579,7 @@ export default class CartService {
     // -- Backend sync -- //
 
     // Re-reads the cart and merges it into the cart model; a failed read keeps the local cart
-    public sync(): Promise<void> {
+    public syncFromBackend(): Promise<void> {
         const oCartODataModel = this._getCartODataModel();
         const oCartModel = this._getCartModel();
         if (!oCartODataModel || !oCartModel) {
@@ -640,7 +640,7 @@ export default class CartService {
             const aRaw = Array.isArray(vItems) ? vItems : (vItems?.results ?? []);
             return {
                 cartUuid: oRow.ShoppingCartUuid ?? "",
-                totalAmount: CartService.toNum(oRow.NetAmount),
+                totalAmount: CartService.toNumber(oRow.NetAmount),
                 totalCurrency: oRow.CurrencyCode ?? "EUR",
                 fields: CartService.trimHeaderFields(oRow),
                 items: CartService.groupItems(CartService.mapRawItems(aRaw))
@@ -684,7 +684,7 @@ export default class CartService {
                 if (sMaterial && !mCatalog.has(sMaterial)) {
                     mCatalog.set(sMaterial, {
                         uuid: asText(r.CatalogItemUuid),
-                        price: CartService.toNum(r.NetPriceAmount),
+                        price: CartService.toNumber(r.NetPriceAmount),
                         currency: asText(r.TransactionCurrency) || "EUR"
                     });
                 }

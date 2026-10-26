@@ -15,7 +15,7 @@ export default class OrderConfirmController extends BaseController {
     }
 
     private _onRouteMatched(): void {
-        const sOrderUuid = String(this._json(Constants.MODELS.ORDER_CONFIRM)?.getProperty("/orderUuid") ?? "");
+        const sOrderUuid = String(this._jsonModel(Constants.MODELS.ORDER_CONFIRM)?.getProperty("/orderUuid") ?? "");
 
         // Opened by URL without an order: go home
         if (!sOrderUuid) {

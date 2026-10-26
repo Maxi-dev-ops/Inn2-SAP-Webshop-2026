@@ -160,7 +160,7 @@ export default class ProductListController extends BaseController {
                 title: oCatalog.Title || this._getText("catalogFallback", [oCatalog.CatalogId])
             }))
         ];
-        this._json("plpView").setProperty("/categoryChips", aChips);
+        this._jsonModel("plpView").setProperty("/categoryChips", aChips);
         this._highlightActiveChip();
     }
 
@@ -391,12 +391,12 @@ export default class ProductListController extends BaseController {
         const oData = this._ctxObject<CatalogProduct>(oEvent);
         if (!oData) {return;}
 
-        const oModel = this._json("cartDialog");
+        const oModel = this._jsonModel("cartDialog");
         oModel.setData({
             uuid: oData.CatalogItemUuid,
             name: oData.ProductName,
             material: oData.Material,
-            price: CartService.toNum(oData.NetPriceAmount),
+            price: CartService.toNumber(oData.NetPriceAmount),
             currency: oData.TransactionCurrency,
             pictureUrl: oData.ProductPictureUrl,
             quantity: Constants.UI.STEP_INPUT_MIN,
@@ -417,7 +417,7 @@ export default class ProductListController extends BaseController {
 
     private _loadDialogDetails(sUuid: string): void {
         const oODataModel = this.getOwnerComponent().getModel() as ODataModel;
-        const oDialogModel = this._json("cartDialog");
+        const oDialogModel = this._jsonModel("cartDialog");
 
         readOnce<{
             ProductSalesDescription?: string;
@@ -449,7 +449,7 @@ export default class ProductListController extends BaseController {
     }
 
     public onConfirmAddToCart(): void {
-        const oModel = this._json("cartDialog");
+        const oModel = this._jsonModel("cartDialog");
         const oProduct: CatalogProduct = {
             CatalogItemUuid: oModel.getProperty("/uuid") as string,
             ProductName: oModel.getProperty("/name") as string,
@@ -486,7 +486,7 @@ export default class ProductListController extends BaseController {
             uuid: oData.CatalogItemUuid,
             name: oData.ProductName,
             material: oData.Material,
-            price: CartService.toNum(oData.NetPriceAmount),
+            price: CartService.toNumber(oData.NetPriceAmount),
             currency: oData.TransactionCurrency,
             pictureUrl: oData.ProductPictureUrl
         };

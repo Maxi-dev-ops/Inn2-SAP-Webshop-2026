@@ -51,7 +51,7 @@ export default class App extends BaseController {
         CatalogService.load(oComponent).catch(() => undefined); // already logged
 
         // Fills the shell badge and the cart model from the backend on app start
-        void new CartService(oComponent).sync();
+        void new CartService(oComponent).syncFromBackend();
 
         // Starts the check whether the stored lists still belong to this user
         void listsReady().then((bDropped) => {

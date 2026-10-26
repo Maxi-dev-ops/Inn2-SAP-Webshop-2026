@@ -35,8 +35,8 @@ export default class OrderHistoryController extends BaseController {
 
     // -- Lifecycle & loading -- //
 
-    private _model(): JSONModel {
-        return this._json(OrderHistoryController.MODEL);
+    private _orderHistoryModel(): JSONModel {
+        return this._jsonModel(OrderHistoryController.MODEL);
     }
 
     public onInit(): void {
@@ -57,7 +57,7 @@ export default class OrderHistoryController extends BaseController {
     private static readonly VIEW_OLDER = "older";
 
     private _onRouteMatched(): void {
-        const oModel = this._model();
+        const oModel = this._orderHistoryModel();
         oModel.setProperty("/loading", true);
         this._setVisibility(oModel);
 
@@ -70,7 +70,7 @@ export default class OrderHistoryController extends BaseController {
     }
 
     private _setOrders(aOrders: Order[]): void {
-        const oModel = this._model();
+        const oModel = this._orderHistoryModel();
         this._markMatches(aOrders);
         oModel.setProperty("/orders", aOrders);
         oModel.setProperty("/loading", false);
@@ -119,7 +119,7 @@ export default class OrderHistoryController extends BaseController {
     }
 
     private _isOlderView(): boolean {
-        return this._model().getProperty("/view") === OrderHistoryController.VIEW_OLDER;
+        return this._orderHistoryModel().getProperty("/view") === OrderHistoryController.VIEW_OLDER;
     }
 
     // Heading above a group
@@ -145,7 +145,7 @@ export default class OrderHistoryController extends BaseController {
 
     // Recent / older switch at the top
     public onSelectView(oEvent: SegmentedButton$SelectionChangeEvent): void {
-        const oModel = this._model();
+        const oModel = this._orderHistoryModel();
         const sKey = oEvent.getParameter("item")?.getKey() ?? OrderHistoryController.VIEW_RECENT;
 
         if (sKey === OrderHistoryController.VIEW_OLDER && (oModel.getProperty("/olderCount") as number) === 0) {
@@ -165,7 +165,7 @@ export default class OrderHistoryController extends BaseController {
 
     // Bound to liveChange and search, so typing and the clear button both land here
     public onSearchOrders(oEvent: Event<object, SearchField>): void {
-        const oModel = this._model();
+        const oModel = this._orderHistoryModel();
         oModel.setProperty("/query", oEvent.getSource().getValue());
         this._markMatches((oModel.getProperty("/orders") as Order[] | undefined) ?? []);
         this._setVisibility(oModel);
@@ -173,7 +173,7 @@ export default class OrderHistoryController extends BaseController {
     }
 
     private _markMatches(aOrders: Order[]): void {
-        const sQuery = String(this._model().getProperty("/query") ?? "");
+        const sQuery = String(this._orderHistoryModel().getProperty("/query") ?? "");
         aOrders.forEach((o) => { o.match = OrderService.matchesQuery(o, sQuery); });
     }
 
@@ -185,7 +185,7 @@ export default class OrderHistoryController extends BaseController {
         if (!oCtx) { return; }
 
         const sPath = oCtx.getPath();
-        const oModel = this._model();
+        const oModel = this._orderHistoryModel();
         const oOrder = oCtx.getObject() as Order;
         const bExpanded = !oOrder.expanded;
         oModel.setProperty(`${sPath}/expanded`, bExpanded);
@@ -210,7 +210,7 @@ export default class OrderHistoryController extends BaseController {
         const oCtx = oEvent.getSource().getBindingContext(OrderHistoryController.MODEL);
         if (!oCtx || !this._cartService) {return;}
 
-        const oModel = this._model();
+        const oModel = this._orderHistoryModel();
         if (oModel.getProperty("/reordering") === true) {return;}
 
         const sPath = oCtx.getPath();
@@ -251,7 +251,7 @@ export default class OrderHistoryController extends BaseController {
         if (oOrder.itemsLoaded) {return Promise.resolve(oOrder.items);}
 
         return OrderService.loadItems(this.getOwnerComponent(), oOrder.cartUuid).then((aItems) => {
-            const oModel = this._model();
+            const oModel = this._orderHistoryModel();
             oModel.setProperty(`${sPath}/items`, aItems);
             oModel.setProperty(`${sPath}/itemCount`, aItems.reduce((s, i) => s + i.quantity, 0));
             oModel.setProperty(`${sPath}/itemsLoaded`, true);

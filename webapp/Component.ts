@@ -1,4 +1,5 @@
 import BaseComponent from "sap/ui/core/UIComponent";
+import Device from "sap/ui/Device";
 import JSONModel from "sap/ui/model/json/JSONModel";
 import ResourceModel from "sap/ui/model/resource/ResourceModel";
 import ResourceBundle from "sap/base/i18n/ResourceBundle";
@@ -19,6 +20,7 @@ export default class Component extends BaseComponent {
 	private _oErrorHandler?: ErrorHandler;
 
 	public init() : void {
+		this._applyContentDensity();
 		super.init();
 
 		// Central handler for fatal OData errors
@@ -43,5 +45,12 @@ export default class Component extends BaseComponent {
 
 	public exit(): void {
 		this._oErrorHandler?.destroy();
+	}
+
+	private _applyContentDensity(): void {
+		// eslint-disable-next-line @sap-ux/fiori-tools/sap-browser-api-warning, @sap-ux/fiori-tools/sap-no-proprietary-browser-api -- no jQuery in this app
+		const oClasses = document.body.classList;
+		if (oClasses.contains("sapUiSizeCompact") || oClasses.contains("sapUiSizeCozy")) {return;}
+		oClasses.add(Device.support.touch ? "sapUiSizeCozy" : "sapUiSizeCompact");
 	}
 }

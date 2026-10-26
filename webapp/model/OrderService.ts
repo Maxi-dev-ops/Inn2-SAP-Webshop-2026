@@ -106,7 +106,7 @@ export default class OrderService {
 
     public static mapOrders(aRaw: RawOrder[], dNow = new Date()): Order[] {
         const aSubmitted = aRaw.filter((r) => r.orderShoppingCart_ac === false && !!r.ShoppingCartUuid);
-        return OrderService.byAge(OrderService.mapSubmitted(aSubmitted), aSubmitted, dNow);
+        return OrderService.bucketByAge(OrderService.mapSubmitted(aSubmitted), aSubmitted, dNow);
     }
 
     private static mapSubmitted(aRaw: RawOrder[]): Order[] {
@@ -119,13 +119,13 @@ export default class OrderService {
                 date: OrderService.formatDate(r.CreationDateTime),
                 status: r.ApproverStatus ?? "",
                 statusText: (r.to_ApproverStatus?.DomainValue_Text ?? "").trim(),
-                statusCriticality: CartService.toNum(r.ApproverStatusCriticality),
+                statusCriticality: CartService.toNumber(r.ApproverStatusCriticality),
                 reference: (r.ExternalReference ?? "").trim(),
                 remark: (r.Remark ?? "").trim(),
                 deliveryAddress: OrderService.formatAddress(r),
                 match: true,
                 itemCount: 0,
-                totalAmount: CartService.toNum(r.NetAmount),
+                totalAmount: CartService.toNumber(r.NetAmount),
                 currency: r.CurrencyCode ?? "EUR",
                 items: [],
                 expanded: false,
@@ -133,7 +133,8 @@ export default class OrderService {
             }));
     }
 
-    public static byAge(aOrders: Order[], aRaw: RawOrder[], dNow = new Date()): Order[] {
+    // Marks orders older than RECENT_MONTHS and drops those beyond MAX_AGE_MONTHS
+    public static bucketByAge(aOrders: Order[], aRaw: RawOrder[], dNow = new Date()): Order[] {
         const monthsAgo = (nMonths: number): number => {
             const d = new Date(dNow.getTime());
             d.setMonth(d.getMonth() - nMonths);

@@ -90,7 +90,7 @@ export default class HomeController extends BaseController {
     }
 
     private _getHomeModel(): JSONModel {
-        return this._json("home");
+        return this._jsonModel("home");
     }
 
     // -- Data loading -- //
@@ -123,7 +123,7 @@ export default class HomeController extends BaseController {
                     uuid: r.CatalogItemUuid ?? "",
                     name: r.ProductName ?? "",
                     material: r.Material ?? "",
-                    price: CartService.toNum(r.NetPriceAmount),
+                    price: CartService.toNumber(r.NetPriceAmount),
                     currency: r.TransactionCurrency ?? "EUR",
                     pictureUrl: r.ProductPictureUrl ?? ""
                 }));
