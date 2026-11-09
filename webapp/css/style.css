@@ -56,6 +56,15 @@
 .rsCartSummaryPanel .sapMTitle,
 .rsOrderSidePanel .sapMTitle { font-size: 1.05rem !important; }
 
+/* Phone (cart, checkout, order history): the side panel moves below the main column */
+@media (max-width: 599px) {
+    .rsSidePanelLayout.sapMHBox { margin: 1rem 1rem 0 !important; }
+    .rsSidePanelLayout > .rsCartItemsColumn { flex: 1 1 100%; min-width: 0; margin-right: 0 !important; }
+    /* The panel is not a FlexBox, so its wrapper div is the flex item; !important beats the wrapper's inline flex styles */
+    .rsSidePanelLayout > .sapMFlexItem:last-child { flex: 1 1 100% !important; min-width: 0; margin-top: 16px; }
+    .rsSidePanelLayout :is(.rsCartSummaryPanel, .rsOrderSidePanel).sapMPanel { min-width: 0; position: static; }
+}
+
 /* -- SHARED: sapMList as CSS-grid container -- */
 :is(.rsProductGrid, .rsBundleGrid, .rsCartDialogBundleList):is(.sapMList) {
     background: transparent !important;
@@ -159,6 +168,19 @@
     z-index: 200 !important;
 }
 
+/* Phone (below 600px, as sap.ui.Device): icons only, the search takes the space the Bar leaves between them */
+@media (max-width: 599px) {
+    .rsShellLogoBtn.sapMBtn .sapMBtnInner { padding: 0 !important; }
+    .rsShellLogoBtn.sapMBtn .sapMBtnIcon { margin: 0 !important; }
+    /* Hidden visually only, so the text stays the button's accessible name */
+    .rsShellLogoBtn .sapMBtnContent {
+        position: absolute !important;
+        width: 1px !important; height: 1px !important;
+        overflow: hidden !important; clip: rect(0 0 0 0) !important; white-space: nowrap !important;
+    }
+    .rsShellBar .sapMSF { width: 100% !important; }
+}
+
 /* -- HERO BANNER -- */
 .rsHeroBanner,
 .rsHeroBanner.sapMPanel {
@@ -215,6 +237,24 @@
 }
 .rsHeroCustomerLogo,
 .rsHeroCustomerLogo img { max-width: 100% !important; max-height: 138px !important; object-fit: contain !important; }
+
+/* Phone: text across the full width, smaller title, logo box below the text */
+@media (max-width: 599px) {
+    .rsHeroBannerInner.sapMHBox { flex-direction: column !important; align-items: stretch !important; padding: 24px 20px; min-height: 0; }
+    .rsHeroContent { max-width: none; }
+    .rsHeroContent > .sapMHBox { flex-wrap: wrap; row-gap: 8px; }
+    .rsHeroTitle,
+    .rsHeroTitle.sapMTitle,
+    .rsHeroTitle span,
+    .rsHeroTitle .sapMTitleInner { font-size: 1.75rem !important; }
+    .rsHeroText,
+    .rsHeroText.sapMText,
+    .rsHeroText span,
+    .rsHeroText .sapMTextInner { font-size: 0.95rem !important; }
+    .rsHeroCustomerBox { width: auto; height: 96px; margin: 20px 0 0; padding: 12px; }
+    .rsHeroCustomerLogo,
+    .rsHeroCustomerLogo img { max-height: 72px !important; }
+}
 
 /* -- CATEGORY PILLS -- */
 /* Horizon transparent Button restyled as a pill (radius + colors only) */
@@ -375,6 +415,18 @@
 .rsPriceInput { width: 100% !important; }
 .rsEmptyResultState { width: 100% !important; padding: 60px 20px !important; text-align: center !important; color: var(--rs-color-text-muted) !important; }
 
+/* Phone: filters stack above the results, the sort select gets its own row */
+@media (max-width: 599px) {
+    .rsProductListLayout.sapMHBox { flex-direction: column !important; align-items: stretch !important; }
+    .rsProductListLayout > .rsFilterPanel { width: auto; min-width: 0; margin: 1rem 1rem 0 !important; }
+    .rsProductListLayout > .rsProductListContent { width: auto !important; margin: 1rem 1rem 0 !important; }
+    .rsFilterPanel .rsFilterDivider { margin: 0.75rem 0 !important; }
+    .rsResultBar.sapMHBox { flex-wrap: wrap !important; gap: 8px; padding: 12px 16px; margin-bottom: 16px !important; }
+    .rsResultBarSort { width: 100%; }
+    .rsResultBarSort > .sapMFlexItem:last-child { flex: 1 1 auto !important; min-width: 0; }
+    .rsResultBarSort .sapMSlt { width: 100% !important; }
+}
+
 /* -- PRODUCT DETAIL -- */
 .rsProductDetailId .sapMText { color: var(--rs-color-text-muted) !important; font-size: 0.85rem !important; }
 .rsProductPriceLabel .sapMText { color: var(--rs-color-text-light) !important; font-size: 0.78rem !important; }
@@ -411,6 +463,20 @@
 .rsPdpQtyLabel.sapMLabel { font-weight: 600 !important; margin-right: 14px !important; }
 .rsPdpCartBtn { width: 100% !important; }
 
+/* Phone: name and price stacked, picture above the order panel */
+@media (max-width: 599px) {
+    .rsDetailHeader.sapMHBox { flex-direction: column !important; align-items: stretch !important; gap: 12px; }
+    .rsDetailHeader .sapMTitle { white-space: normal !important; }
+    /* Price lines on the left, the heart (first child) on the right next to them */
+    .rsDetailPriceBlock.sapMVBox { display: grid !important; grid-template-columns: 1fr auto; align-items: center; }
+    .rsDetailPriceBlock > :first-child { grid-column: 2; grid-row: 1 / span 3; }
+    .rsDetailMainImagePanel img,
+    .rsDetailMainImage { height: 220px !important; padding: 12px !important; }
+    .rsDetailLayout.sapMHBox { grid-template-columns: 1fr !important; gap: 16px !important; }
+    .rsDetailLayout > .rsDetailImageColumn { margin-right: 0 !important; }
+    .rsDetailConfigPanel.sapMPanel { min-width: 0; }
+}
+
 /* -- CART -- */
 .rsCartItemsColumn { flex: 1 1 0%; min-width: 300px; }
 .rsCartItem { padding: 16px; width: 100%; gap: 16px; }
@@ -443,6 +509,13 @@
 .rsCartSummaryPanel.sapMPanel { flex: 0 0 380px; min-width: 320px; }
 .rsCartSummaryPanel .sapMHBox { gap: 12px; }
 .rsCartTrustBadges { padding-top: 12px; border-top: 1px solid #f0f0f0; }
+
+/* Phone: a cart row in two lines (picture + name, quantity + price) */
+@media (max-width: 599px) {
+    .rsCartItemGrid.sapMHBox { grid-template-columns: 80px 1fr auto !important; gap: 12px !important; }
+    .rsCartItemGrid.sapMHBox > .sapMFlexItem:nth-child(2) { grid-column: 2 / -1; }
+    .rsCartItemGrid.sapMHBox > .sapMFlexItem:nth-child(3) { grid-column: 1 / 3; }
+}
 
 .rsGreen .sapMText,
 .rsGreen.sapMText { color: var(--rs-color-success) !important; font-weight: 600 !important; }
@@ -482,6 +555,11 @@ body > div { height: 100% !important; overflow: hidden !important; }
 .rsProductCard.sapMVBox { height: 100% !important; display: flex !important; flex-direction: column !important; }
 .rsProductPrice .sapMText { font-size: 1.25rem !important; font-weight: 700 !important; color: var(--rs-color-text) !important; }
 
+/* Phone: one card per row across the full width (product list, home, wishlist) */
+@media (max-width: 599px) {
+    .rsProductGrid.sapMList .sapMListItems { grid-template-columns: 1fr !important; gap: 16px !important; }
+}
+
 /* -- BUNDLE GRID -- */
 .rsBundleGrid.sapMList .sapMListItems { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important; gap: 12px !important; }
 .rsBundleCard {
@@ -505,6 +583,14 @@ body > div { height: 100% !important; overflow: hidden !important; }
 .rsBundleCardBody { padding: 10px 12px !important; }
 .rsBundleCardBody .rsProductCardTitle .sapMTitle { font-size: 0.8rem !important; }
 .rsBundleCardBody .rsProductCardId .sapMText { font-size: 0.68rem !important; }
+
+/* Phone: two components per row instead of one oversized card */
+@media (max-width: 599px) {
+    .rsBundleGrid.sapMList .sapMListItems { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+    .rsBundleCardImageWrap { height: 96px; }
+    .rsBundleCardImageWrap .sapMImg img,
+    .rsBundleCardImageWrap img { max-height: 96px !important; }
+}
 
 /* -- ORDER CONFIRM -- */
 .rsOrderConfirmPage { max-width: 640px !important; margin: 0 auto !important; padding: 64px 24px !important; text-align: center !important; }

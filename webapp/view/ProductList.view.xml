@@ -25,7 +25,6 @@
                         placeholder="{i18n>searchPlaceholder}"
                         tooltip="{i18n>searchAriaLabel}"
                         ariaLabelledBy="plpSearchLabel"
-                        width="400px"
                         liveChange="onSearchLive"
                         search="onSearch"
                         class="rsShellSearch"/>

@@ -39,7 +39,7 @@
             <!-- Same split as the cart: list on the left, narrow column on the right -->
             <HBox
                 visible="{orderHistoryModel>/hasOrders}"
-                class="sapUiMediumMarginBeginEnd sapUiMediumMarginTop"
+                class="rsSidePanelLayout sapUiMediumMarginBeginEnd sapUiMediumMarginTop"
                 wrap="Wrap"
                 alignItems="Start">
 
@@ -147,7 +147,7 @@
                                 </HBox>
 
                                 <!-- Details toggle + reorder -->
-                                <HBox alignItems="Center" justifyContent="SpaceBetween" class="sapUiTinyMarginTop">
+                                <HBox alignItems="Center" justifyContent="SpaceBetween" wrap="Wrap" class="sapUiTinyMarginTop">
                                     <Button
                                         text="{
                                             path: 'orderHistoryModel>expanded',

@@ -57,7 +57,7 @@
             <!-- Cart with items -->
             <HBox
                 visible="{cartModel>/showItems}"
-                class="sapUiMediumMarginBeginEnd sapUiMediumMarginTop"
+                class="rsSidePanelLayout sapUiMediumMarginBeginEnd sapUiMediumMarginTop"
                 wrap="Wrap"
                 alignItems="Start">
 

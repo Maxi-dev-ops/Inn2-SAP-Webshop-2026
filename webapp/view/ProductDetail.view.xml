@@ -20,7 +20,6 @@
                         placeholder="{i18n>searchPlaceholder}"
                         tooltip="{i18n>searchAriaLabel}"
                         ariaLabelledBy="pdpSearchLabel"
-                        width="400px"
                         search="onSearch"
                         class="rsShellSearch"/>
                 </contentMiddle>
@@ -34,7 +33,7 @@
 
             <!-- Product header -->
             <HBox
-                class="sapUiMediumMarginBeginEnd sapUiSmallMarginBottom sapUiMediumMarginTop"
+                class="rsDetailHeader sapUiMediumMarginBeginEnd sapUiSmallMarginBottom sapUiMediumMarginTop"
                 justifyContent="SpaceBetween"
                 alignItems="Start">
                 <VBox>
@@ -45,7 +44,7 @@
                         </VBox>
                     </HBox>
                 </VBox>
-                <VBox alignItems="End">
+                <VBox alignItems="End" class="rsDetailPriceBlock">
                     <!-- Wishlist heart -->
                     <Button
                         id="pdpWishlistBtn"
