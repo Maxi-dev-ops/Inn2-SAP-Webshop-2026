@@ -34,9 +34,9 @@
     "start-mock": "fiori run --config ./ui5-mock.yaml --open \"index.html?sap-ui-xx-viewCache=false\"",
     "start-t4e": "ui5 serve --config ./ui5-t4e.yaml --open \"index.html?sap-ui-xx-viewCache=false\"",
     "start-t4e-flp": "ui5 serve --config ./ui5-t4e.yaml --open \"test/flp.html?sap-ui-xx-viewCache=false&sap-language=DE#ZWebshop-display\"",
-    "int-test": "fiori run --config ./ui5-mock.yaml --open \"test/integration/opaTests.qunit.html\"",
-    "start-variants-management": "fiori run --open \"/preview.html#app-preview\"",
-    "unit-test": "fiori run --config ./ui5-mock.yaml --open \"test/unit/unitTests.qunit.html\""
+    "start-dist": "npm run build && ui5 serve --config ./ui5-dist.yaml --open \"index.html\"",
+    "start-dist-flp": "npm run build && ui5 serve --config ./ui5-dist.yaml --open \"test/flp.html?sap-ui-xx-componentPreload=async&sap-language=DE#ZWebshop-display\"",
+    "start-variants-management": "fiori run --open \"/preview.html#app-preview\""
   },
   "sapuxLayer": "CUSTOMER_BASE"
 }

@@ -12,12 +12,6 @@
     "paths": {
       "com/sapwebshop2026/sapwebshop/*": [
         "./webapp/*"
-      ],
-      "unit/*": [
-        "./webapp/test/unit/*"
-      ],
-      "integration/*": [
-        "./webapp/test/integration/*"
       ]
     },
     "typeRoots": [

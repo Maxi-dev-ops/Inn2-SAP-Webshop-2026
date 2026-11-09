@@ -1,0 +1,39 @@
+# yaml-language-server: $schema=https://sap.github.io/ui5-tooling/schema/ui5.yaml.json
+
+specVersion: "4.0"
+metadata:
+  name: com.sapwebshop2026.sapwebshop
+type: application
+# Serves the built app (npm run build) with UI5 1.102.8 from T4E, as the launchpad will run it
+resources:
+  configuration:
+    paths:
+      webapp: dist
+server:
+  # Own port, so the browser cache never mixes built files with the sources from start-t4e
+  settings:
+    httpPort: 8100
+  customMiddleware:
+    - name: fiori-tools-proxy
+      afterMiddleware: compression
+      configuration:
+        ignoreCertErrors: false
+        backend:
+          - path: /resources
+            pathReplace: /sap/public/bc/ui5_ui5/resources
+            url: http://tld-vm-t4e.telekom.site:50000
+            client: '100'
+            destination: T4ECLNT100
+          - path: /sap
+            url: http://tld-vm-t4e.telekom.site:50000
+            client: '100'
+            destination: T4ECLNT100
+    # No transpile middleware: dist also contains the .ts sources, which must not be served transpiled again
+    - name: fiori-tools-preview
+      afterMiddleware: compression
+      configuration:
+        flp:
+          theme: sap_horizon
+          intent:
+            object: ZWebshop
+            action: display
