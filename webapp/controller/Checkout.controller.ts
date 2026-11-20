@@ -1,12 +1,14 @@
 import BaseController from "./BaseController";
 import JSONModel from "sap/ui/model/json/JSONModel";
 import MessageToast from "sap/m/MessageToast";
-import MessageBox from "sap/m/MessageBox";
+import Input from "sap/m/Input";
+import Event from "sap/ui/base/Event";
 import DateFormat from "sap/ui/core/format/DateFormat";
 import { type Router$RouteMatchedEvent } from "sap/ui/core/routing/Router";
 import formatter from "../model/formatter";
 import CartService, { CartHeaderFields, CartState, HeaderField } from "../model/CartService";
 import Constants from "../model/Constants";
+import { FieldError } from "../model/validation";
 
 /**
  * Last step before the order: customer reference, remark and a deviating delivery address
@@ -21,6 +23,15 @@ export default class CheckoutController extends BaseController {
         Constants.ROUTES.CART, Constants.ROUTES.CHECKOUT,
         Constants.ROUTES.WISHLIST, Constants.ROUTES.PROFILE
     ];
+
+    // Checked fields in the order the form shows them, so the focus lands on the topmost error
+    private static readonly FIELD_IDS: Readonly<Partial<Record<HeaderField, string>>> = {
+        ExternalReference: "checkoutExternalReference",
+        DeliveryStreet: "checkoutStreet",
+        DeliveryPostalCode: "checkoutPostalCode",
+        DeliveryCity: "checkoutCity",
+        DeliveryCountry: "checkoutCountry"
+    };
 
     private _cartService: CartService | undefined;
 
@@ -123,40 +134,51 @@ export default class CheckoutController extends BaseController {
 
     // Unchecking only hides the address; what was typed stays in the model so re-checking brings it back
     public onToggleDeviatingAddress(): void {
-        this._clearFieldStates();
+        // Freshly shown empty fields are not wrong yet, they are checked on leaving or on order
+        this._showErrors({}, CartService.DELIVERY_FIELDS);
     }
 
-    // Clears the red frame as soon as the user types, instead of leaving it until the next order
-    public onFieldChange(): void {
-        this._clearFieldStates();
-    }
-
-    private _clearFieldStates(): void {
-        const oModel = this._jsonModel(Constants.MODELS.CHECKOUT);
-        for (const sKey of CartService.headerFieldNames()) {
-            oModel.setProperty(`/states/${sKey}`, "None");
-            oModel.setProperty(`/stateTexts/${sKey}`, "");
+    // Checks the field the user just left (change fires on focus out or Enter); only its own frame changes
+    public onFieldChange(oEvent: Event<object, Input>): void {
+        const sKey = oEvent.getSource().getBindingPath("value")?.split("/").pop() as HeaderField | undefined;
+        if (!sKey) {return;}
+        const aKeys: HeaderField[] = [sKey];
+        // The postal code shape follows the country, so a new country re-checks a postal code already typed
+        if (sKey === "DeliveryCountry" && this._jsonModel(Constants.MODELS.CHECKOUT).getProperty("/fields/DeliveryPostalCode")) {
+            aKeys.push("DeliveryPostalCode");
         }
+        this._showErrors(this._formErrors(), aKeys);
     }
 
-    // Marks every field that blocks the order; true when none does
-    private _validateForm(): boolean {
+    private _formErrors(): Partial<Record<HeaderField, FieldError>> {
         const oModel = this._jsonModel(Constants.MODELS.CHECKOUT);
-        this._clearFieldStates();
-
-        const oErrors = CartService.validateHeader(
+        return CartService.validateHeader(
             oModel.getProperty("/fields") as CartHeaderFields,
             oModel.getProperty("/deviatingAddress") as boolean
         );
-        const aKeys = Object.keys(oErrors) as HeaderField[];
+    }
+
+    // Sets the value state of the given fields: red with its message, or back to normal
+    private _showErrors(oErrors: Partial<Record<HeaderField, FieldError>>, aKeys: readonly HeaderField[]): void {
+        const oModel = this._jsonModel(Constants.MODELS.CHECKOUT);
         for (const sKey of aKeys) {
-            oModel.setProperty(`/states/${sKey}`, "Error");
-            oModel.setProperty(`/stateTexts/${sKey}`, this._getText(oErrors[sKey]!));
+            const oError = oErrors[sKey];
+            oModel.setProperty(`/states/${sKey}`, oError ? "Error" : "None");
+            oModel.setProperty(`/stateTexts/${sKey}`, oError ? this._getText(oError.key, oError.args) : "");
         }
-        if (aKeys.length) {
-            MessageBox.warning(this._getText("checkoutFieldsInvalid"));
+    }
+
+    // Marks every field that blocks the order and focuses the topmost; true when none does
+    private _validateForm(): boolean {
+        const oErrors = this._formErrors();
+        this._showErrors(oErrors, CartService.headerFieldNames());
+
+        const sFirst = (Object.keys(CheckoutController.FIELD_IDS) as HeaderField[]).find((sKey) => oErrors[sKey]);
+        if (sFirst) {
+            // The focused field reads out its value state text, so no extra dialog is needed
+            this.byId(CheckoutController.FIELD_IDS[sFirst]!)?.focus();
         }
-        return aKeys.length === 0;
+        return Object.keys(oErrors).length === 0;
     }
 
     // -- Order -- //

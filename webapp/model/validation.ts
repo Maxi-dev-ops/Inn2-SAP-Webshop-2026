@@ -13,9 +13,37 @@ export interface FieldRule {
     messageKey?: string;
 }
 
+// What the form shows at a field: an i18n key plus its placeholder values
+export interface FieldError {
+    key: string;
+    args?: string[];
+}
+
 // Module state as statics, matching the Constants/Service style of this project
 class Shared {
     public static readonly MSG_REQUIRED = "checkoutFieldRequired";
+    // Letters, digits, spaces and the punctuation real addresses use; keeps out ! ? @ < > and the like
+    public static readonly ADDRESS_CHARS = /^[\p{L}\p{M}\p{N} .,'()/&-]+$/u;
+    // Four times the same letter in a row ("xxxx") appears in no street or town name
+    public static readonly REPEATED_LETTER = /(\p{L})\1{3}/iu;
+    // Postal code shape per country from Google libaddressinput, with the first of its examples
+    public static readonly POSTAL_CODES: Readonly<Partial<Record<string, { pattern: RegExp; example: string }>>> = {
+        // German codes run from 01 to 99, a leading 00 is not assigned
+        DE: { pattern: /^(?!00)\d{5}$/, example: "53113" },
+        AT: { pattern: /^\d{4}$/, example: "1010" },
+        CH: { pattern: /^\d{4}$/, example: "8001" },
+        BE: { pattern: /^\d{4}$/, example: "1000" },
+        LU: { pattern: /^\d{4}$/, example: "4750" },
+        DK: { pattern: /^\d{4}$/, example: "8660" },
+        NL: { pattern: /^[1-9]\d{3} ?(?:[A-RT-Z][A-Z]|S[BCE-RT-Z])$/, example: "1234 AB" },
+        FR: { pattern: /^\d{2} ?\d{3}$/, example: "75008" },
+        IT: { pattern: /^\d{5}$/, example: "00144" },
+        ES: { pattern: /^\d{5}$/, example: "28039" },
+        PL: { pattern: /^\d{2}-\d{3}$/, example: "00-950" },
+        CZ: { pattern: /^\d{3} ?\d{2}$/, example: "100 00" },
+        US: { pattern: /^\d{5}(?:[ -]\d{4})?$/, example: "95014" }
+    };
+    public static readonly NOT_COUNTRIES: readonly string[] = ["ZZ", "EU", "EZ", "UN", "QO", "XA", "XB"];
     // Built on first use: constructing the region list per keystroke is wasted work
     public static regionNames: Intl.DisplayNames | null | undefined;
 }
@@ -54,15 +82,35 @@ export function hasAlphanumeric(sValue: string): boolean {
     return /[\p{L}\p{N}]/u.test(sValue);
 }
 
-// Letters, digits, spaces and hyphens, with at least one digit
+// A street or town as people write it: starts with a letter or digit, holds a letter, address punctuation only
+export function isAddressLine(sValue: string): boolean {
+    return sValue.length >= 2
+        && /^[\p{L}\p{N}]/u.test(sValue)
+        && hasLetter(sValue)
+        && Shared.ADDRESS_CHARS.test(sValue)
+        && !Shared.REPEATED_LETTER.test(sValue);
+}
+
+// Letters, digits, spaces and hyphens, with at least one digit; the shape for countries without a pattern
 export function isPostalCode(sValue: string): boolean {
     return /^(?=.*\d)[A-Z0-9][A-Z0-9 -]{1,9}$/.test(sValue);
 }
 
+// Example postal code of a country with a known pattern, or undefined
+export function postalCodeExample(sCountry: string): string | undefined {
+    return Shared.POSTAL_CODES[sCountry]?.example;
+}
+
+// Country-specific shape of a postal code; countries without a pattern are left to isPostalCode
+export function fitsPostalCodeOf(sValue: string, sCountry: string): boolean {
+    const oRule = Shared.POSTAL_CODES[sCountry];
+    return !oRule || oRule.pattern.test(sValue);
+}
+
 // A two-letter country code Intl can name; the backend itself accepts anything that fits
 export function isKnownCountry(sValue: string): boolean {
-    // ZZ is the placeholder CLDR answers with for "unknown region" - it has a name but no country
-    if (!/^[A-Z]{2}$/.test(sValue) || sValue === "ZZ") {return false;}
+    // Codes CLDR names that are no country: unknown region, groupings and pseudo-locales
+    if (!/^[A-Z]{2}$/.test(sValue) || Shared.NOT_COUNTRIES.includes(sValue)) {return false;}
     if (Shared.regionNames === undefined) {
         try {
             Shared.regionNames = new Intl.DisplayNames(["en"], { type: "region" });

@@ -95,7 +95,8 @@
                                         <Title text="{= ${i18n>orderNumberPrefix} + ' ' + ${orderHistoryModel>orderId}}" level="H5" class="rsOrderUuid"/>
                                         <HBox alignItems="Center" class="sapUiTinyMarginTop">
                                             <core:Icon src="sap-icon://calendar" class="sapUiTinyMarginEnd rsOrderDateIcon"/>
-                                            <Text text="{orderHistoryModel>date}" class="rsOrderDate"/>
+                                            <!-- The service has no order date, only when the cart was created -->
+                                            <Text text="{= ${i18n>orderCartCreated} + ' ' + ${orderHistoryModel>date}}" class="rsOrderDate"/>
                                         </HBox>
                                         <HBox
                                             visible="{= !!${orderHistoryModel>reference} }"

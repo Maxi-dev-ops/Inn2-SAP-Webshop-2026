@@ -643,6 +643,7 @@ body > div { height: 100% !important; overflow: hidden !important; }
 .rsProfileHeaderPanel .sapMPanelContent { padding: 24px !important; }
 .rsProfileHeader { gap: 20px; }
 .rsProfileAvatar.sapFAvatar { background-color: var(--rs-color-primary) !important; flex-shrink: 0; }
+.rsProfileAvatar .sapFAvatarInitialsHolder { color: #ffffff !important; }
 .rsProfileName.sapMTitle { font-size: 1.5rem !important; font-weight: 700 !important; color: var(--rs-color-text) !important; }
 .rsProfileInfoRow { padding: 12px 0; border-bottom: 1px solid var(--rs-color-separator); }
 .rsProfileInfoRowLast { border-bottom: none !important; }

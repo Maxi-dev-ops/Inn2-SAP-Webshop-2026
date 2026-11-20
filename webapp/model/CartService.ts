@@ -5,8 +5,8 @@ import Log from "sap/base/Log";
 import Constants from "./Constants";
 import { callOnce, errText, readList, removeOnce, updateOnce } from "./odata";
 import {
-    asText, checkText, FieldRule, hasAlphanumeric, hasLetter, isKnownCountry, isPostalCode,
-    normalizeText
+    asText, checkText, FieldError, FieldRule, fitsPostalCodeOf, hasAlphanumeric, isAddressLine, isKnownCountry,
+    isPostalCode, normalizeText, postalCodeExample
 } from "./validation";
 
 // -- Types -- //
@@ -121,14 +121,16 @@ export default class CartService {
     public static readonly HEADER_RULES: Readonly<Record<HeaderField, FieldRule>> = {
         ExternalReference: { maxLength: 35, check: hasAlphanumeric, messageKey: "validationReference" },
         Remark: { maxLength: 256 },
-        DeliveryStreet: { maxLength: 60, check: hasLetter, messageKey: "validationStreet" },
-        DeliveryCity: { maxLength: 40, check: hasLetter, messageKey: "validationCity" },
+        DeliveryStreet: { maxLength: 60, check: isAddressLine, messageKey: "validationStreet" },
+        DeliveryCity: { maxLength: 40, check: isAddressLine, messageKey: "validationCity" },
         DeliveryPostalCode: { maxLength: 10, upperCase: true, check: isPostalCode, messageKey: "validationPostalCode" },
         DeliveryCountry: { maxLength: 3, upperCase: true, check: isKnownCountry, messageKey: "validationCountry" }
     };
 
+    private static readonly MSG_POSTAL_COUNTRY = "validationPostalCodeCountry";
+
     // The deviating delivery address, only valid as a whole
-    private static readonly DELIVERY_FIELDS: HeaderField[] =
+    public static readonly DELIVERY_FIELDS: readonly HeaderField[] =
         ["DeliveryStreet", "DeliveryPostalCode", "DeliveryCity", "DeliveryCountry"];
 
     // Materials enrichFromCatalog already looked up; a catalog answer does not change between syncs
@@ -310,19 +312,29 @@ export default class CartService {
         return oResult;
     }
 
-    // i18n message key per field that blocks the order; a deviating address must be complete
+    // Message per field that blocks the order; a deviating address must be complete
     public static validateHeader(
         oFields: Partial<CartHeaderFields> | null | undefined,
         bDeviatingAddress: boolean
-    ): Partial<Record<HeaderField, string>> {
+    ): Partial<Record<HeaderField, FieldError>> {
         const oTrimmed = CartService.trimHeaderFields(oFields);
-        const oErrors: Partial<Record<HeaderField, string>> = {};
+        const oErrors: Partial<Record<HeaderField, FieldError>> = {};
         for (const sKey of CartService.headerFieldNames()) {
             const bAddressField = CartService.DELIVERY_FIELDS.includes(sKey);
             // No deviating address wanted: nothing to check
             if (bAddressField && !bDeviatingAddress) {continue;}
             const sMessage = checkText(oTrimmed[sKey], CartService.HEADER_RULES[sKey], bAddressField);
-            if (sMessage) {oErrors[sKey] = sMessage;}
+            if (sMessage) {oErrors[sKey] = { key: sMessage };}
+        }
+        // The postal code shape depends on the country, so it is only checked against a usable one
+        const sPostalCode = oTrimmed.DeliveryPostalCode;
+        const sCountry = oTrimmed.DeliveryCountry;
+        if (bDeviatingAddress && sPostalCode && !oErrors.DeliveryPostalCode && sCountry && !oErrors.DeliveryCountry
+            && !fitsPostalCodeOf(sPostalCode, sCountry)) {
+            oErrors.DeliveryPostalCode = {
+                key: CartService.MSG_POSTAL_COUNTRY,
+                args: [sCountry, postalCodeExample(sCountry) ?? ""]
+            };
         }
         return oErrors;
     }
